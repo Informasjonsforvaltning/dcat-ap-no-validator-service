@@ -48,3 +48,10 @@ To run linters, checkers and tests:
 ```
 % nox
 ```
+##
+```
+% curl -H "Content-Type: text/turtle" \
+  -X POST \
+  --data @file.ttl \
+  http://localhost:8000/validator
+```
