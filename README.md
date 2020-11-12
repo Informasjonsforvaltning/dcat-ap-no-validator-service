@@ -21,14 +21,11 @@ A shacl based validator backend  service for validating catalogs against dcat-ap
 ```
 ### Running the API locally
  Start the endpoint:
-```
-% poetry shell
-% FLASK_APP=dcat_ap_no_validator_service FLASK_ENV=development flask run --port=8080
-```
+ TBD
 ## Running the API in a wsgi-server (gunicorn)
 ```
 % poetry shell
-% gunicorn  --chdir src "dcat_ap_no_validator_service:create_app()"  --config=src/dcat_ap_no_validator_service/gunicorn_config.py
+% gunicorn dcat_ap_no_validator_service:create_app --bind localhost:8080 --worker-class aiohttp.GunicornWebWorker
 ```
 ## Running the wsgi-server in Docker
 To build and run the api in a Docker container:
