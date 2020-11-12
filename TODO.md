@@ -1,0 +1,2 @@
+- [ ] Get SHACL from official sources, e.g. DCAT-AP-NO
+- [ ] Support validation based on both v1.1 and v2

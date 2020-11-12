@@ -1,0 +1,31 @@
+openapi: 3.0.3
+info:
+  title: DCAT-AP-NO validator service
+  description: The service validates a graph against dcat-ap-no specification
+  version: '1.0'
+  contact:
+    name: Digitaliseringsdirektoratet
+    url: 'https://digdir.no'
+  license:
+    name: License of API
+    url: 'http://data.norge.no/nlod/no/2.0'
+servers:
+  - url: https://data.norge.no/validator
+paths:
+  /validator:
+    post:
+      description: Validates RDF graph and generates a validation report
+      requestBody:
+        description: An RDF graph
+        content:
+          text/turtle:
+            schema:
+              type: string
+        required: true
+      responses:
+        200:
+          description: OK
+          content:
+            text/turtle:
+              schema:
+                type: string

@@ -1,0 +1,7 @@
+.gitignore
+Dockerfile
+README.md
+__pycache__
+.venv
+.env
+**/db.json

@@ -1,0 +1,7 @@
+version: '3'
+services:
+  dcat-ap-no-validator-service:
+    build: .
+    image: eu.gcr.io/digdir-fdk-infra/dcat-ap-no-validator-service:test
+    ports:
+      - "8080:8080"
