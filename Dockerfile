@@ -15,4 +15,4 @@ ADD src /app/src
 
 EXPOSE 8080
 
-CMD gunicorn  --chdir src "dcat_ap_no_validator_service:create_app()"  --config=src/dcat_ap_no_validator_service/gunicorn_config.py
+CMD gunicorn  --chdir src "dcat_ap_no_validator_service:create_app"  --config=src/dcat_ap_no_validator_service/gunicorn_config.py --worker-class aiohttp.GunicornWebWorker
