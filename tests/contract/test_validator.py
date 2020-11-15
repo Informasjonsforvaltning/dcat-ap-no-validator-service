@@ -17,4 +17,4 @@ def test_validator(http_service: Any) -> None:
     response = requests.post(url, headers=headers, data=data)
     assert response.status_code == 200
     text = response.text
-    assert "OK" == text
+    assert "Conforms: True" in text

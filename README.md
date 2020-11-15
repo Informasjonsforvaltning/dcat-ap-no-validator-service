@@ -22,7 +22,7 @@ A shacl based validator backend  service for validating catalogs against dcat-ap
 ### Running the API locally
 Start the server locally:
 ```
-% pipx install aiohttp-devtools
+% poetry shell
 % adev runserver src/dcat_ap_no_validator_service
 ```
  TBD

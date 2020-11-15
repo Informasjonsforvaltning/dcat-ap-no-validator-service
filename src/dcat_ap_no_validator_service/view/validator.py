@@ -2,7 +2,8 @@
 from typing import Any
 
 from aiohttp import web
-from rdflib import Graph
+
+from dcat_ap_no_validator_service.service import ValidatorService
 
 
 class Validator(web.View):
@@ -11,5 +12,10 @@ class Validator(web.View):
     async def post(self) -> Any:
         """Ready route function."""
         data = await self.request.text()
-        _ = Graph().parse(data=data, format="turtle")
-        return web.Response(text="OK")
+        try:
+            service = ValidatorService(data)
+            conforms, results_graph, results_text = await service.validate()
+            return web.Response(text=results_text)
+        except Exception as e:
+            print(f"Exception: {e}")
+            return web.Response(status=400, text="Bad request")
