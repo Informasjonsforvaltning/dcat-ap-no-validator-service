@@ -27,5 +27,32 @@ paths:
           description: OK
           content:
             text/turtle:
+              description: a SHACL validation report
+              schema:
+                type: string
+            text/plain:
+              description: a SHACL validation report in text
+              schema:
+                type: string
+  /shapes:
+    get:
+      description: returns a list of shape graphs the validator can execute
+      responses:
+        200:
+          description: OK
+          content:
+            text/turtle:
+              description: A list of references to shap graphs
+              schema:
+                type: string
+  /shapes/{id}:
+    get:
+      description: returns the content of a shape graphs
+      responses:
+        200:
+          description: OK
+          content:
+            text/turtle:
+              description: A shape graph
               schema:
                 type: string

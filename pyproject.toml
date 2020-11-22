@@ -44,6 +44,7 @@ requests-mock = "^1.8.0"
 pytest-mock = "^3.3.1"
 pytest-aiohttp = "^0.3.0"
 aiohttp-devtools = "^0.13.1"
+pytest-asyncio = "^0.14.0"
 
 [tool.coverage.paths]
 source = ["src", "*/site-packages"]

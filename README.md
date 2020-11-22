@@ -1,6 +1,35 @@
 # dcat-ap-no-validator-service
-A shacl based validator backend  service for validating catalogs against dcat-ap-no specification
+A shacl based validator backend service for validating catalogs against dcat-ap-no specification
 
+Input should be one of the following
+ - a file containing your graph as turtle, or
+ - a url pointing to resource on the internet containing your graph as turtle, or
+ - a string containing your graph as turtle
+
+
+Response will be a Multipart response consisting of
+ - the data sent in for validation,
+ - the actual graph that was validated (incl any added triples)
+ - the shacl shapes used in validation
+ - the report as a graph
+ - the report as text
+
+
+## Usage by curl example
+### url (Not implemented yet)
+```
+% curl -i \
+  -H "Accept: text/turtle" \
+  -F "url=https://example.com/my_graph" \
+  http://localhost:8000/validator
+```
+### file
+```
+% curl -i \
+  -H "Accept: text/turtle" \
+  -F "file=@tests/files/catalog_1.ttl" \
+  http://localhost:8000/validator
+```
 ## Develop and run locally
 ### Requirements
 - [pyenv](https://github.com/pyenv/pyenv) (recommended)
@@ -47,11 +76,4 @@ We use [pytest](https://docs.pytest.org/en/latest/) for contract testing.
 To run linters, checkers and tests:
 ```
 % nox
-```
-##
-```
-% curl -H "Content-Type: text/turtle" \
-  -X POST \
-  --data @file.ttl \
-  http://localhost:8000/validator
 ```

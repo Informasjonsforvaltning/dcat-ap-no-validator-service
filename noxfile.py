@@ -65,7 +65,12 @@ def contract_tests(session: Session) -> None:
     args = session.posargs
     nox_poetry.install(session, nox_poetry.WHEEL)
     nox_poetry.install(
-        session, "pytest", "pytest-docker", "requests_mock", "pytest_mock"
+        session,
+        "pytest",
+        "pytest-docker",
+        "requests_mock",
+        "pytest_mock",
+        "pytest-asyncio",
     )
     session.run(
         "pytest",
