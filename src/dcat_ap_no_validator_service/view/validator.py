@@ -1,4 +1,5 @@
 """Resource module for liveness resources."""
+import logging
 from typing import Any
 
 from aiohttp import MultipartWriter, web
@@ -27,39 +28,39 @@ class Validator(web.View):
     #         return web.Response(status=400, text="Bad request")
 
     async def post(self) -> Any:
-        """Validator route function."""
+        """Validate route function."""
         # Iterate through each field of MultipartReader
         data = str()
         filename = None
         async for field in (await self.request.multipart()):
-            print(f"field.name {field.name}")
+            logging.debug(f"field.name {field.name}")
             if field.name == "url":
                 # Do something about token
                 url = (await field.read()).decode()
-                print(f"got url: {url}")
+                logging.debug(f"Got url: {url}")
                 return web.Response(status=501, text="Not Implemented")
                 pass
 
             if field.name == "text":
                 # Do something about key
                 data = (await field.read()).decode()
-                print(f"got text: {data}")
+                logging.debug(f"Got text: {data}")
                 pass
 
             if field.name == "file":
-                print(f"got file: {field.filename}")
                 # Process any files you uploaded
                 filename = field.filename
+                logging.debug(f"got filename: {filename}")
                 # In your example, filename should be "2C80...jpg"
                 data = (await field.read()).decode()
-                print(f"content of {filename}: {data}")
-                # Deal with actual file data
+                logging.debug(f"content of {filename}: {data}")
+        # We have got data, now validate:
         try:
             service = ValidatorService(data)
             conforms, results_graph, results_text = await service.validate()
 
         except Exception as e:
-            print(f"Exception: {e}")
+            logging.error(f"Exception: {e}")
             return web.Response(status=400, text="Bad request")
 
         # TODO Build Response as Multipart. Should consist of:
