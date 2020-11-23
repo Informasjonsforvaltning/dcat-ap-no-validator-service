@@ -6,31 +6,40 @@ Input should be one of the following
  - a url pointing to resource on the internet containing your graph as turtle, or
  - a string containing your graph as turtle
 
+ In addition you can input what version of dcat-ap-no you want your graph to be validated against.
+ Today we support the following versions:
+ - dcat-ap-no v1.1: 1.1
+ - dcat-ap-no v2: 2
 
 Response will be a Multipart response consisting of
  - the data sent in for validation,
  - the actual graph that was validated (incl any added triples)
  - the shacl shapes used in validation
- - the report as a graph
- - the report as text
+ - the report as a graph/text (depending on accept header, default is text/turtle)
 
-
-## Usage by curl example
-### url (Not implemented yet)
+## Usage by curl examples
+### Validate file
 ```
 % curl -i \
-  -H "Accept: text/turtle" \
-  -F "url=https://example.com/my_graph" \
-  -X POST
-  http://localhost:8000/validator
+ -H "Accept: multipart/mixed" \
+ -H "Content-Type: multipart/form-data" \
+ -F "file=@tests/files/catalog_1.ttl;type=text/turtle" \
+ -X POST https://validator.staging.fellesdatakatalog.digdir.no/validator
 ```
-### file
+### Validate endpoint(url) (Not implemented yet)
 ```
 % curl -i \
-  -H "Accept: text/turtle" \
-  -F "file=@tests/files/catalog_1.ttl" \
-  -X POST http://localhost:8000/validator
+ -H "Accept: multipart/mixed" \
+ -H "Content-Type: multipart/form-data" \
+ -F "url=https://example.com/mygraph" \
+ -X POST https://validator.staging.fellesdatakatalog.digdir.no/validator
 ```
+### List all available shacl shapes (Not implemented yet)
+```
+% curl -i \
+ -H "Accept: text/turtle" \
+ -X GET https://validator.staging.fellesdatakatalog.digdir.no/shapes
+ ```
 ## Develop and run locally
 ### Requirements
 - [pyenv](https://github.com/pyenv/pyenv) (recommended)

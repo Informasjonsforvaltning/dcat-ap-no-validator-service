@@ -10,30 +10,60 @@ info:
     name: License of API
     url: 'http://data.norge.no/nlod/no/2.0'
 servers:
-  - url: https://data.norge.no/validator
+  - url: https://validator.staging.fellesdatakatalog.digdir
 paths:
   /validator:
     post:
       description: Validates RDF graph and generates a validation report
       requestBody:
-        description: An RDF graph
+        description: A Multipart/form-data body containing one or more of the following parts
         content:
-          text/turtle:
+          multipart/form-data:
             schema:
-              type: string
-        required: true
+              type: object
+              properties: # Request parts
+                  version:
+                    type: string
+                    description: an identifier of the version to be validated against
+                  text:
+                    type: string
+                    description: a text string with RDF as turtle
+                  url:
+                    type: string
+                    format: uri
+                    description: a url pointing to a resource on the internet
+                  file:
+                    type: string
+                    format: binary
+                    description: a file containing RDF
+            encoding:
+              file:
+                contentType: text/turtle
       responses:
         200:
           description: OK
           content:
-            text/turtle:
-              description: a SHACL validation report
+            multipart/mixed:
               schema:
-                type: string
-            text/plain:
-              description: a SHACL validation report in text
-              schema:
-                type: string
+                type: object
+                properties:
+                  data:
+                    type: string
+                    description: a text string with the data sent for validaton
+                  data_graph:
+                    type: string
+                    description: a turtle representantion of the data graph that got validated, including addtional triples
+                  results_text:
+                    type: string
+                    description: a text representantion of the validaton report
+                  results_graph:
+                    type: string
+                    description: a turtle representation of the validation report
+              encoding:
+                data:
+                  contentType: text/turtle
+                result_graph:
+                  contentType: text/turtle
   /shapes:
     get:
       description: returns a list of shape graphs the validator can execute
@@ -42,17 +72,22 @@ paths:
           description: OK
           content:
             text/turtle:
-              description: A list of references to shap graphs
               schema:
                 type: string
   /shapes/{id}:
     get:
-      description: returns the content of a shape graphs
+      description: returns the content of a shape graph given by id
+      parameters:
+      - name: id
+        in: path
+        description: shape id
+        required: true
+        schema:
+          type: string
       responses:
         200:
           description: OK
           content:
             text/turtle:
-              description: A shape graph
               schema:
                 type: string

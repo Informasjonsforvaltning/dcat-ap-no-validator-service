@@ -1,3 +1,5 @@
 - [ ] Get SHACL from official sources, e.g. DCAT-AP-NO
 - [ ] Support validation based on both v1.1 and v2
-- [ ] Should accept multipart/form-data, ref https://stackoverflow.com/a/57264428/767586
+- [x] Should accept multipart/form-data, ref https://stackoverflow.com/a/57264428/767586
+- [ ] Implement endpoint for shapes
+- [ ] Get triples at the end of predicates and add to graph to be validated
