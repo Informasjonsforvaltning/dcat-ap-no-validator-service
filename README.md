@@ -21,6 +21,7 @@ Response will be a Multipart response consisting of
 % curl -i \
   -H "Accept: text/turtle" \
   -F "url=https://example.com/my_graph" \
+  -X POST
   http://localhost:8000/validator
 ```
 ### file
@@ -28,7 +29,7 @@ Response will be a Multipart response consisting of
 % curl -i \
   -H "Accept: text/turtle" \
   -F "file=@tests/files/catalog_1.ttl" \
-  http://localhost:8000/validator
+  -X POST http://localhost:8000/validator
 ```
 ## Develop and run locally
 ### Requirements
