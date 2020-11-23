@@ -7,15 +7,7 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix foaf: <http://xmlns.com/foaf/0.1/> .
 @prefix rov: <http://www.w3.org/ns/regorg#> .
-@prefix owl: <http://www.w3.org/2002/07/owl#> .
 
-
-<http://example.com/mydocument> ;
-   dct:title "My catalog"@en ;
-   dct:description "A catalog of dataservices I want to publish."@en ;
-   dct:issued "2020-11-19"^^xsd:date ;
-   dct:conformsTo <https://data.norge.no/specification/dcat-ap-no/v2/> ;
-   .
 
 <http://dataservice-publisher:8080/catalogs/1> a dcat:Catalog ;
     dct:identifier "1" ;
@@ -86,3 +78,13 @@
     dct:conformsTo <http://example.com/specifications/kontooppslag> ,
                    <http://example.com/specifications/saldoopplysninger>
     .
+
+<http://example.com/specifications/saldoopplysninger> a dct:Standard .
+<http://example.com/specifications/kontooppslag> a dct:Standard .
+
+<https://organization-catalogue.fellesdatakatalog.digdir.no/organizations/961181399> a rov:RegisteredOrganization ;
+  rov:legalName          "DIGITALISERINGSDIREKTORATET" ;
+  .
+
+rov:RegisteredOrganization rdfs:subClassOf foaf:Agent .
+rov:legalName rdfs:subPropertyOf foaf:name .

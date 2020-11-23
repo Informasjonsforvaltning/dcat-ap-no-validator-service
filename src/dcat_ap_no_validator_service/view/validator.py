@@ -10,30 +10,20 @@ from dcat_ap_no_validator_service.service import ValidatorService
 class Validator(web.View):
     """Class representing validator resource."""
 
-    # async def post(self) -> Any:
-    #     """Ready route function."""
-    #     data = await self.request.text()
-    #     try:
-    #         service = ValidatorService(data)
-    #         conforms, results_graph, results_text = await service.validate()
-    #         print(self.request.headers)
-    #         if "Accept" in self.request.headers:
-    #             print(self.request.headers["Accept"])
-    #             if self.request.headers["Accept"] == "text/turtle":
-    #                 body = results_graph.serialize(format="turtle", encoding="utf-8")
-    #                 return web.Response(text=body.decode(), content_type="text/turtle")
-    #         return web.Response(text=results_text, content_type="text/plain")
-    #     except Exception as e:
-    #         print(f"Exception: {e}")
-    #         return web.Response(status=400, text="Bad request")
-
     async def post(self) -> Any:
         """Validate route function."""
         # Iterate through each field of MultipartReader
-        data = str()
+        data = ""
+        version = ""
         filename = None
         async for field in (await self.request.multipart()):
             logging.debug(f"field.name {field.name}")
+            if field.name == "version":
+                # Do something about token
+                version = (await field.read()).decode()
+                logging.debug(f"Got version: {version}")
+                pass
+
             if field.name == "url":
                 # Do something about token
                 url = (await field.read()).decode()
@@ -56,8 +46,8 @@ class Validator(web.View):
                 logging.debug(f"content of {filename}: {data}")
         # We have got data, now validate:
         try:
-            service = ValidatorService(data)
-            conforms, results_graph, results_text = await service.validate()
+            service = ValidatorService(data, version)
+            conforms, data_graph, results_graph, results_text = await service.validate()
 
         except Exception as e:
             logging.error(f"Exception: {e}")
@@ -71,17 +61,19 @@ class Validator(web.View):
         # - the report as text
         with MultipartWriter("mixed") as mpwriter:
             p = mpwriter.append(data)
-            if filename:
-                p.set_content_disposition("attachment", name="data", filename=filename)
-            else:
-                p.set_content_disposition("attachment", name="data")
+            p.set_content_disposition("inline", name="data")
+            p = mpwriter.append(
+                data_graph.serialize(format="turtle"),
+                {"CONTENT-TYPE": "text/turtle"},
+            )
+            p.set_content_disposition("inline", name="data_graph")
             p = mpwriter.append(results_text)
-            p.set_content_disposition("attachment", name="results_text")
+            p.set_content_disposition("inline", name="results_text")
             p = mpwriter.append(
                 results_graph.serialize(format="turtle"),
                 {"CONTENT-TYPE": "text/turtle"},
             )
-            p.set_content_disposition("attachment", name="results_graph")
+            p.set_content_disposition("inline", name="results_graph")
 
         # Reply ok, all fields processed successfully
         return web.Response(body=mpwriter)
