@@ -37,11 +37,6 @@ jobs:
 
       - name: Build image and test with nox
         run: nox
-        env:
-          SECRET_KEY: ${{ secrets.SECRET_KEY }}
-          ADMIN_USERNAME: ${{ secrets.ADMIN_USERNAME }}
-          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
-          FUSEKI_PASSWORD: ${{ secrets.FUSEKI_PASSWORD }}
 
       - name: Tag and publish docker image to Google Cloud
         run: |
