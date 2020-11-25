@@ -25,7 +25,6 @@ async def test_validator_with_file(http_service: Any) -> None:
     results_graph = ""
     async with session.post(url, data=mpwriter) as resp:
         # ...
-        assert resp.status == 200
         reader = MultipartReader.from_response(resp)
         while True:
             part = await reader.next()  # noqa: B305
@@ -48,6 +47,9 @@ async def test_validator_with_file(http_service: Any) -> None:
                 results_graph = await part.text()
                 continue
     await session.close()
+
+    assert resp.status == 200
+    assert "multipart/mixed" in resp.headers[hdrs.CONTENT_TYPE]
 
     # We have all of the parts in the response. Lets test:
     # data should be equal to input:

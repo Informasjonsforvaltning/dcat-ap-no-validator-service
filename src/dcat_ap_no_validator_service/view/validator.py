@@ -1,6 +1,5 @@
 """Resource module for liveness resources."""
 import logging
-from typing import Any
 
 from aiohttp import MultipartWriter, web
 
@@ -10,7 +9,7 @@ from dcat_ap_no_validator_service.service import ValidatorService
 class Validator(web.View):
     """Class representing validator resource."""
 
-    async def post(self) -> Any:
+    async def post(self) -> web.Response:
         """Validate route function."""
         # Iterate through each field of MultipartReader
         data = ""
@@ -28,7 +27,7 @@ class Validator(web.View):
                 # Do something about token
                 url = (await field.read()).decode()
                 logging.debug(f"Got url: {url}")
-                return web.Response(status=501, text="Not Implemented")
+                raise web.HTTPNotImplemented
                 pass
 
             if field.name == "text":
@@ -51,7 +50,7 @@ class Validator(web.View):
 
         except Exception as e:
             logging.error(f"Exception: {e}")
-            return web.Response(status=400, text="Bad request")
+            raise web.HTTPBadRequest
 
         # TODO Build Response as Multipart. Should consist of:
         # - the data sent in for validation,

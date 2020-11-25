@@ -24,7 +24,6 @@ def unit_tests(session: Session) -> None:
     nox_poetry.install(
         session,
         "pytest",
-        "requests-mock",
         "pytest-mock",
     )
     session.run(
@@ -46,7 +45,6 @@ def integration_tests(session: Session) -> None:
         "coverage[toml]",
         "pytest",
         "pytest-cov",
-        "requests-mock",
         "pytest-mock",
         "pytest-aiohttp",
     )
@@ -68,7 +66,6 @@ def contract_tests(session: Session) -> None:
         session,
         "pytest",
         "pytest-docker",
-        "requests_mock",
         "pytest_mock",
         "pytest-asyncio",
     )

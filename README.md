@@ -23,8 +23,9 @@ Response will be a Multipart response consisting of
 % curl -i \
  -H "Accept: multipart/mixed" \
  -H "Content-Type: multipart/form-data" \
+ -F "version=2" \
  -F "file=@tests/files/catalog_1.ttl;type=text/turtle" \
- -X POST https://validator.staging.fellesdatakatalog.digdir.no/validator
+ -X POST http://localhost:8000/validator
 ```
 ### Validate endpoint(url) (Not implemented yet)
 ```
@@ -32,13 +33,13 @@ Response will be a Multipart response consisting of
  -H "Accept: multipart/mixed" \
  -H "Content-Type: multipart/form-data" \
  -F "url=https://example.com/mygraph" \
- -X POST https://validator.staging.fellesdatakatalog.digdir.no/validator
+ -X POST http://localhost:8000/validator
 ```
 ### List all available shacl shapes (Not implemented yet)
 ```
 % curl -i \
  -H "Accept: text/turtle" \
- -X GET https://validator.staging.fellesdatakatalog.digdir.no/shapes
+ -X GET http://localhost:8000/validator/shapes
  ```
 ## Develop and run locally
 ### Requirements
