@@ -1,0 +1,49 @@
+name: Deploy to demo
+
+on:
+  repository_dispatch:
+    types: [deploy-demo]
+
+jobs:
+  deploy-demo:
+    name: Deploy latest production image to demo environment
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Apply Helm template
+        run: |
+          helm repo add fdk https://informasjonsforvaltning.github.io/helm-chart/
+          helm fetch --untar --untardir ./helm fdk/dcat-ap-no-validator-service
+          helm template --set DOCKER_IMAGE_NAME="eu.gcr.io/digdir-fdk-infra/dcat-ap-no-validator-service:${{ github.event.client_payload.sha }}" -f ./helm/dcat-ap-no-validator-service/values/demo.yaml ./helm/dcat-ap-no-validator-service/ > ./kubectlapply.yaml
+          chmod o+w ./kubectlapply.yaml
+          cat kubectlapply.yaml
+
+      - name: Get kubeconfig file from GKE
+        uses: machine-learning-apps/gke-kubeconfig@master
+        with:
+          application_credentials: ${{ secrets.DIGDIR_FDK_DEV_AUTODEPLOY }}
+          project_id: digdir-fdk-dev
+          location_zone: europe-north1-a
+          cluster_name: digdir-fdk-dev
+
+      - name: Deploy to demo
+        uses: docker://bitnami/kubectl:latest
+        env:
+          KUBECONFIG: '/github/workspace/.kube/config'
+        with:
+          args: "apply -f ./kubectlapply.yaml --force"
+
+      - name: Notify slack
+        uses: 8398a7/action-slack@v3
+        with:
+          mention: 'channel'
+          if_mention: failure
+          status: ${{ job.status }}
+          author_name: 'Application: dcat-ap-no-validator-service | Environment: demo'
+          fields: commit,author,workflow
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        if: always()
