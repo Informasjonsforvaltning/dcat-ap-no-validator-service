@@ -1,13 +1,13 @@
 name: Deploy to staging
 
 on:
-  pull_request:
+  push:
     branches:
       - main
 
 jobs:
   build-and-deploy:
-    name: Build, test and deploy to staging environment
+    name: Build,test and deploy to production environment
     runs-on: ubuntu-latest
 
     steps:
@@ -40,7 +40,7 @@ jobs:
       - name: Tag and publish docker image to Google Cloud
         run: |
           docker tag eu.gcr.io/digdir-fdk-infra/dcat-ap-no-validator-service:test eu.gcr.io/digdir-fdk-infra/dcat-ap-no-validator-service:$GITHUB_SHA
-          docker tag eu.gcr.io/digdir-fdk-infra/dcat-ap-no-validator-service:test eu.gcr.io/digdir-fdk-infra/dcat-ap-no-validator-service:staging_latest
+          docker tag eu.gcr.io/digdir-fdk-infra/dcat-ap-no-validator-service:test eu.gcr.io/digdir-fdk-infra/dcat-ap-no-validator-service:latest
           docker rmi eu.gcr.io/digdir-fdk-infra/dcat-ap-no-validator-service:test
           docker -- push eu.gcr.io/digdir-fdk-infra/dcat-ap-no-validator-service
 
@@ -48,17 +48,17 @@ jobs:
         run: |
           helm repo add fdk https://informasjonsforvaltning.github.io/helm-chart/
           helm fetch --untar --untardir ./helm fdk/dcat-ap-no-validator-service
-          helm template --set DOCKER_IMAGE_NAME="eu.gcr.io/digdir-fdk-infra/dcat-ap-no-validator-service:$GITHUB_SHA" -f ./helm/dcat-ap-no-validator-service/values/staging.yaml ./helm/dcat-ap-no-validator-service/ > ./kubectlapply.yaml
+          helm template --set DOCKER_IMAGE_NAME="eu.gcr.io/digdir-fdk-infra/dcat-ap-no-validator-service:$GITHUB_SHA" -f ./helm/dcat-ap-no-validator-service/values/prod.yaml ./helm/dcat-ap-no-validator-service/ > ./kubectlapply.yaml
           chmod o+w ./kubectlapply.yaml
           cat kubectlapply.yaml
 
       - name: Get kubeconfig file from GKE
         uses: machine-learning-apps/gke-kubeconfig@master
         with:
-          application_credentials: ${{ secrets.DIGDIR_FDK_DEV_AUTODEPLOY }}
-          project_id: digdir-fdk-dev
+          application_credentials: ${{ secrets.DIGDIR_FDK_PROD_AUTODEPLOY }}
+          project_id: digdir-fdk-prod
           location_zone: europe-north1-a
-          cluster_name: digdir-fdk-dev
+          cluster_name: digdir-fdk-prod
 
       - name: Deploy to staging
         uses: docker://bitnami/kubectl:latest
@@ -70,10 +70,19 @@ jobs:
       - name: Notify slack
         uses: 8398a7/action-slack@v3
         with:
+          mention: 'channel'
+          if_mention: failure
           status: ${{ job.status }}
-          author_name: 'Application: dcat-ap-no-validator-service | Environment: staging'
-          fields: commit,author,workflow
+          author_name: 'Application: dcat-ap-no-validator-service | Environment: prod'
+          fields: commit,author,workflow,message
         env:
           GITHUB_TOKEN: ${{ github.token }}
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         if: always()
+
+      - name: Trigger deploy to demo
+        uses: peter-evans/repository-dispatch@master
+        with:
+          token: ${{ secrets.DISPATCH_TOKEN }}
+          event-type: deploy-demo
+          client-payload: '{"sha": "${{ github.sha }}"}'
