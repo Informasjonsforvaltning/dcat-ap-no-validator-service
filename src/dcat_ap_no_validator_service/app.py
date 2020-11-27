@@ -20,5 +20,5 @@ async def create_app() -> web.Application:
     )
     # logging configurataion:
     # TODO: get level from environment and set default to INFO
-    logging.basicConfig(level=logging.DEBUG)
+    logging.basicConfig(level=logging.INFO)
     return app
