@@ -52,7 +52,6 @@ async def test_validator_text(client: _TestClient) -> None:
 async def _assess_response(resp: ClientResponse) -> None:
     assert resp.status == 200
 
-    data = ""
     data_graph = ""
     results_text = ""
     results_graph = ""
@@ -63,10 +62,6 @@ async def _assess_response(resp: ClientResponse) -> None:
             break
         if part is None:
             break
-        if part.name == "data":
-            assert part.headers[hdrs.CONTENT_TYPE] == "text/plain; charset=utf-8"
-            data = await part.text()
-            continue
         if part.name == "data_graph":
             assert part.headers[hdrs.CONTENT_TYPE] == "text/turtle"
             data_graph = await part.text()
@@ -80,11 +75,12 @@ async def _assess_response(resp: ClientResponse) -> None:
             results_graph = await part.text()
             continue
 
-    # We have all of the parts in the response. Lets test:
-    # data should be equal to input:
-    with open("tests/files/catalog_1.ttl", "r") as file:
-        data_in = file.read()
-    assert data == data_in
+    # data_graph should not be equal to the input graph since we are inferring triples:
+    g1 = Graph().parse(data=data_graph, format="turtle")
+    g2 = Graph().parse("tests/files/catalog_1.ttl", format="turtle")
+
+    _isomorphic = isomorphic(g1, g2)
+    assert not _isomorphic, "data_graph is equal to input graph"
 
     # data_graph should in this case be equal to the data + inferred triples:
     g1 = Graph().parse(data=data_graph, format="turtle")
@@ -94,10 +90,10 @@ async def _assess_response(resp: ClientResponse) -> None:
     if not _isomorphic:
         _dump_diff(g1, g2)
         pass
-    assert _isomorphic, "data_graph is not equal to the input data"
+    assert _isomorphic, "data_graph is not correct"
 
     # results_text should contain "Conforms: True":
-    assert "Conforms: True" in results_text
+    assert "Conforms: True" in results_text, "result_text is not correct"
 
     # results_graph (validation report) should be isomorphic to the following:
     src = """
@@ -115,7 +111,7 @@ async def _assess_response(resp: ClientResponse) -> None:
     if not _isomorphic:
         _dump_diff(g1, g2)
         pass
-    assert _isomorphic
+    assert _isomorphic, "result_graph is not correct"
 
 
 # -- Bad cases
@@ -128,7 +124,7 @@ async def test_validator_bad_syntax(client: _TestClient) -> None:
 
     with MultipartWriter("mixed") as mpwriter:
         p = mpwriter.append(data)
-        p.set_content_disposition("attachment", name="data")
+        p.set_content_disposition("attachment", name="text")
 
     resp = await client.post("/validator", data=mpwriter)
     assert resp.status == 400
@@ -137,11 +133,11 @@ async def test_validator_bad_syntax(client: _TestClient) -> None:
 @pytest.mark.integration
 async def test_validator_empty(client: _TestClient) -> None:
     """Should return status 400."""
-    data = "Bad syntax. No turtle here."
+    data = ""
 
     with MultipartWriter("mixed") as mpwriter:
         p = mpwriter.append(data)
-        p.set_content_disposition("attachment", name="data")
+        p.set_content_disposition("attachment", name="text")
 
     resp = await client.post("/validator", data=mpwriter)
     assert resp.status == 400

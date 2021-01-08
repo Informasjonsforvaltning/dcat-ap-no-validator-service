@@ -19,7 +19,6 @@ async def test_validator_with_file(http_service: Any) -> None:
         p.set_content_disposition("attachment", name="file", filename=filename)
 
     session = ClientSession()
-    data = ""
     data_graph = ""
     results_text = ""
     results_graph = ""
@@ -30,10 +29,6 @@ async def test_validator_with_file(http_service: Any) -> None:
             part = await reader.next()  # noqa: B305
             if part is None:
                 break
-            if part.name == "data":
-                assert part.headers[hdrs.CONTENT_TYPE] == "text/plain; charset=utf-8"
-                data = await part.text()
-                continue
             if part.name == "data_graph":
                 assert part.headers[hdrs.CONTENT_TYPE] == "text/turtle"
                 data_graph = await part.text()
@@ -52,10 +47,12 @@ async def test_validator_with_file(http_service: Any) -> None:
     assert "multipart/mixed" in resp.headers[hdrs.CONTENT_TYPE]
 
     # We have all of the parts in the response. Lets test:
-    # data should be equal to input:
-    with open("tests/files/catalog_1.ttl", "r") as file:
-        data_in = file.read()
-    assert data == data_in
+    # data_graph should not be equal to the input graph since we are inferring triples:
+    g1 = Graph().parse(data=data_graph, format="turtle")
+    g2 = Graph().parse("tests/files/catalog_1.ttl", format="turtle")
+
+    _isomorphic = isomorphic(g1, g2)
+    assert not _isomorphic, "data_graph is equal to input graph"
 
     # data_graph should in this case be equal to the data + inferred triples:
     g1 = Graph().parse(data=data_graph, format="turtle")
@@ -65,10 +62,10 @@ async def test_validator_with_file(http_service: Any) -> None:
     if not _isomorphic:
         _dump_diff(g1, g2)
         pass
-    assert _isomorphic, "data_graph is not equal to the input data"
+    assert _isomorphic, "data_graph is not correct"
 
     # results_text should contain "Conforms: True":
-    assert "Conforms: True" in results_text
+    assert "Conforms: True" in results_text, "result_text is not correct"
 
     # results_graph (validation report) should be isomorphic to the following:
     src = """

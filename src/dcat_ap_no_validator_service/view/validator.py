@@ -1,5 +1,6 @@
 """Resource module for liveness resources."""
 import logging
+import traceback
 
 from aiohttp import MultipartWriter, web
 
@@ -48,26 +49,31 @@ class Validator(web.View):
             service = ValidatorService(data, version)
             conforms, data_graph, results_graph, results_text = await service.validate()
 
-        except Exception as e:
-            logging.error(f"Exception: {e}")
-            raise web.HTTPBadRequest
+        except ValueError:
+            logging.error(traceback.format_exc())
+            raise web.HTTPBadRequest(reason="Input is empty.")
+
+        except SyntaxError:
+            logging.error(traceback.format_exc())
+            raise web.HTTPBadRequest(reason="Bad syntax in input.")
 
         # TODO Build Response as Multipart. Should consist of:
-        # - the data sent in for validation,
-        # - the actual graph that was validated (incl any added triples)
+        # - "data_graph": the actual graph that was validated (incl any added triples)
+        # - "result_graph": the report as a rdf (based on accept header), or
+        # - "result_text": the report as text (based on accept header)
         # - the shacl shapes used in validation
-        # - the report as a graph
-        # - the report as text
         with MultipartWriter("mixed") as mpwriter:
-            p = mpwriter.append(data)
-            p.set_content_disposition("inline", name="data")
+            # data_graph:
             p = mpwriter.append(
                 data_graph.serialize(format="turtle"),
                 {"CONTENT-TYPE": "text/turtle"},
             )
             p.set_content_disposition("inline", name="data_graph")
+            # result_text:
+            # TODO: should return serialization based on content-negotiation
             p = mpwriter.append(results_text)
             p.set_content_disposition("inline", name="results_text")
+            # result_graph:
             p = mpwriter.append(
                 results_graph.serialize(format="turtle"),
                 {"CONTENT-TYPE": "text/turtle"},
