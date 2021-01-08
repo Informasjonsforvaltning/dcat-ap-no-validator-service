@@ -31,8 +31,8 @@ jobs:
       - name: Install dependencies
         run: |
           pip install poetry==1.1.4
-          pip install nox==2020.08.22
-          pip install nox-poetry==0.5.0
+          pip install nox==2020.12.31
+          pip install nox-poetry==0.7.0
 
       - name: Build image and test with nox
         run: nox
