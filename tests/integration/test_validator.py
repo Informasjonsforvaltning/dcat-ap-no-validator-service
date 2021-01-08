@@ -1,5 +1,5 @@
 """Integration test cases for the ready route."""
-from aiohttp import ClientResponse, hdrs, MultipartReader, MultipartWriter
+from aiohttp import hdrs, MultipartWriter
 from aiohttp.test_utils import TestClient as _TestClient
 import pytest
 from rdflib import Graph
@@ -19,7 +19,11 @@ async def test_validator_file(client: _TestClient) -> None:
         p.set_content_disposition("inline", name="version")
 
     resp = await client.post("/validator", data=mpwriter)
-    await _assess_response(resp)
+    assert resp.status == 200
+    assert resp.headers[hdrs.CONTENT_TYPE] == "text/turtle"
+    body = await resp.text()
+
+    await _assess_response_body(body)
 
 
 @pytest.mark.integration
@@ -46,56 +50,16 @@ async def test_validator_text(client: _TestClient) -> None:
         p.set_content_disposition("inline", name="text")
 
     resp = await client.post("/validator", data=mpwriter)
-    await _assess_response(resp)
-
-
-async def _assess_response(resp: ClientResponse) -> None:
     assert resp.status == 200
+    assert resp.headers[hdrs.CONTENT_TYPE] == "text/turtle"
+    body = await resp.text()
 
-    data_graph = ""
-    results_text = ""
-    results_graph = ""
-    reader = MultipartReader.from_response(resp)
-    while True:
-        part = await reader.next()  # noqa: B305
-        if part is None:
-            break
-        if part is None:
-            break
-        if part.name == "data_graph":
-            assert part.headers[hdrs.CONTENT_TYPE] == "text/turtle"
-            data_graph = await part.text()
-            continue
-        if part.name == "results_text":
-            assert part.headers[hdrs.CONTENT_TYPE] == "text/plain; charset=utf-8"
-            results_text = await part.text()
-            continue
-        if part.name == "results_graph":
-            assert part.headers[hdrs.CONTENT_TYPE] == "text/turtle"
-            results_graph = await part.text()
-            continue
+    await _assess_response_body(body)
 
-    # data_graph should not be equal to the input graph since we are inferring triples:
-    g1 = Graph().parse(data=data_graph, format="turtle")
-    g2 = Graph().parse("tests/files/catalog_1.ttl", format="turtle")
 
-    _isomorphic = isomorphic(g1, g2)
-    assert not _isomorphic, "data_graph is equal to input graph"
+async def _assess_response_body(body: str) -> None:
 
-    # data_graph should in this case be equal to the data + inferred triples:
-    g1 = Graph().parse(data=data_graph, format="turtle")
-    g2 = Graph().parse("tests/files/data_graph.ttl", format="turtle")
-
-    _isomorphic = isomorphic(g1, g2)
-    if not _isomorphic:
-        _dump_diff(g1, g2)
-        pass
-    assert _isomorphic, "data_graph is not correct"
-
-    # results_text should contain "Conforms: True":
-    assert "Conforms: True" in results_text, "result_text is not correct"
-
-    # results_graph (validation report) should be isomorphic to the following:
+    # body (validation report) should be isomorphic to the following:
     src = """
     @prefix sh: <http://www.w3.org/ns/shacl#> .
     @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
@@ -105,7 +69,7 @@ async def _assess_response(resp: ClientResponse) -> None:
          .
     """
     g2 = Graph().parse(data=src, format="turtle")
-    g1 = Graph().parse(data=results_graph, format="turtle")
+    g1 = Graph().parse(data=body, format="turtle")
 
     _isomorphic = isomorphic(g1, g2)
     if not _isomorphic:

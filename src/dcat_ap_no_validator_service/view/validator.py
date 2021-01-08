@@ -2,7 +2,7 @@
 import logging
 import traceback
 
-from aiohttp import MultipartWriter, web
+from aiohttp import web
 
 from dcat_ap_no_validator_service.service import ValidatorService
 
@@ -59,26 +59,12 @@ class Validator(web.View):
 
         # TODO Build Response as Multipart. Should consist of:
         # - "data_graph": the actual graph that was validated (incl any added triples)
-        # - "result_graph": the report as a rdf (based on accept header), or
-        # - "result_text": the report as text (based on accept header)
+        # - "results_graph": the report as a rdf (based on accept header), or
+        # - "results_text": the report as text (based on accept header)
         # - the shacl shapes used in validation
-        with MultipartWriter("mixed") as mpwriter:
-            # data_graph:
-            p = mpwriter.append(
-                data_graph.serialize(format="turtle"),
-                {"CONTENT-TYPE": "text/turtle"},
-            )
-            p.set_content_disposition("inline", name="data_graph")
-            # result_text:
-            # TODO: should return serialization based on content-negotiation
-            p = mpwriter.append(results_text)
-            p.set_content_disposition("inline", name="results_text")
-            # result_graph:
-            p = mpwriter.append(
-                results_graph.serialize(format="turtle"),
-                {"CONTENT-TYPE": "text/turtle"},
-            )
-            p.set_content_disposition("inline", name="results_graph")
 
         # Reply ok, all fields processed successfully
-        return web.Response(body=mpwriter)
+        return web.Response(
+            body=results_graph.serialize(format="text/turtle"),
+            content_type="text/turtle",
+        )
