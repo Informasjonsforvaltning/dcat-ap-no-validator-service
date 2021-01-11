@@ -1,7 +1,8 @@
 """Resource module for liveness resources."""
 import logging
+import traceback
 
-from aiohttp import MultipartWriter, web
+from aiohttp import web
 
 from dcat_ap_no_validator_service.service import ValidatorService
 
@@ -48,31 +49,16 @@ class Validator(web.View):
             service = ValidatorService(data, version)
             conforms, data_graph, results_graph, results_text = await service.validate()
 
-        except Exception as e:
-            logging.error(f"Exception: {e}")
-            raise web.HTTPBadRequest
+        except ValueError as e:
+            logging.error(traceback.format_exc())
+            raise web.HTTPBadRequest(reason=str(e))
 
-        # TODO Build Response as Multipart. Should consist of:
-        # - the data sent in for validation,
-        # - the actual graph that was validated (incl any added triples)
-        # - the shacl shapes used in validation
-        # - the report as a graph
-        # - the report as text
-        with MultipartWriter("mixed") as mpwriter:
-            p = mpwriter.append(data)
-            p.set_content_disposition("inline", name="data")
-            p = mpwriter.append(
-                data_graph.serialize(format="turtle"),
-                {"CONTENT-TYPE": "text/turtle"},
-            )
-            p.set_content_disposition("inline", name="data_graph")
-            p = mpwriter.append(results_text)
-            p.set_content_disposition("inline", name="results_text")
-            p = mpwriter.append(
-                results_graph.serialize(format="turtle"),
-                {"CONTENT-TYPE": "text/turtle"},
-            )
-            p.set_content_disposition("inline", name="results_graph")
+        except SyntaxError:
+            logging.error(traceback.format_exc())
+            raise web.HTTPBadRequest(reason="Bad syntax in input graph.")
 
         # Reply ok, all fields processed successfully
-        return web.Response(body=mpwriter)
+        return web.Response(
+            body=results_graph.serialize(format="text/turtle"),
+            content_type="text/turtle",
+        )
