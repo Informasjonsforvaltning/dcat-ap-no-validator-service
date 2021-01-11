@@ -40,27 +40,12 @@ paths:
               file:
                 contentType: text/turtle
       responses:
-        200:
+        '200':
           description: OK
           content:
-            multipart/mixed:
+            text/turtle:
               schema:
-                type: object
-                properties:
-                  data_graph:
-                    type: string
-                    description: a turtle representantion of the data graph that got validated, including addtional triples
-                  results_text:
-                    type: string
-                    description: a text representantion of the validaton report
-                  results_graph:
-                    type: string
-                    description: a turtle representation of the validation report
-              encoding:
-                data_graph:
-                  contentType: text/turtle
-                result_graph:
-                  contentType: text/turtle
+                type: string
   /shapes:
     get:
       description: returns a list of shape graphs the validator can execute
