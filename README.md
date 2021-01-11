@@ -11,17 +11,14 @@ Input should be one of the following
  - dcat-ap-no v1.1: 1.1
  - dcat-ap-no v2: 2
 
-Response will be a Multipart response consisting of
- - the data sent in for validation,
- - the actual graph that was validated (incl any added triples)
- - the shacl shapes used in validation
- - the report as a graph/text (depending on accept header, default is text/turtle)
+Response will be a RDF graph consisting of
+ - the report as a graph according to a SHACL (validation report)[https://www.w3.org/TR/shacl/#validation-report]
 
 ## Usage by curl examples
 ### Validate file
 ```
 % curl -i \
- -H "Accept: multipart/mixed" \
+ -H "Accept: text/turtle" \
  -H "Content-Type: multipart/form-data" \
  -F "version=2" \
  -F "file=@tests/files/catalog_1.ttl;type=text/turtle" \
@@ -30,7 +27,7 @@ Response will be a Multipart response consisting of
 ### Validate endpoint(url) (Not implemented yet)
 ```
 % curl -i \
- -H "Accept: multipart/mixed" \
+ -H "Accept: text/turtle" \
  -H "Content-Type: multipart/form-data" \
  -F "url=https://example.com/mygraph" \
  -X POST http://localhost:8000/validator

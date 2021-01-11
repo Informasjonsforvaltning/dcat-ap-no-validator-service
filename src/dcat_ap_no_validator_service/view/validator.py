@@ -49,19 +49,13 @@ class Validator(web.View):
             service = ValidatorService(data, version)
             conforms, data_graph, results_graph, results_text = await service.validate()
 
-        except ValueError:
+        except ValueError as e:
             logging.error(traceback.format_exc())
-            raise web.HTTPBadRequest(reason="Input is empty.")
+            raise web.HTTPBadRequest(reason=str(e))
 
         except SyntaxError:
             logging.error(traceback.format_exc())
-            raise web.HTTPBadRequest(reason="Bad syntax in input.")
-
-        # TODO Build Response as Multipart. Should consist of:
-        # - "data_graph": the actual graph that was validated (incl any added triples)
-        # - "results_graph": the report as a rdf (based on accept header), or
-        # - "results_text": the report as text (based on accept header)
-        # - the shacl shapes used in validation
+            raise web.HTTPBadRequest(reason="Bad syntax in input graph.")
 
         # Reply ok, all fields processed successfully
         return web.Response(

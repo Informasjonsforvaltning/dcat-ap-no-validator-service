@@ -20,7 +20,7 @@ class ValidatorService:
     async def validate(self) -> Tuple[bool, Graph, Graph, str]:
         """Validate function."""
         if len(self._g) == 0:  # No need to validate empty graph
-            raise ValueError
+            raise ValueError("Input graph cannot be empty.")
         # get the shape graph:
         _sg = await ShapeService().get_shape_by_id(self._version)
         # inference in {"none", "rdfs", "owlrl", "both"}
