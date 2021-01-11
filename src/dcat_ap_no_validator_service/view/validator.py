@@ -72,6 +72,6 @@ class Validator(web.View):
                 body=results_graph.serialize(format=format),
                 content_type=format,
             )
-        except PluginException:
+        except PluginException:  # rdflib raises PluginException, in this context imples 406
             logging.error(traceback.format_exc())
-            raise web.HTTPNotAcceptable()
+            raise web.HTTPNotAcceptable()  # 406
