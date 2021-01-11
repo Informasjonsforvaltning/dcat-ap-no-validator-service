@@ -36,8 +36,8 @@ async def test_validator_with_file(http_service: Any) -> None:
          sh:conforms true
          .
     """
-    g1 = Graph().parse(data=body, format="turtle")
-    g2 = Graph().parse(data=src, format="turtle")
+    g1 = Graph().parse(data=body, format="text/turtle")
+    g2 = Graph().parse(data=src, format="text/turtle")
 
     _isomorphic = isomorphic(g1, g2)
     if not _isomorphic:
@@ -110,6 +110,6 @@ def _dump_diff(g1: Graph, g2: Graph) -> None:
 
 
 def _dump_turtle(g: Graph) -> None:
-    for _l in g.serialize(format="turtle").splitlines():
+    for _l in g.serialize(format="text/turtle").splitlines():
         if _l:
             print(_l.decode())
