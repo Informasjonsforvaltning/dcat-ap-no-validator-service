@@ -1,4 +1,6 @@
 """Integration test cases for the ready route."""
+from typing import Any
+
 from aiohttp import hdrs, MultipartWriter
 from aiohttp.test_utils import TestClient as _TestClient
 import pytest
@@ -21,9 +23,49 @@ async def test_validator_file(client: _TestClient) -> None:
     resp = await client.post("/validator", data=mpwriter)
     assert resp.status == 200
     assert resp.headers[hdrs.CONTENT_TYPE] == "text/turtle"
-    body = await resp.text()
 
+    body = await resp.text()
     await _assess_response_body(body)
+
+
+@pytest.mark.integration
+async def test_validator_file_content_negotiation_json_ld(client: _TestClient) -> None:
+    """Should return OK."""
+    filename = "tests/files/catalog_1.ttl"
+    version = "2"
+    content_type = "application/ld+json"
+    headers = {"Accept": content_type}
+
+    with MultipartWriter("mixed") as mpwriter:
+        p = mpwriter.append(open(filename, "rb"))
+        p.set_content_disposition("attachment", name="file", filename=filename)
+        p = mpwriter.append(version)
+        p.set_content_disposition("inline", name="version")
+
+    resp = await client.post("/validator", headers=headers, data=mpwriter)
+    assert resp.status == 200
+    assert resp.headers[hdrs.CONTENT_TYPE] == content_type
+
+    body = await resp.text()
+    await _assess_response_body(body, content_type)
+
+
+@pytest.mark.integration
+async def test_validator_file_accept_header_not_valid(client: _TestClient) -> None:
+    """Should return status_code 406."""
+    filename = "tests/files/catalog_1.ttl"
+    version = "2"
+    content_type = "not_valid"
+    headers = {"Accept": content_type}
+
+    with MultipartWriter("mixed") as mpwriter:
+        p = mpwriter.append(open(filename, "rb"))
+        p.set_content_disposition("attachment", name="file", filename=filename)
+        p = mpwriter.append(version)
+        p.set_content_disposition("inline", name="version")
+
+    resp = await client.post("/validator", headers=headers, data=mpwriter)
+    assert resp.status == 406
 
 
 @pytest.mark.integration
@@ -57,7 +99,7 @@ async def test_validator_text(client: _TestClient) -> None:
     await _assess_response_body(body)
 
 
-async def _assess_response_body(body: str) -> None:
+async def _assess_response_body(body: str, content_type: Any = "text/turtle") -> None:
 
     # body (validation report) should be isomorphic to the following:
     src = """
@@ -69,7 +111,7 @@ async def _assess_response_body(body: str) -> None:
          .
     """
     g2 = Graph().parse(data=src, format="turtle")
-    g1 = Graph().parse(data=body, format="turtle")
+    g1 = Graph().parse(data=body, format=content_type)
 
     _isomorphic = isomorphic(g1, g2)
     if not _isomorphic:

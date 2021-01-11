@@ -3,6 +3,7 @@ import logging
 import traceback
 
 from aiohttp import web
+from rdflib.plugin import PluginException
 
 from dcat_ap_no_validator_service.service import ValidatorService
 
@@ -12,6 +13,8 @@ class Validator(web.View):
 
     async def post(self) -> web.Response:
         """Validate route function."""
+        accept_header = self.request.headers["Accept"]
+        logging.debug(f"Got following accept-headers: {accept_header}")
         # Iterate through each field of MultipartReader
         data = ""
         version = ""
@@ -57,8 +60,18 @@ class Validator(web.View):
             logging.error(traceback.format_exc())
             raise web.HTTPBadRequest(reason="Bad syntax in input graph.")
 
-        # Reply ok, all fields processed successfully
-        return web.Response(
-            body=results_graph.serialize(format="text/turtle"),
-            content_type="text/turtle",
-        )
+        # Try to content-negotiate:
+        format = "text/turtle"  # default
+        if accept_header == "*/*":
+            pass  # use default
+        elif accept_header:  # we try to serialize according to accept-header
+            format = accept_header
+
+        try:
+            return web.Response(
+                body=results_graph.serialize(format=format),
+                content_type=format,
+            )
+        except PluginException:
+            logging.error(traceback.format_exc())
+            raise web.HTTPNotAcceptable()
