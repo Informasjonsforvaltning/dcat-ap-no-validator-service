@@ -46,6 +46,12 @@ paths:
             text/turtle:
               schema:
                 type: string
+            application/ld+json:
+              schema:
+                type: string
+            application/rdf+xml:
+              schema:
+                type: string
   /shapes:
     get:
       description: returns a list of shape graphs the validator can execute
