@@ -1,3 +1,4 @@
+TODO:
 - [ ] Get SHACL from official sources, e.g. DCAT-AP-NO
 - [x] Support validation based on both v1.1 and v2
 - [x] Should accept multipart/form-data, ref https://stackoverflow.com/a/57264428/767586

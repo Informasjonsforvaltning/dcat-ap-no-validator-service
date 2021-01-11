@@ -1,9 +1,14 @@
 """Package for exposing validation endpoint."""
 import logging
+import os
 
 from aiohttp import web
+from dotenv import load_dotenv
 
 from .view import Ping, Ready, Shape, Shapes, Validator
+
+load_dotenv()
+LOGGING_LEVEL = os.getenv("LOGGING_LEVEL", "INFO")
 
 
 async def create_app() -> web.Application:
@@ -19,6 +24,5 @@ async def create_app() -> web.Application:
         ]
     )
     # logging configurataion:
-    # TODO: get level from environment and set default to INFO
-    logging.basicConfig(level=logging.INFO)
+    logging.basicConfig(level=LOGGING_LEVEL)
     return app
