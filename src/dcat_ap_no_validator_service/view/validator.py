@@ -62,7 +62,7 @@ class Validator(web.View):
 
         # Try to content-negotiate:
         format = "text/turtle"  # default
-        if accept_header == "*/*":
+        if "*/*" in accept_header:
             pass  # use default
         elif accept_header:  # we try to serialize according to accept-header
             format = accept_header
