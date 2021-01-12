@@ -71,14 +71,17 @@ async def test_validator_file_accept_header_not_valid(client: _TestClient) -> No
 @pytest.mark.integration
 async def test_validator_url(client: _TestClient) -> None:
     """Should return status 501."""
-    url = "http://example.com/"
-
+    url_to_graph = "https://raw.githubusercontent.com/Informasjonsforvaltning/dcat-ap-no-validator-service/main/tests/files/catalog_1.ttl"  # noqa: B950
     with MultipartWriter("mixed") as mpwriter:
-        p = mpwriter.append(url)
+        p = mpwriter.append(url_to_graph)
         p.set_content_disposition("inline", name="url")
 
     resp = await client.post("/validator", data=mpwriter)
-    assert resp.status == 501
+    assert resp.status == 200
+    assert resp.headers[hdrs.CONTENT_TYPE] == "text/turtle"
+    body = await resp.text()
+
+    await _assess_response_body(body)
 
 
 @pytest.mark.integration
