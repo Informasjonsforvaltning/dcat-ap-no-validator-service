@@ -105,12 +105,30 @@ async def test_validator_url(client: _TestClient) -> None:
 
 @pytest.mark.integration
 async def test_validator_text(client: _TestClient) -> None:
-    """Should return status 501."""
+    """Should return status 200 and turtle body."""
     with open("tests/files/catalog_1.ttl", "r") as file:
         text = file.read()
 
     with MultipartWriter("mixed") as mpwriter:
-        p = mpwriter.append(text)
+        p = mpwriter.append(text, {"CONTENT-TYPE": "text/turtle"})
+        p.set_content_disposition("inline", name="text")
+
+    resp = await client.post("/validator", data=mpwriter)
+    assert resp.status == 200
+    assert resp.headers[hdrs.CONTENT_TYPE] == "text/turtle"
+    body = await resp.text()
+
+    await _assess_response_body(body)
+
+
+@pytest.mark.integration
+async def test_validator_text_format_json_ld(client: _TestClient) -> None:
+    """Should return status 200 and turtle body."""
+    with open("tests/files/catalog_1.json", "r") as file:
+        text = file.read()
+
+    with MultipartWriter("mixed") as mpwriter:
+        p = mpwriter.append(text, {"CONTENT-TYPE": "application/ld+json"})
         p.set_content_disposition("inline", name="text")
 
     resp = await client.post("/validator", data=mpwriter)
@@ -151,7 +169,7 @@ async def test_validator_bad_syntax(client: _TestClient) -> None:
     data = "Bad syntax. No turtle here."
 
     with MultipartWriter("mixed") as mpwriter:
-        p = mpwriter.append(data)
+        p = mpwriter.append(data, {"CONTENT-TYPE": "text/turtle"})
         p.set_content_disposition("attachment", name="text")
 
     resp = await client.post("/validator", data=mpwriter)
@@ -164,11 +182,39 @@ async def test_validator_empty(client: _TestClient) -> None:
     data = ""
 
     with MultipartWriter("mixed") as mpwriter:
-        p = mpwriter.append(data)
+        p = mpwriter.append(data, {"CONTENT-TYPE": "text/turtle"})
         p.set_content_disposition("attachment", name="text")
 
     resp = await client.post("/validator", data=mpwriter)
     assert resp.status == 400
+
+
+@pytest.mark.integration
+async def test_validator_text_unsupported_content_type(client: _TestClient) -> None:
+    """Should return status 415."""
+    with open("tests/files/catalog_1.json", "r") as file:
+        text = file.read()
+
+    with MultipartWriter("mixed") as mpwriter:
+        p = mpwriter.append(text, {"CONTENT-TYPE": "unsupported/content+type"})
+        p.set_content_disposition("inline", name="text")
+
+    resp = await client.post("/validator", data=mpwriter)
+    assert resp.status == 415
+
+
+@pytest.mark.integration
+async def test_validator_text_no_content_type(client: _TestClient) -> None:
+    """Should return status 415."""
+    with open("tests/files/catalog_1.json", "r") as file:
+        text = file.read()
+
+    with MultipartWriter("mixed") as mpwriter:
+        p = mpwriter.append(text)
+        p.set_content_disposition("inline", name="text")
+
+    resp = await client.post("/validator", data=mpwriter)
+    assert resp.status == 415
 
 
 # ---------------------------------------------------------------------- #

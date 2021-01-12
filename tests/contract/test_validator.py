@@ -54,7 +54,46 @@ async def test_validator_with_text(http_service: Any) -> None:
         text = file.read()
 
     with MultipartWriter("mixed") as mpwriter:
-        p = mpwriter.append(text)
+        p = mpwriter.append(text, {"CONTENT-TYPE": "text/turtle"})
+        p.set_content_disposition("inline", name="text")
+
+    session = ClientSession()
+    async with session.post(url, data=mpwriter) as resp:
+        body = await resp.text()
+    await session.close()
+
+    assert resp.status == 200
+    assert "text/turtle" in resp.headers[hdrs.CONTENT_TYPE]
+
+    # results_graph (validation report) should be isomorphic to the following:
+    src = """
+    @prefix sh: <http://www.w3.org/ns/shacl#> .
+    @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+    [] a sh:ValidationReport ;
+         sh:conforms true
+         .
+    """
+    g1 = Graph().parse(data=body, format="text/turtle")
+    g2 = Graph().parse(data=src, format="text/turtle")
+
+    _isomorphic = isomorphic(g1, g2)
+    if not _isomorphic:
+        _dump_diff(g1, g2)
+        pass
+    assert _isomorphic, "results_graph is incorrect"
+
+
+@pytest.mark.contract
+@pytest.mark.asyncio
+async def test_validator_with_text_json_ld(http_service: Any) -> None:
+    """Should return OK and successful validation."""
+    url = f"{http_service}/validator"
+    with open("tests/files/catalog_1.json", "r") as file:
+        text = file.read()
+
+    with MultipartWriter("mixed") as mpwriter:
+        p = mpwriter.append(text, {"CONTENT-TYPE": "application/ld+json"})
         p.set_content_disposition("inline", name="text")
 
     session = ClientSession()

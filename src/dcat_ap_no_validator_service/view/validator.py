@@ -37,6 +37,9 @@ class Validator(web.View):
 
             if part.name == "text":
                 # Get data from text input:
+                if part.headers[hdrs.CONTENT_TYPE]:
+                    content_type = part.headers[hdrs.CONTENT_TYPE]
+                    logging.debug(f"content_type of {content_type}")
                 data = (await part.read()).decode()
                 logging.debug(f"Got text: {data}")
                 pass
@@ -62,6 +65,12 @@ class Validator(web.View):
         except SyntaxError:
             logging.error(traceback.format_exc())
             raise web.HTTPBadRequest(reason="Bad syntax in input graph.")
+
+        except PluginException:
+            logging.error(traceback.format_exc())
+            raise web.HTTPUnsupportedMediaType(
+                reason=f"Input graph format not supported: {content_type}"
+            )
 
         # Try to content-negotiate:
         format = "text/turtle"  # default
