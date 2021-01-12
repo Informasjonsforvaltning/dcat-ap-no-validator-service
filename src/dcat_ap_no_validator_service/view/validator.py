@@ -2,7 +2,7 @@
 import logging
 import traceback
 
-from aiohttp import web
+from aiohttp import ClientSession, web
 from rdflib.plugin import PluginException
 
 from dcat_ap_no_validator_service.service import ValidatorService
@@ -22,20 +22,20 @@ class Validator(web.View):
         async for field in (await self.request.multipart()):
             logging.debug(f"field.name {field.name}")
             if field.name == "version":
-                # Do something about token
+                # Get version of input from version:
                 version = (await field.read()).decode()
                 logging.debug(f"Got version: {version}")
                 pass
 
             if field.name == "url":
-                # Do something about token
+                # Get data from url:
                 url = (await field.read()).decode()
                 logging.debug(f"Got url: {url}")
-                raise web.HTTPNotImplemented
+                data = await get_graph_at_url(url)
                 pass
 
             if field.name == "text":
-                # Do something about key
+                # Get data from text input:
                 data = (await field.read()).decode()
                 logging.debug(f"Got text: {data}")
                 pass
@@ -75,3 +75,15 @@ class Validator(web.View):
         except PluginException:  # rdflib raises PluginException, in this context imples 406
             logging.error(traceback.format_exc())
             raise web.HTTPNotAcceptable()  # 406
+
+
+async def get_graph_at_url(url: str) -> str:
+    """Get a graph to be validated at given url."""
+    session = ClientSession()
+    async with session.get(url) as resp:
+        graph = await resp.text()
+    await session.close()
+
+    logging.debug(f"Got the following text from {url}/{resp.status}:\n {graph}")
+
+    return graph
