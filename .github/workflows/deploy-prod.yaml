@@ -13,14 +13,14 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      # Setup gcloud CLI
-      - uses: google-github-actions/setup-gcloud@master
+      - name: Setup gcloud CLI
+        uses: google-github-actions/setup-gcloud@master
         with:
           service_account_email: ${{ secrets.GCP_SA_DIGDIR_FDK_GCR_EMAIL }}
           service_account_key: ${{ secrets.GCP_SA_DIGDIR_FDK_GCR_KEY }}
 
-      # Configure docker to use the gcloud command-line tool as a credential helper
-      - run: gcloud auth configure-docker
+      - name: Configure docker to use the gcloud command-line tool as a credential helper
+        run: gcloud auth configure-docker eu.gcr.io
 
       - name: Set up Python 3.9
         uses: actions/setup-python@v1
