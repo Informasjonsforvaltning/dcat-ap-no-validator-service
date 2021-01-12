@@ -2,7 +2,7 @@
 
 import nox
 from nox.sessions import Session
-import nox_poetry.patch
+import nox_poetry
 
 locations = "src", "tests", "noxfile.py"
 nox.options.stop_on_first_error = True
