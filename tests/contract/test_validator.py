@@ -175,6 +175,26 @@ async def test_validator_url(http_service: Any) -> None:
     assert _isomorphic, "results_graph is incorrect"
 
 
+@pytest.mark.contract
+@pytest.mark.asyncio
+async def test_validator_notexisting_url(http_service: Any) -> None:
+    """Should return 400."""
+    url = f"{http_service}/validator"
+
+    url_to_graph = "https://raw.githubusercontent.com/Informasjonsforvaltning/dcat-ap-no-validator-service/main/tests/files/does_not_exist.ttl"  # noqa: B950
+    with MultipartWriter("mixed") as mpwriter:
+        p = mpwriter.append(url_to_graph)
+        p.set_content_disposition("inline", name="url")
+
+    session = ClientSession()
+    async with session.post(url, data=mpwriter) as resp:
+        # ...
+        _ = await resp.text()
+    await session.close()
+
+    assert resp.status == 400
+
+
 # ---------------------------------------------------------------------- #
 # Utils for displaying debug information
 
