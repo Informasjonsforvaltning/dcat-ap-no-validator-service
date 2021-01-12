@@ -22,20 +22,20 @@ class Validator(web.View):
         async for field in (await self.request.multipart()):
             logging.debug(f"field.name {field.name}")
             if field.name == "version":
-                # Do something about token
+                # Get version of input from version:
                 version = (await field.read()).decode()
                 logging.debug(f"Got version: {version}")
                 pass
 
             if field.name == "url":
-                # Do something about token
+                # Get data from url:
                 url = (await field.read()).decode()
                 logging.debug(f"Got url: {url}")
                 data = await get_graph_at_url(url)
                 pass
 
             if field.name == "text":
-                # Do something about key
+                # Get data from text input:
                 data = (await field.read()).decode()
                 logging.debug(f"Got text: {data}")
                 pass
