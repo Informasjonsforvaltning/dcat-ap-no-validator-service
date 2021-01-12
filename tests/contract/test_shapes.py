@@ -15,12 +15,12 @@ async def test_get_all_shapes(http_service: Any) -> None:
 
     session = ClientSession()
     async with session.get(url) as resp:
-        pass
+        body = await resp.text()
     await session.close()
 
     assert resp.status == 200
     assert resp.headers[hdrs.CONTENT_TYPE] == "text/turtle"
-    print(f"resp.text: {resp.text}")
+    print(f"body: {body}")
 
 
 # ---------------------------------------------------------------------- #
