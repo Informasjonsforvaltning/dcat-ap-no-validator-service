@@ -16,8 +16,8 @@ class Validator(web.View):
         accept_header = self.request.headers["Accept"]
         logging.debug(f"Got following accept-headers: {accept_header}")
         # Iterate through each part of MultipartReader
-        data = ""
-        version = ""
+        data = None
+        version = None
         filename = None
         content_type = "text/turtle"  # default content
         async for part in (await self.request.multipart()):
