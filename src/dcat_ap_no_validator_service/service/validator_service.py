@@ -24,6 +24,8 @@ class ValidatorService:
         self._g = Graph().parse(data=graph, format=format)
         if version is None:
             self._version = DEFAULT_SHACL_VERSION
+        elif version == "":
+            self._version = DEFAULT_SHACL_VERSION
         else:
             self._version = version
 
