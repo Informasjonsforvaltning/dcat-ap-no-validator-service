@@ -29,6 +29,43 @@ async def test_validator_file(client: _TestClient) -> None:
 
 
 @pytest.mark.integration
+async def test_validator_file_no_version(client: _TestClient) -> None:
+    """Should return OK."""
+    filename = "tests/files/catalog_1.ttl"
+
+    with MultipartWriter("mixed") as mpwriter:
+        p = mpwriter.append(open(filename, "rb"))
+        p.set_content_disposition("attachment", name="file", filename=filename)
+
+    resp = await client.post("/validator", data=mpwriter)
+    assert resp.status == 200
+    assert resp.headers[hdrs.CONTENT_TYPE] == "text/turtle"
+
+    body = await resp.text()
+    await _assess_response_body(body)
+
+
+@pytest.mark.integration
+async def test_validator_file_empty_version(client: _TestClient) -> None:
+    """Should return OK."""
+    filename = "tests/files/catalog_1.ttl"
+    version = ""
+
+    with MultipartWriter("mixed") as mpwriter:
+        p = mpwriter.append(open(filename, "rb"))
+        p.set_content_disposition("attachment", name="file", filename=filename)
+        p = mpwriter.append(version)
+        p.set_content_disposition("inline", name="version")
+
+    resp = await client.post("/validator", data=mpwriter)
+    assert resp.status == 200
+    assert resp.headers[hdrs.CONTENT_TYPE] == "text/turtle"
+
+    body = await resp.text()
+    await _assess_response_body(body)
+
+
+@pytest.mark.integration
 async def test_validator_file_content_negotiation_json_ld(client: _TestClient) -> None:
     """Should return OK."""
     filename = "tests/files/catalog_1.ttl"

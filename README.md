@@ -24,7 +24,7 @@ Response will be a RDF graph consisting of
  -F "file=@tests/files/catalog_1.ttl;type=text/turtle" \
  -X POST http://localhost:8000/validator
 ```
-### Validate endpoint(url) (Not implemented yet)
+### Validate endpoint(url)
 ```
 % curl -i \
  -H "Accept: text/turtle" \
