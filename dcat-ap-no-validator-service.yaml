@@ -27,15 +27,15 @@ paths:
                     description: an identifier of the version to be validated against
                   text:
                     type: string
-                    description: a text string with RDF as turtle
+                    description: a text string with serialized RDF
                   url:
                     type: string
                     format: uri
-                    description: a url pointing to a resource on the internet
+                    description: a url pointing to an RDF graph on the internet
                   file:
                     type: string
                     format: binary
-                    description: a file containing RDF
+                    description: a file containing serialized RDF
             encoding:
               file:
                 contentType: text/turtle

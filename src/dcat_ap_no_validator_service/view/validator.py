@@ -32,7 +32,10 @@ class Validator(web.View):
                 # Get data from url:
                 url = (await part.read()).decode()
                 logging.debug(f"Got url: {url}")
-                data = await get_graph_at_url(url)
+                data, content_type = await get_graph_at_url(url)
+                # Since we do not support text/plain, we assume turtle in this case:
+                if "text/plain" in content_type:
+                    content_type = "text/turtle"
                 pass
 
             if part.name == "text":
@@ -89,13 +92,16 @@ class Validator(web.View):
             raise web.HTTPNotAcceptable()  # 406
 
 
-async def get_graph_at_url(url: str) -> str:
+async def get_graph_at_url(url: str) -> tuple:
     """Get a graph to be validated at given url."""
     session = ClientSession()
     async with session.get(url) as resp:
         graph = await resp.text()
     await session.close()
 
-    logging.debug(f"Got the following text from {url}/{resp.status}:\n {graph}")
+    content_type = resp.headers[hdrs.CONTENT_TYPE]
+    logging.debug(
+        f"Got the following text from {url}/{resp.status}/{content_type}:\n {graph}"
+    )
 
-    return graph
+    return graph, content_type
