@@ -1,0 +1,231 @@
+{
+  "@context": {
+    "dcat": "http://www.w3.org/ns/dcat#",
+    "dct": "http://purl.org/dc/terms/",
+    "foaf": "http://xmlns.com/foaf/0.1/",
+    "rov": "http://www.w3.org/ns/regorg#",
+    "vcard": "http://www.w3.org/2006/vcard/ns#"
+  },
+  "@graph": [
+    {
+      "@id": "http://dataservice-publisher:8080/dataservices/6",
+      "@type": "dcat:DataService",
+      "dcat:endpointDescription": {
+        "@id": "https://raw.githubusercontent.com/OAI/OpenAPI-Specification/master/examples/v3.0/petstore.yaml"
+      },
+      "dcat:endpointURL": {
+        "@id": "http://test.petstore.swagger.io/v1"
+      },
+      "dcat:mediaType": {
+        "@id": "https://www.iana.org/assignments/media-types/application/json"
+      },
+      "dct:conformsTo": [
+        {
+          "@id": "http://example.com/specifications/saldoopplysninger"
+        },
+        {
+          "@id": "http://example.com/specifications/kontooppslag"
+        }
+      ],
+      "dct:identifier": "6",
+      "dct:publisher": {
+        "@id": "https://organization-catalogue.fellesdatakatalog.digdir.no/organizations/961181399"
+      },
+      "dct:title": {
+        "@language": "en",
+        "@value": "Swagger Petstore"
+      }
+    },
+    {
+      "@id": "http://dataservice-publisher:8080/dataservices/5",
+      "@type": "dcat:DataService",
+      "dcat:endpointDescription": {
+        "@id": "https://raw.githubusercontent.com/OAI/OpenAPI-Specification/master/examples/v3.0/petstore.yaml"
+      },
+      "dcat:endpointURL": {
+        "@id": "http://petstore.swagger.io/v1"
+      },
+      "dcat:mediaType": {
+        "@id": "https://www.iana.org/assignments/media-types/application/json"
+      },
+      "dct:conformsTo": [
+        {
+          "@id": "http://example.com/specifications/saldoopplysninger"
+        },
+        {
+          "@id": "http://example.com/specifications/kontooppslag"
+        }
+      ],
+      "dct:identifier": "5",
+      "dct:publisher": {
+        "@id": "https://organization-catalogue.fellesdatakatalog.digdir.no/organizations/961181399"
+      },
+      "dct:title": {
+        "@language": "en",
+        "@value": "Swagger Petstore"
+      }
+    },
+    {
+      "@id": "rov:legalName",
+      "http://www.w3.org/2000/01/rdf-schema#subPropertyOf": {
+        "@id": "foaf:name"
+      }
+    },
+    {
+      "@id": "http://dataservice-publisher:8080/dataservices/2",
+      "@type": "dcat:DataService",
+      "dcat:endpointDescription": {
+        "@id": "https://raw.githubusercontent.com/OAI/OpenAPI-Specification/master/examples/v3.0/petstore.yaml"
+      },
+      "dcat:endpointURL": {
+        "@id": "http://test.petstore.swagger.io/v1"
+      },
+      "dcat:mediaType": {
+        "@id": "https://www.iana.org/assignments/media-types/application/json"
+      },
+      "dct:identifier": "2",
+      "dct:title": {
+        "@language": "en",
+        "@value": "Swagger Petstore"
+      }
+    },
+    {
+      "@id": "http://example.com/specifications/saldoopplysninger",
+      "@type": "dct:Standard"
+    },
+    {
+      "@id": "http://dataservice-publisher:8080/dataservices/4",
+      "@type": "dcat:DataService",
+      "dcat:endpointDescription": {
+        "@id": "https://raw.githubusercontent.com/OAI/OpenAPI-Specification/master/examples/v3.0/petstore.yaml"
+      },
+      "dcat:endpointURL": {
+        "@id": "http://test.petstore.swagger.io/v1"
+      },
+      "dcat:mediaType": {
+        "@id": "https://www.iana.org/assignments/media-types/application/json"
+      },
+      "dct:identifier": "4",
+      "dct:publisher": {
+        "@id": "https://organization-catalogue.fellesdatakatalog.digdir.no/organizations/961181399"
+      },
+      "dct:title": {
+        "@language": "en",
+        "@value": "Swagger Petstore"
+      }
+    },
+    {
+      "@id": "http://dataservice-publisher:8080/dataservices/3",
+      "@type": "dcat:DataService",
+      "dcat:endpointDescription": {
+        "@id": "https://raw.githubusercontent.com/OAI/OpenAPI-Specification/master/examples/v3.0/petstore.yaml"
+      },
+      "dcat:endpointURL": {
+        "@id": "http://petstore.swagger.io/v1"
+      },
+      "dcat:mediaType": {
+        "@id": "https://www.iana.org/assignments/media-types/application/json"
+      },
+      "dct:identifier": "3",
+      "dct:publisher": {
+        "@id": "https://organization-catalogue.fellesdatakatalog.digdir.no/organizations/961181399"
+      },
+      "dct:title": {
+        "@language": "en",
+        "@value": "Swagger Petstore"
+      }
+    },
+    {
+      "@id": "https://organization-catalogue.fellesdatakatalog.digdir.no/organizations/961181399",
+      "@type": "rov:RegisteredOrganization",
+      "rov:legalName": "DIGITALISERINGSDIREKTORATET"
+    },
+    {
+      "@id": "http://dataservice-publisher:8080/dataservices/1",
+      "@type": "dcat:DataService",
+      "dcat:endpointDescription": {
+        "@id": "https://raw.githubusercontent.com/OAI/OpenAPI-Specification/master/examples/v3.0/petstore.yaml"
+      },
+      "dcat:endpointURL": {
+        "@id": "http://petstore.swagger.io/v1"
+      },
+      "dcat:mediaType": {
+        "@id": "https://www.iana.org/assignments/media-types/application/json"
+      },
+      "dct:identifier": "1",
+      "dct:title": {
+        "@language": "en",
+        "@value": "Swagger Petstore"
+      }
+    },
+    {
+      "@id": "rov:RegisteredOrganization",
+      "http://www.w3.org/2000/01/rdf-schema#subClassOf": {
+        "@id": "foaf:Agent"
+      }
+    },
+    {
+      "@id": "http://example.com/specifications/kontooppslag",
+      "@type": "dct:Standard"
+    },
+    {
+      "@id": "http://dataservice-publisher:8080/catalogs/1",
+      "@type": "dcat:Catalog",
+      "dcat:service": [
+        {
+          "@id": "http://dataservice-publisher:8080/dataservices/2"
+        },
+        {
+          "@id": "http://dataservice-publisher:8080/dataservices/6"
+        },
+        {
+          "@id": "http://dataservice-publisher:8080/dataservices/4"
+        },
+        {
+          "@id": "http://dataservice-publisher:8080/dataservices/3"
+        },
+        {
+          "@id": "http://dataservice-publisher:8080/dataservices/1"
+        },
+        {
+          "@id": "http://dataservice-publisher:8080/dataservices/5"
+        }
+      ],
+      "dct:conformsTo": {
+        "@id": "https://data.norge.no/specification/dcat-ap-no/v2"
+      },
+      "dct:description": [
+        {
+          "@language": "nb",
+          "@value": "Beskrivelse"
+        },
+        {
+          "@language": "nn",
+          "@value": "Skildring"
+        },
+        {
+          "@language": "en",
+          "@value": "Description"
+        }
+      ],
+      "dct:identifier": "1",
+      "dct:publisher": {
+        "@id": "https://organization-catalogue.fellesdatakatalog.digdir.no/organizations/961181399"
+      },
+      "dct:title": [
+        {
+          "@language": "nb",
+          "@value": "Testkatalog"
+        },
+        {
+          "@language": "nn",
+          "@value": "Testkatalog"
+        },
+        {
+          "@language": "en",
+          "@value": "Testcatalog"
+        }
+      ]
+    }
+  ]
+}

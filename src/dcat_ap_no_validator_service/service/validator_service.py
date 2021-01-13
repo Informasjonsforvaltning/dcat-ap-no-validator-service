@@ -11,10 +11,12 @@ from dcat_ap_no_validator_service.service import ShapeService
 class ValidatorService:
     """Class representing validator service."""
 
-    def __init__(self, graph: str, version: str = "2") -> None:
+    def __init__(
+        self, graph: str, format: str = "text/turtle", version: str = "2"
+    ) -> None:
         """Initialize service instance."""
         logging.debug(f"Got request for version: {version}")
-        self._g = Graph().parse(data=graph, format="turtle")
+        self._g = Graph().parse(data=graph, format=format)
         self._version = version
 
     async def validate(self) -> Tuple[bool, Graph, Graph, str]:

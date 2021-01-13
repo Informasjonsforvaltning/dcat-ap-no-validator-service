@@ -2,7 +2,7 @@
 import logging
 import traceback
 
-from aiohttp import ClientSession, web
+from aiohttp import ClientSession, hdrs, web
 from rdflib.plugin import PluginException
 
 from dcat_ap_no_validator_service.service import ValidatorService
@@ -15,41 +15,50 @@ class Validator(web.View):
         """Validate route function."""
         accept_header = self.request.headers["Accept"]
         logging.debug(f"Got following accept-headers: {accept_header}")
-        # Iterate through each field of MultipartReader
+        # Iterate through each part of MultipartReader
         data = ""
         version = ""
         filename = None
-        async for field in (await self.request.multipart()):
-            logging.debug(f"field.name {field.name}")
-            if field.name == "version":
+        content_type = "text/turtle"  # default content
+        async for part in (await self.request.multipart()):
+            logging.debug(f"part.name {part.name}")
+            if part.name == "version":
                 # Get version of input from version:
-                version = (await field.read()).decode()
+                version = (await part.read()).decode()
                 logging.debug(f"Got version: {version}")
                 pass
 
-            if field.name == "url":
+            if part.name == "url":
                 # Get data from url:
-                url = (await field.read()).decode()
+                url = (await part.read()).decode()
                 logging.debug(f"Got url: {url}")
-                data = await get_graph_at_url(url)
+                data, content_type = await get_graph_at_url(url)
+                # Since we do not support text/plain, we assume turtle in this case:
+                if "text/plain" in content_type:
+                    content_type = "text/turtle"
                 pass
 
-            if field.name == "text":
+            if part.name == "text":
                 # Get data from text input:
-                data = (await field.read()).decode()
+                if part.headers[hdrs.CONTENT_TYPE]:
+                    content_type = part.headers[hdrs.CONTENT_TYPE]
+                    logging.debug(f"content_type of {content_type}")
+                data = (await part.read()).decode()
                 logging.debug(f"Got text: {data}")
                 pass
 
-            if field.name == "file":
+            if part.name == "file":
                 # Process any files you uploaded
-                filename = field.filename
+                filename = part.filename
                 logging.debug(f"got filename: {filename}")
-                # In your example, filename should be "2C80...jpg"
-                data = (await field.read()).decode()
-                logging.debug(f"content of {filename}: {data}")
+                if part.headers[hdrs.CONTENT_TYPE]:
+                    content_type = part.headers[hdrs.CONTENT_TYPE]
+                    logging.debug(f"content_type of {content_type}")
+                data = (await part.read()).decode()
+                logging.debug(f"content_type of {filename}: {data}")
         # We have got data, now validate:
         try:
-            service = ValidatorService(data, version)
+            service = ValidatorService(data, format=content_type, version=version)
             conforms, data_graph, results_graph, results_text = await service.validate()
 
         except ValueError as e:
@@ -59,6 +68,12 @@ class Validator(web.View):
         except SyntaxError:
             logging.error(traceback.format_exc())
             raise web.HTTPBadRequest(reason="Bad syntax in input graph.")
+
+        except PluginException:
+            logging.error(traceback.format_exc())
+            raise web.HTTPUnsupportedMediaType(
+                reason=f"Input graph format not supported: {content_type}"
+            )
 
         # Try to content-negotiate:
         format = "text/turtle"  # default
@@ -77,13 +92,16 @@ class Validator(web.View):
             raise web.HTTPNotAcceptable()  # 406
 
 
-async def get_graph_at_url(url: str) -> str:
+async def get_graph_at_url(url: str) -> tuple:
     """Get a graph to be validated at given url."""
     session = ClientSession()
     async with session.get(url) as resp:
         graph = await resp.text()
     await session.close()
 
-    logging.debug(f"Got the following text from {url}/{resp.status}:\n {graph}")
+    content_type = resp.headers[hdrs.CONTENT_TYPE]
+    logging.debug(
+        f"Got the following text from {url}/{resp.status}/{content_type}:\n {graph}"
+    )
 
-    return graph
+    return graph, content_type
