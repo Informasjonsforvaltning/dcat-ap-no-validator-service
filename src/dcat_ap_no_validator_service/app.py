@@ -11,18 +11,17 @@ from .view import Ping, Ready, Shape, Shapes, Validator
 load_dotenv()
 LOGGING_LEVEL = os.getenv("LOGGING_LEVEL", "INFO")
 
-# CORS configuration
+# CORS configuration:
+# Allow CORS requests from following urls:
 CORS_ALLOW_ORIGINS = ["https://staging.fellesdatakatalog.digdir.no"]
 
 
 async def create_app() -> web.Application:
     """Create an web application."""
-    # Unsecure configuration to allow all CORS requests, for testing
-    # app = web.Application(middlewares=[cors_middleware(allow_all=True)])
     app = web.Application(
         middlewares=[
             cors_middleware(origins=CORS_ALLOW_ORIGINS, allow_credentials=True),
-            error_middleware(),
+            error_middleware(),  # default error handler for whole application
         ]
     )
     app.add_routes(
