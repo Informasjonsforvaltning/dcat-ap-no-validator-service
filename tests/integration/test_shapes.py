@@ -42,7 +42,7 @@ async def test_get_shapes_by_id_not_found(client: _TestClient) -> None:
     resp = await client.get("/shapes/doesnotexist")
     assert resp.status == 404
     body = await resp.text()
-    assert "404: Not Found" in body
+    assert "Not Found" in body
 
 
 @pytest.mark.integration
@@ -54,7 +54,7 @@ async def test_get_all_shapes_accept_header_not_supported(
     resp = await client.get("/shapes", headers=headers)
     assert resp.status == 406
     body = await resp.text()
-    assert "406: Not Acceptable" in body
+    assert "Not Acceptable" in body
 
 
 @pytest.mark.integration
@@ -66,7 +66,7 @@ async def test_get_shapes_by_id_accept_header_not_supported(
     resp = await client.get("/shapes/1.1", headers=headers)
     assert resp.status == 406
     body = await resp.text()
-    assert "406: Not Acceptable" in body
+    assert "Not Acceptable" in body
 
 
 @pytest.mark.integration
@@ -80,7 +80,7 @@ async def test_get_all_shapes_fails(client: _TestClient, mocker: MockFixture) ->
     resp = await client.get("/shapes")
     assert resp.status == 500
     body = await resp.text()
-    assert "500: Internal Server Error" in body
+    assert "Internal Server Error" in body
 
 
 @pytest.mark.integration
@@ -94,7 +94,7 @@ async def test_get_shapes_by_id_fails(client: _TestClient, mocker: MockFixture) 
     resp = await client.get("/shapes/1.1")
     assert resp.status == 500
     body = await resp.text()
-    assert "500: Internal Server Error" in body
+    assert "Internal Server Error" in body
 
 
 # ---------------------------------------------------------------------- #

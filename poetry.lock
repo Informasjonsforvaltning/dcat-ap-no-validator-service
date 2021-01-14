@@ -33,6 +33,18 @@ Pygments = ">=2.2.0"
 watchgod = ">=0.2"
 
 [[package]]
+name = "aiohttp-middlewares"
+version = "1.1.0"
+description = "Collection of useful middlewares for aiohttp applications."
+category = "main"
+optional = false
+python-versions = ">=3.6,<4.0"
+
+[package.dependencies]
+aiohttp = ">=3.5,<4.0"
+async-timeout = ">=1.2,<4"
+
+[[package]]
 name = "appdirs"
 version = "1.4.4"
 description = "A small Python module for determining appropriate platform-specific dirs, e.g. a \"user data dir\"."
@@ -1031,7 +1043,7 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "e78fc657097dd900b817773c8bb55b643d3e7f6e85cf7a1efb166b143976a10f"
+content-hash = "6455d2f77ab76f94cdead6a48cb9342168db253ed6e757d8c1ea0827b1e07a71"
 
 [metadata.files]
 aiohttp = [
@@ -1076,6 +1088,10 @@ aiohttp = [
 aiohttp-devtools = [
     {file = "aiohttp-devtools-0.13.1.tar.gz", hash = "sha256:da9490c56671ed3920ceb98fc558065dec573c771ca17d500467b245b63f0f9d"},
     {file = "aiohttp_devtools-0.13.1-py35.py36.py37-none-any.whl", hash = "sha256:70dbab32e2234296ddc995cacc06acf6b7ee2cf2ac1be62d4e12e0d333e63f00"},
+]
+aiohttp-middlewares = [
+    {file = "aiohttp-middlewares-1.1.0.tar.gz", hash = "sha256:4a58c090ea50f44ae49a8ce1dc79f7366b8b6223f179f499bc97f399751efeed"},
+    {file = "aiohttp_middlewares-1.1.0-py3-none-any.whl", hash = "sha256:47080da0eaa8dee0f3d26ce781959b077b79dd063f45308f5e93fd4134f1c683"},
 ]
 appdirs = [
     {file = "appdirs-1.4.4-py2.py3-none-any.whl", hash = "sha256:a841dacd6b99318a741b166adb07e19ee71a274450e68237b4650ca1055ab128"},
