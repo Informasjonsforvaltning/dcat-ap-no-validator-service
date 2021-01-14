@@ -91,7 +91,11 @@
     },
     {
       "@id": "http://example.com/specifications/saldoopplysninger",
-      "@type": "dct:Standard"
+      "@type": "dct:Standard",
+      "dct:title": {
+        "@language": "nb",
+        "@value": "Standard for saldoopplysninger"
+      }
     },
     {
       "@id": "http://dataservice-publisher:8080/dataservices/4",
@@ -166,7 +170,11 @@
     },
     {
       "@id": "http://example.com/specifications/kontooppslag",
-      "@type": "dct:Standard"
+      "@type": "dct:Standard",
+      "dct:title": {
+        "@language": "nb",
+        "@value": "Standard for kontooppslag"
+      }
     },
     {
       "@id": "http://dataservice-publisher:8080/catalogs/1",

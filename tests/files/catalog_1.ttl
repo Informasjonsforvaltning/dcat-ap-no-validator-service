@@ -79,8 +79,12 @@
                    <http://example.com/specifications/saldoopplysninger>
     .
 
-<http://example.com/specifications/saldoopplysninger> a dct:Standard .
-<http://example.com/specifications/kontooppslag> a dct:Standard .
+<http://example.com/specifications/saldoopplysninger> a dct:Standard ;
+    dct:title "Standard for saldoopplysninger"@nb ;
+    .
+<http://example.com/specifications/kontooppslag> a dct:Standard ;
+    dct:title "Standard for kontooppslag"@nb ;
+    .
 
 <https://organization-catalogue.fellesdatakatalog.digdir.no/organizations/961181399> a rov:RegisteredOrganization ;
   rov:legalName          "DIGITALISERINGSDIREKTORATET" ;

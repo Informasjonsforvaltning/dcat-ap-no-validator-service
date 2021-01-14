@@ -17,7 +17,7 @@ class ShapeService:
                 "dcat-ap_shacl_shapes_1.1.ttl", format="turtle"
             )
             self._shape_db["2"] = Graph().parse(
-                "BRegDCAT-AP-shacl_shapes_2.00.ttl", format="turtle"
+                "dcat-ap-no-shacl_shapes_2.00.ttl", format="turtle"
             )
         except Exception as e:
             logging.error(f"Exception: {e}")
