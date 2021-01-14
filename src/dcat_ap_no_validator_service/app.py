@@ -12,7 +12,7 @@ load_dotenv()
 LOGGING_LEVEL = os.getenv("LOGGING_LEVEL", "INFO")
 
 # CORS configuration
-CORS_ALLOW_ORIGINS = ["https://staging..fellesdatakatalog.digdir.no"]
+CORS_ALLOW_ORIGINS = ["https://staging.fellesdatakatalog.digdir.no"]
 
 
 async def create_app() -> web.Application:
