@@ -328,6 +328,68 @@ async def test_validator_with_minimal_file(http_service: Any) -> None:
     assert not _isomorphic, "results_graph is incorrect"
 
 
+@pytest.mark.contract
+@pytest.mark.asyncio
+async def test_validator_with_not_valid_file(http_service: Any) -> None:
+    """Should return OK and unsuccessful validation."""
+    url = f"{http_service}/validator"
+    filename = "tests/files/catalog_2_not_valid.ttl"
+    version = "2"
+
+    with MultipartWriter("mixed") as mpwriter:
+        p = mpwriter.append(open(filename, "rb"))
+        p.set_content_disposition("attachment", name="file", filename=filename)
+        p = mpwriter.append(version)
+        p.set_content_disposition("inline", name="version")
+
+    session = ClientSession()
+    async with session.post(url, data=mpwriter) as resp:
+        body = await resp.text()
+    await session.close()
+
+    assert resp.status == 200
+    assert "text/turtle" in resp.headers[hdrs.CONTENT_TYPE]
+
+    # results_graph (validation report) should be isomorphic to the following:
+    src = """
+    @prefix sh: <http://www.w3.org/ns/shacl#> .
+    @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+    [] a sh:ValidationReport ;
+         sh:conforms false ;
+         sh:result [ a sh:ValidationResult ;
+                sh:focusNode <http://dataset-publisher:8080/datasets/1> ;
+                sh:resultMessage "Less than 1 values on <http://dataset-publisher:8080/datasets/1>->dct:description" ;
+                sh:resultPath <http://purl.org/dc/terms/description> ;
+                sh:resultSeverity sh:Violation ;
+                sh:sourceConstraintComponent sh:MinCountConstraintComponent ;
+                sh:sourceShape [ sh:minCount 1 ;
+                        sh:nodeKind sh:Literal ;
+                        sh:path <http://purl.org/dc/terms/description> ;
+                        sh:severity sh:Violation ] ],
+            [ a sh:ValidationResult ;
+                sh:focusNode <http://dataset-publisher:8080/catalogs/1> ;
+                sh:resultMessage "Value does not have class foaf:Agent" ;
+                sh:resultPath <http://purl.org/dc/terms/publisher> ;
+                sh:resultSeverity sh:Violation ;
+                sh:sourceConstraintComponent sh:ClassConstraintComponent ;
+                sh:sourceShape [ sh:class <http://xmlns.com/foaf/0.1/Agent> ;
+                        sh:maxCount 1 ;
+                        sh:minCount 1 ;
+                        sh:path <http://purl.org/dc/terms/publisher> ;
+                        sh:severity sh:Violation ] ;
+                sh:value <https://organization-catalogue.fellesdatakatalog.digdir.no/organizations/961181399> ]
+    .
+    """
+    g1 = Graph().parse(data=body, format="text/turtle")
+    g2 = Graph().parse(data=src, format="text/turtle")
+
+    _isomorphic = isomorphic(g1, g2)
+    if not _isomorphic:
+        _dump_diff(g1, g2)
+        pass
+    assert _isomorphic, "results_graph is incorrect"
+
+
 # --- bad cases ---
 @pytest.mark.contract
 @pytest.mark.asyncio
