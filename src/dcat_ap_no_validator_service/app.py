@@ -3,7 +3,7 @@ import logging
 import os
 
 from aiohttp import web
-from aiohttp_middlewares import cors_middleware
+from aiohttp_middlewares import cors_middleware, error_middleware
 from dotenv import load_dotenv
 
 from .view import Ping, Ready, Shape, Shapes, Validator
@@ -21,7 +21,8 @@ async def create_app() -> web.Application:
     # app = web.Application(middlewares=[cors_middleware(allow_all=True)])
     app = web.Application(
         middlewares=[
-            cors_middleware(origins=CORS_ALLOW_ORIGINS, allow_credentials=True)
+            cors_middleware(origins=CORS_ALLOW_ORIGINS, allow_credentials=True),
+            error_middleware(),
         ]
     )
     app.add_routes(
