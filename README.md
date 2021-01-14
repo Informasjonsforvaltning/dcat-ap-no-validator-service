@@ -21,7 +21,7 @@ Response will be a RDF graph consisting of
  -H "Accept: text/turtle" \
  -H "Content-Type: multipart/form-data" \
  -F "version=2" \
- -F "file=@tests/files/catalog_1.ttl;type=text/turtle" \
+ -F "file=@tests/files/valid_catalog.ttl;type=text/turtle" \
  -X POST http://localhost:8000/validator
 ```
 ### Validate endpoint(url)
@@ -59,14 +59,12 @@ Response will be a RDF graph consisting of
 ### Running the API locally
 Start the server locally:
 ```
-% poetry shell
-% adev runserver src/dcat_ap_no_validator_service
+% poetry run adev runserver src/dcat_ap_no_validator_service
 ```
  TBD
 ## Running the API in a wsgi-server (gunicorn)
 ```
-% poetry shell
-% gunicorn dcat_ap_no_validator_service:create_app --bind localhost:8080 --worker-class aiohttp.GunicornWebWorker
+% poetry run gunicorn dcat_ap_no_validator_service:create_app --bind localhost:8080 --worker-class aiohttp.GunicornWebWorker
 ```
 ## Running the wsgi-server in Docker
 To build and run the api in a Docker container:

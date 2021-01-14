@@ -11,7 +11,7 @@ from rdflib.compare import graph_diff, isomorphic
 @pytest.mark.integration
 async def test_validator_file(client: _TestClient) -> None:
     """Should return OK."""
-    filename = "tests/files/catalog_1.ttl"
+    filename = "tests/files/valid_catalog.ttl"
     version = "2"
 
     with MultipartWriter("mixed") as mpwriter:
@@ -31,7 +31,7 @@ async def test_validator_file(client: _TestClient) -> None:
 @pytest.mark.integration
 async def test_validator_file_no_version(client: _TestClient) -> None:
     """Should return OK."""
-    filename = "tests/files/catalog_1.ttl"
+    filename = "tests/files/valid_catalog.ttl"
 
     with MultipartWriter("mixed") as mpwriter:
         p = mpwriter.append(open(filename, "rb"))
@@ -48,7 +48,7 @@ async def test_validator_file_no_version(client: _TestClient) -> None:
 @pytest.mark.integration
 async def test_validator_file_empty_version(client: _TestClient) -> None:
     """Should return OK."""
-    filename = "tests/files/catalog_1.ttl"
+    filename = "tests/files/valid_catalog.ttl"
     version = ""
 
     with MultipartWriter("mixed") as mpwriter:
@@ -68,7 +68,7 @@ async def test_validator_file_empty_version(client: _TestClient) -> None:
 @pytest.mark.integration
 async def test_validator_file_content_negotiation_json_ld(client: _TestClient) -> None:
     """Should return OK."""
-    filename = "tests/files/catalog_1.ttl"
+    filename = "tests/files/valid_catalog.ttl"
     version = "2"
     accept = "application/ld+json"
     headers = {"Accept": accept}
@@ -90,7 +90,7 @@ async def test_validator_file_content_negotiation_json_ld(client: _TestClient) -
 @pytest.mark.integration
 async def test_validator_file_content_type_json_ld(client: _TestClient) -> None:
     """Should return OK and successful validation."""
-    filename = "tests/files/catalog_1.json"
+    filename = "tests/files/valid_catalog.json"
 
     with MultipartWriter("mixed") as mpwriter:
         p = mpwriter.append(
@@ -109,7 +109,7 @@ async def test_validator_file_content_type_json_ld(client: _TestClient) -> None:
 @pytest.mark.integration
 async def test_validator_file_accept_header_not_valid(client: _TestClient) -> None:
     """Should return status_code 406."""
-    filename = "tests/files/catalog_1.ttl"
+    filename = "tests/files/valid_catalog.ttl"
     version = "2"
     content_type = "not_valid"
     headers = {"Accept": content_type}
@@ -127,7 +127,7 @@ async def test_validator_file_accept_header_not_valid(client: _TestClient) -> No
 @pytest.mark.integration
 async def test_validator_file_content_encoding(client: _TestClient) -> None:
     """Should return OK."""
-    filename = "tests/files/catalog_1.ttl"
+    filename = "tests/files/valid_catalog.ttl"
     version = "2"
 
     with MultipartWriter("mixed") as mpwriter:
@@ -148,7 +148,7 @@ async def test_validator_file_content_encoding(client: _TestClient) -> None:
 @pytest.mark.integration
 async def test_validator_url(client: _TestClient) -> None:
     """Should return status 501."""
-    url_to_graph = "https://raw.githubusercontent.com/Informasjonsforvaltning/dcat-ap-no-validator-service/main/tests/files/catalog_1.ttl"  # noqa: B950
+    url_to_graph = "https://raw.githubusercontent.com/Informasjonsforvaltning/dcat-ap-no-validator-service/main/tests/files/valid_catalog.ttl"  # noqa: B950
     with MultipartWriter("mixed") as mpwriter:
         p = mpwriter.append(url_to_graph)
         p.set_content_disposition("inline", name="url")
@@ -164,7 +164,7 @@ async def test_validator_url(client: _TestClient) -> None:
 @pytest.mark.integration
 async def test_validator_text(client: _TestClient) -> None:
     """Should return status 200 and turtle body."""
-    with open("tests/files/catalog_1.ttl", "r") as file:
+    with open("tests/files/valid_catalog.ttl", "r") as file:
         text = file.read()
 
     with MultipartWriter("mixed") as mpwriter:
@@ -182,7 +182,7 @@ async def test_validator_text(client: _TestClient) -> None:
 @pytest.mark.integration
 async def test_validator_text_format_json_ld(client: _TestClient) -> None:
     """Should return status 200 and turtle body."""
-    with open("tests/files/catalog_1.json", "r") as file:
+    with open("tests/files/valid_catalog.json", "r") as file:
         text = file.read()
 
     with MultipartWriter("mixed") as mpwriter:
@@ -250,7 +250,7 @@ async def test_validator_empty(client: _TestClient) -> None:
 @pytest.mark.integration
 async def test_validator_text_unsupported_content_type(client: _TestClient) -> None:
     """Should return status 415."""
-    with open("tests/files/catalog_1.json", "r") as file:
+    with open("tests/files/valid_catalog.json", "r") as file:
         text = file.read()
 
     with MultipartWriter("mixed") as mpwriter:
@@ -264,7 +264,7 @@ async def test_validator_text_unsupported_content_type(client: _TestClient) -> N
 @pytest.mark.integration
 async def test_validator_text_no_content_type(client: _TestClient) -> None:
     """Should return status 415."""
-    with open("tests/files/catalog_1.json", "r") as file:
+    with open("tests/files/valid_catalog.json", "r") as file:
         text = file.read()
 
     with MultipartWriter("mixed") as mpwriter:

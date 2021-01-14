@@ -14,7 +14,7 @@ RUN poetry config virtualenvs.create false \
 ADD src /app/src
 
 # Need to copy the shapes into the container
-COPY BRegDCAT-AP-shacl_shapes_2.00.ttl /app/src/.
+COPY dcat-ap-no-shacl_shapes_2.00.ttl /app/src/.
 COPY dcat-ap_shacl_shapes_1.1.ttl /app/src/.
 
 EXPOSE 8080

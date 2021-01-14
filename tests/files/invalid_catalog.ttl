@@ -12,11 +12,12 @@
 <http://dataset-publisher:8080/catalogs/1> a dcat:Catalog ;
     dct:identifier "1" ;
     dct:publisher <https://organization-catalogue.fellesdatakatalog.digdir.no/organizations/961181399> ;
-    dct:title "Testcatalog"@en, "Testkatalog"@nb, "Testkatalog"@nn ;
-    dct:description "Description"@en, "Beskrivelse"@nb, "Skildring"@nn ;
+    dct:title "Invalid testcatalog"@en ;
+    dct:description "A test catalog that is not valid according to dcat-ap-no v2"@en ;
     dcat:dataset <http://dataset-publisher:8080/datasets/1> ;
     .
 
+### This dataset is lacking the mandatory property dct:desctiption
 <http://dataset-publisher:8080/datasets/1> a dcat:Dataset ;
     dct:identifier "1" ;
     dct:title "Test dataset"@en ;
