@@ -28,13 +28,3 @@
                  skos:definition "dataset used for testing activities"@en ;
                ] ;
     .
-
-<https://organization-catalogue.fellesdatakatalog.digdir.no/organizations/961181399> a rov:RegisteredOrganization ;
-    rov:legalName          "DIGITALISERINGSDIREKTORATET" ;
-    .
-
-rov:RegisteredOrganization rdfs:subClassOf foaf:Agent
-.
-
-rov:legalName rdfs:subPropertyOf foaf:name
-.
