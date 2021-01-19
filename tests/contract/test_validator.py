@@ -35,8 +35,13 @@ async def test_validator_with_file(http_service: Any) -> None:
          sh:conforms true
          .
     """
-    g1 = Graph().parse(data=body, format="text/turtle")
-    g2 = Graph().parse(data=src, format="text/turtle")
+    with open("tests/files/valid_catalog.ttl", "r") as file:
+        text = file.read()
+
+    # body is graph of both the input data and the validation report
+    g0 = Graph().parse(data=text, format="text/turtle")
+    g1 = g0 + Graph().parse(data=src, format="turtle")
+    g2 = Graph().parse(data=body, format="text/turtle")
 
     _isomorphic = isomorphic(g1, g2)
     if not _isomorphic:
@@ -74,8 +79,10 @@ async def test_validator_with_text(http_service: Any) -> None:
          sh:conforms true
          .
     """
-    g1 = Graph().parse(data=body, format="text/turtle")
-    g2 = Graph().parse(data=src, format="text/turtle")
+
+    g0 = Graph().parse(data=text, format="text/turtle")
+    g1 = g0 + Graph().parse(data=src, format="turtle")
+    g2 = Graph().parse(data=body, format="text/turtle")
 
     _isomorphic = isomorphic(g1, g2)
     if not _isomorphic:
@@ -113,8 +120,9 @@ async def test_validator_with_text_json_ld(http_service: Any) -> None:
          sh:conforms true
          .
     """
-    g1 = Graph().parse(data=body, format="text/turtle")
-    g2 = Graph().parse(data=src, format="text/turtle")
+    g0 = Graph().parse(data=text, format="application/ld+json")
+    g1 = g0 + Graph().parse(data=src, format="turtle")
+    g2 = Graph().parse(data=body, format="text/turtle")
 
     _isomorphic = isomorphic(g1, g2)
     if not _isomorphic:
@@ -162,8 +170,12 @@ async def test_validator_accept_json_ld(http_service: Any) -> None:
       }
     ]
     """
-    g1 = Graph().parse(data=body, format="application/ld+json")
-    g2 = Graph().parse(data=src, format="application/ld+json")
+    with open(filename, "r") as file:
+        text = file.read()
+
+    g0 = Graph().parse(data=text, format="text/turtle")
+    g1 = g0 + Graph().parse(data=src, format="application/ld+json")
+    g2 = Graph().parse(data=body, format="application/ld+json")
 
     _isomorphic = isomorphic(g1, g2)
     if not _isomorphic:
@@ -202,8 +214,12 @@ async def test_validator_file_content_type_json_ld(http_service: Any) -> None:
          sh:conforms true
          .
     """
-    g1 = Graph().parse(data=body, format="text/turtle")
-    g2 = Graph().parse(data=src, format="text/turtle")
+    with open(filename, "r") as file:
+        text = file.read()
+
+    g0 = Graph().parse(data=text, format="application/ld+json")
+    g1 = g0 + Graph().parse(data=src, format="text/turtle")
+    g2 = Graph().parse(data=body, format="text/turtle")
 
     _isomorphic = isomorphic(g1, g2)
     if not _isomorphic:
@@ -240,9 +256,12 @@ async def test_validator_url(http_service: Any) -> None:
          sh:conforms true
          .
     """
+    with open("tests/files/valid_catalog.ttl", "r") as file:
+        text = file.read()
 
-    g1 = Graph().parse(data=body, format="text/turtle")
-    g2 = Graph().parse(data=src, format="text/turtle")
+    g0 = Graph().parse(data=text, format="text/turtle")
+    g1 = g0 + Graph().parse(data=src, format="text/turtle")
+    g2 = Graph().parse(data=body, format="text/turtle")
 
     _isomorphic = isomorphic(g1, g2)
     if not _isomorphic:
@@ -280,8 +299,12 @@ async def test_validator_with_file_content_encoding(http_service: Any) -> None:
          sh:conforms true
          .
     """
-    g1 = Graph().parse(data=body, format="text/turtle")
-    g2 = Graph().parse(data=src, format="text/turtle")
+    with open(filename, "r") as file:
+        text = file.read()
+
+    g0 = Graph().parse(data=text, format="text/turtle")
+    g1 = g0 + Graph().parse(data=src, format="text/turtle")
+    g2 = Graph().parse(data=body, format="text/turtle")
 
     _isomorphic = isomorphic(g1, g2)
     if not _isomorphic:
@@ -337,34 +360,15 @@ async def test_validator_with_not_valid_file(http_service: Any) -> None:
                 sh:sourceShape [ sh:minCount 1 ;
                         sh:nodeKind sh:Literal ;
                         sh:path <http://purl.org/dc/terms/description> ;
-                        sh:severity sh:Violation ] ],
-            [ a sh:ValidationResult ;
-                sh:focusNode <http://dataset-publisher:8080/datasets/1> ;
-                sh:resultMessage "Less than 1 values on <http://dataset-publisher:8080/datasets/1>->dct:publisher" ;
-                sh:resultPath <http://purl.org/dc/terms/publisher> ;
-                sh:resultSeverity sh:Violation ;
-                sh:sourceConstraintComponent sh:MinCountConstraintComponent ;
-                sh:sourceShape [ sh:class <http://xmlns.com/foaf/0.1/Agent> ;
-                        sh:maxCount 1 ;
-                        sh:minCount 1 ;
-                        sh:path <http://purl.org/dc/terms/publisher> ;
-                        sh:severity sh:Violation ] ],
-            [ a sh:ValidationResult ;
-                sh:focusNode <http://dataset-publisher:8080/catalogs/1> ;
-                sh:resultMessage "Value does not have class foaf:Agent" ;
-                sh:resultPath <http://purl.org/dc/terms/publisher> ;
-                sh:resultSeverity sh:Violation ;
-                sh:sourceConstraintComponent sh:ClassConstraintComponent ;
-                sh:sourceShape [ sh:class <http://xmlns.com/foaf/0.1/Agent> ;
-                        sh:maxCount 1 ;
-                        sh:minCount 1 ;
-                        sh:path <http://purl.org/dc/terms/publisher> ;
-                        sh:severity sh:Violation ] ;
-                sh:value <https://organization-catalogue.fellesdatakatalog.digdir.no/organizations/961181399> ]
+                        sh:severity sh:Violation ] ]
     .
     """
-    g1 = Graph().parse(data=body, format="text/turtle")
-    g2 = Graph().parse(data=src, format="text/turtle")
+    with open(filename, "r") as file:
+        text = file.read()
+
+    g0 = Graph().parse(data=text, format="text/turtle")
+    g1 = g0 + Graph().parse(data=src, format="text/turtle")
+    g2 = Graph().parse(data=body, format="text/turtle")
 
     _isomorphic = isomorphic(g1, g2)
     if not _isomorphic:

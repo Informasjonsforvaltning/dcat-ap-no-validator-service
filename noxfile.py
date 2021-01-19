@@ -49,7 +49,7 @@ def integration_tests(session: Session) -> None:
     session.run(
         "pytest",
         "-m integration",
-        "-rA",
+        "-rfE",
         *args,
         env={},
     )
@@ -69,7 +69,7 @@ def contract_tests(session: Session) -> None:
     session.run(
         "pytest",
         "-m contract",
-        "-rA",
+        "-rfE",
         *args,
         env={},
     )

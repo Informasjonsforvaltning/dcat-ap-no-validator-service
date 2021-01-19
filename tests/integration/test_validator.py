@@ -4,6 +4,7 @@ from typing import Any
 from aiohttp import hdrs, MultipartWriter
 from aiohttp.test_utils import TestClient as _TestClient
 import pytest
+from pytest_mock import MockFixture
 from rdflib import Graph
 from rdflib.compare import graph_diff, isomorphic
 
@@ -25,7 +26,11 @@ async def test_validator_file(client: _TestClient) -> None:
     assert resp.headers[hdrs.CONTENT_TYPE] == "text/turtle"
 
     body = await resp.text()
-    await _assess_response_body(body)
+    with open("tests/files/valid_catalog.ttl", "r") as file:
+        text = file.read()
+    await _assess_response_body(
+        data=text, format="text/turtle", body=body, content_type="text/turtle"
+    )
 
 
 @pytest.mark.integration
@@ -42,7 +47,12 @@ async def test_validator_file_no_version(client: _TestClient) -> None:
     assert resp.headers[hdrs.CONTENT_TYPE] == "text/turtle"
 
     body = await resp.text()
-    await _assess_response_body(body)
+
+    with open("tests/files/valid_catalog.ttl", "r") as file:
+        text = file.read()
+    await _assess_response_body(
+        data=text, format="text/turtle", body=body, content_type="text/turtle"
+    )
 
 
 @pytest.mark.integration
@@ -62,7 +72,12 @@ async def test_validator_file_empty_version(client: _TestClient) -> None:
     assert resp.headers[hdrs.CONTENT_TYPE] == "text/turtle"
 
     body = await resp.text()
-    await _assess_response_body(body)
+
+    with open("tests/files/valid_catalog.ttl", "r") as file:
+        text = file.read()
+    await _assess_response_body(
+        data=text, format="text/turtle", body=body, content_type="text/turtle"
+    )
 
 
 @pytest.mark.integration
@@ -84,7 +99,12 @@ async def test_validator_file_content_negotiation_json_ld(client: _TestClient) -
     assert resp.headers[hdrs.CONTENT_TYPE] == accept
 
     body = await resp.text()
-    await _assess_response_body(body, accept)
+
+    with open("tests/files/valid_catalog.ttl", "r") as file:
+        text = file.read()
+    await _assess_response_body(
+        data=text, format="text/turtle", body=body, content_type=accept
+    )
 
 
 @pytest.mark.integration
@@ -103,7 +123,12 @@ async def test_validator_file_content_type_json_ld(client: _TestClient) -> None:
     assert resp.headers[hdrs.CONTENT_TYPE] == "text/turtle"
 
     body = await resp.text()
-    await _assess_response_body(body)
+
+    with open("tests/files/valid_catalog.json", "r") as file:
+        text = file.read()
+    await _assess_response_body(
+        data=text, format="application/ld+json", body=body, content_type="text/turtle"
+    )
 
 
 @pytest.mark.integration
@@ -142,12 +167,23 @@ async def test_validator_file_content_encoding(client: _TestClient) -> None:
     assert resp.headers[hdrs.CONTENT_TYPE] == "text/turtle"
 
     body = await resp.text()
-    await _assess_response_body(body)
+
+    with open("tests/files/valid_catalog.ttl", "r") as file:
+        text = file.read()
+    await _assess_response_body(
+        data=text, format="text/turtle", body=body, content_type="text/turtle"
+    )
 
 
 @pytest.mark.integration
-async def test_validator_url(client: _TestClient) -> None:
+async def test_validator_url(client: _TestClient, mocker: MockFixture) -> None:
     """Should return status 501."""
+    # Set up the mock
+    mocker.patch(
+        "dcat_ap_no_validator_service.view.validator.get_graph_at_url",
+        return_value=_mock_graph_at_url(),
+    )
+
     url_to_graph = "https://raw.githubusercontent.com/Informasjonsforvaltning/dcat-ap-no-validator-service/main/tests/files/valid_catalog.ttl"  # noqa: B950
     with MultipartWriter("mixed") as mpwriter:
         p = mpwriter.append(url_to_graph)
@@ -158,7 +194,12 @@ async def test_validator_url(client: _TestClient) -> None:
     assert resp.headers[hdrs.CONTENT_TYPE] == "text/turtle"
     body = await resp.text()
 
-    await _assess_response_body(body)
+    # need to get the text from url, which actually is content of file:
+    with open("tests/files/valid_catalog.ttl", "r") as file:
+        text = file.read()
+    await _assess_response_body(
+        data=text, format="text/turtle", body=body, content_type="text/turtle"
+    )
 
 
 @pytest.mark.integration
@@ -176,7 +217,9 @@ async def test_validator_text(client: _TestClient) -> None:
     assert resp.headers[hdrs.CONTENT_TYPE] == "text/turtle"
     body = await resp.text()
 
-    await _assess_response_body(body)
+    await _assess_response_body(
+        data=text, format="text/turtle", body=body, content_type="text/turtle"
+    )
 
 
 @pytest.mark.integration
@@ -194,10 +237,14 @@ async def test_validator_text_format_json_ld(client: _TestClient) -> None:
     assert resp.headers[hdrs.CONTENT_TYPE] == "text/turtle"
     body = await resp.text()
 
-    await _assess_response_body(body)
+    await _assess_response_body(
+        data=text, format="application/ld+json", body=body, content_type="text/turtle"
+    )
 
 
-async def _assess_response_body(body: str, content_type: Any = "text/turtle") -> None:
+async def _assess_response_body(
+    data: str, format: str, body: str, content_type: Any = "text/turtle"
+) -> None:
 
     # body (validation report) should be isomorphic to the following:
     src = """
@@ -208,8 +255,9 @@ async def _assess_response_body(body: str, content_type: Any = "text/turtle") ->
          sh:conforms true
          .
     """
-    g2 = Graph().parse(data=src, format="turtle")
-    g1 = Graph().parse(data=body, format=content_type)
+    g0 = Graph().parse(data=data, format=format)
+    g1 = g0 + Graph().parse(data=src, format="turtle")
+    g2 = Graph().parse(data=body, format=content_type)
 
     _isomorphic = isomorphic(g1, g2)
     if not _isomorphic:
@@ -273,6 +321,14 @@ async def test_validator_text_no_content_type(client: _TestClient) -> None:
 
     resp = await client.post("/validator", data=mpwriter)
     assert resp.status == 415
+
+
+# ------------------ #
+# Mocks
+def _mock_graph_at_url() -> tuple:
+    with open("tests/files/valid_catalog.ttl", "r") as file:
+        text = file.read()
+    return text, "text/plain"
 
 
 # ---------------------------------------------------------------------- #

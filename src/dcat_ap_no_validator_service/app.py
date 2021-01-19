@@ -17,7 +17,7 @@ CORS_ALLOW_ORIGINS = ["https://staging.fellesdatakatalog.digdir.no"]
 
 
 async def create_app() -> web.Application:
-    """Create an web application."""
+    """Create a web application."""
     app = web.Application(
         middlewares=[
             cors_middleware(origins=CORS_ALLOW_ORIGINS, allow_credentials=True),

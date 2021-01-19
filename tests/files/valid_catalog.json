@@ -3,30 +3,12 @@
     "dcat": "http://www.w3.org/ns/dcat#",
     "dct": "http://purl.org/dc/terms/",
     "foaf": "http://xmlns.com/foaf/0.1/",
+    "org": "https://organization-catalogue.fellesdatakatalog.digdir.no/organizations/",
     "rov": "http://www.w3.org/ns/regorg#",
     "skos": "http://www.w3.org/2004/02/skos/core#",
     "vcard": "http://www.w3.org/2006/vcard/ns#"
   },
   "@graph": [
-    {
-      "@id": "http://dataset-publisher:8080/catalogs/1",
-      "@type": "dcat:Catalog",
-      "dcat:dataset": {
-        "@id": "http://dataset-publisher:8080/datasets/1"
-      },
-      "dct:description": {
-        "@language": "en",
-        "@value": "A test catalog that is valid according to dcat-ap-no v2"
-      },
-      "dct:identifier": "1",
-      "dct:publisher": {
-        "@id": "https://organization-catalogue.fellesdatakatalog.digdir.no/organizations/961181399"
-      },
-      "dct:title": {
-        "@language": "en",
-        "@value": "Testcatalog"
-      }
-    },
     {
       "@id": "http://dataset-publisher:8080/datasets/1",
       "@type": "dcat:Dataset",
@@ -39,7 +21,7 @@
       },
       "dct:identifier": "1",
       "dct:publisher": {
-        "@id": "https://organization-catalogue.fellesdatakatalog.digdir.no/organizations/961181399"
+        "@id": "org:961181399"
       },
       "dct:title": {
         "@language": "en",
@@ -59,20 +41,22 @@
       }
     },
     {
-      "@id": "rov:legalName",
-      "http://www.w3.org/2000/01/rdf-schema#subPropertyOf": {
-        "@id": "foaf:name"
-      }
-    },
-    {
-      "@id": "https://organization-catalogue.fellesdatakatalog.digdir.no/organizations/961181399",
-      "@type": "rov:RegisteredOrganization",
-      "rov:legalName": "DIGITALISERINGSDIREKTORATET"
-    },
-    {
-      "@id": "rov:RegisteredOrganization",
-      "http://www.w3.org/2000/01/rdf-schema#subClassOf": {
-        "@id": "foaf:Agent"
+      "@id": "http://dataset-publisher:8080/catalogs/1",
+      "@type": "dcat:Catalog",
+      "dcat:dataset": {
+        "@id": "http://dataset-publisher:8080/datasets/1"
+      },
+      "dct:description": {
+        "@language": "en",
+        "@value": "A test catalog that is valid according to dcat-ap-no v2"
+      },
+      "dct:identifier": "1",
+      "dct:publisher": {
+        "@id": "org:961181399"
+      },
+      "dct:title": {
+        "@language": "en",
+        "@value": "Testcatalog"
       }
     }
   ]
