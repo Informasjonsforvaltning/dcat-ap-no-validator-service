@@ -59,7 +59,7 @@ class ValidatorService:
         """Get triples of objects and add to _g."""
         # Todo this loop should be parallellized
         for p, o in self._g.predicate_objects(subject=None):
-            logging.debug(f"{p} a {type(p)}, {o} a {type(o)}")
+            # logging.debug(f"{p} a {type(p)}, {o} a {type(o)}")
             if p == RDF.type:
                 pass
             elif type(o) is URIRef:
@@ -70,6 +70,9 @@ class ValidatorService:
                             t = Graph().parse(o)
                             self.ograph += t
                         except Exception:  # pragma: no cover
+                            logging.warning(
+                                f"failed when trying to fetch triples about {o}"
+                            )
                             logging.debug(traceback.format_exc())
                             pass
 
@@ -81,5 +84,11 @@ class ValidatorService:
         for o in ontologies:
             if (o, None, None) not in self.ograph:
                 logging.debug(f"Loading remote ontology {o}")
-                self.ograph += Graph().parse(o)
-        logging.debug(self.ograph.serialize(format="turtle").decode())
+                try:
+                    t = Graph().parse(o)
+                    self.ograph += t
+                    # logging.debug(self.ograph.serialize(format="turtle").decode())
+                except Exception:  # pragma: no cover
+                    logging.warning(f"failed when trying to load remote ontolgy {o}")
+                    logging.debug(traceback.format_exc())
+                    pass

@@ -106,5 +106,7 @@ async def get_graph_at_url(url: str) -> tuple:  # pragma: no cover
     logging.debug(
         f"Got the following text from {url}/{resp.status}/{content_type}:\n {graph}"
     )
+    # format is the first part of content_type:
+    format = content_type.split(";")[0]
 
-    return graph, content_type
+    return graph, format
