@@ -80,9 +80,8 @@
         sh:path dct:identifier ;
         sh:severity sh:Violation
     ] ;
-      sh:and (
-      [ sh:targetClass foaf:Agent ]
-      [ sh:targetObjectsOf dct:publisher] ) .
+      sh:targetObjectsOf dct:publisher, dct:creator ;
+.
 
 # Katalogpost (dcat:CatalogRecord), only added the Norwegian sh:name
 :CatalogRecord_Shape

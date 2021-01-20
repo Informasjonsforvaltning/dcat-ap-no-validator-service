@@ -23,18 +23,9 @@
     dct:title "Test dataset"@en ;
     dct:description "A valid test dataset"@en ;
     dct:publisher <https://organization-catalogue.fellesdatakatalog.digdir.no/organizations/961181399> ;
+    dct:creator <https://organization-catalogue.fellesdatakatalog.digdir.no/organizations/991825827> ;
     dcat:theme [ a skos:Concept ;
                  skos:prefLabel "testdataset"@en ;
                  skos:definition "dataset used for testing activities"@en ;
                ] ;
     .
-
-<https://organization-catalogue.fellesdatakatalog.digdir.no/organizations/961181399> a rov:RegisteredOrganization ;
-    rov:legalName          "DIGITALISERINGSDIREKTORATET" ;
-    .
-
-rov:RegisteredOrganization rdfs:subClassOf foaf:Agent
-.
-
-rov:legalName rdfs:subPropertyOf foaf:name
-.
