@@ -31,7 +31,10 @@
       "@id": "http://dataset-publisher:8080/datasets/1",
       "@type": "dcat:Dataset",
       "dcat:theme": {
-        "@id": "_:ub1bL25C16"
+        "@id": "_:ub1bL26C16"
+      },
+      "dct:creator": {
+        "@id": "https://organization-catalogue.fellesdatakatalog.digdir.no/organizations/991825827"
       },
       "dct:description": {
         "@language": "en",
@@ -47,7 +50,7 @@
       }
     },
     {
-      "@id": "_:ub1bL25C16",
+      "@id": "_:ub1bL26C16",
       "@type": "skos:Concept",
       "skos:definition": {
         "@language": "en",
@@ -56,23 +59,6 @@
       "skos:prefLabel": {
         "@language": "en",
         "@value": "testdataset"
-      }
-    },
-    {
-      "@id": "rov:legalName",
-      "http://www.w3.org/2000/01/rdf-schema#subPropertyOf": {
-        "@id": "foaf:name"
-      }
-    },
-    {
-      "@id": "https://organization-catalogue.fellesdatakatalog.digdir.no/organizations/961181399",
-      "@type": "rov:RegisteredOrganization",
-      "rov:legalName": "DIGITALISERINGSDIREKTORATET"
-    },
-    {
-      "@id": "rov:RegisteredOrganization",
-      "http://www.w3.org/2000/01/rdf-schema#subClassOf": {
-        "@id": "foaf:Agent"
       }
     }
   ]
