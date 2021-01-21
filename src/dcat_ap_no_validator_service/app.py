@@ -35,9 +35,5 @@ async def create_app() -> web.Application:
     )
 
     # logging configurataion:
-    logging.basicConfig(
-        format="%(asctime)s,%(msecs)d %(levelname)s - %(module)s:%(lineno)d: %(message)s",
-        datefmt="%H:%M:%S",
-        level=LOGGING_LEVEL,
-    )
+    logging.basicConfig(level=LOGGING_LEVEL)
     return app
