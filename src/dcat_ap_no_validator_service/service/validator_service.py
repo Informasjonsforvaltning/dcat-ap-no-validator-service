@@ -19,6 +19,7 @@ class ValidatorService:
         graph: Any,
         format: str = "text/turtle",
         version: Any = DEFAULT_SHACL_VERSION,
+        shacl: Any = None,
     ) -> None:
         """Initialize service instance."""
         logging.debug(f"Got request for version: {version}")
@@ -30,14 +31,17 @@ class ValidatorService:
         else:
             self._version = version
         self.ograph = Graph()
+        # set the shape graph:
+        logging.debug(f"Got input shacl: {shacl}")
+        self.shacl = shacl
 
     async def validate(self) -> Tuple[bool, Graph, Graph, str]:
         """Validate function."""
         if len(self._g) == 0:  # No need to validate empty graph
             raise ValueError("Input graph cannot be empty.")
-        # get the shape graph:
-        _sg = await ShapeService().get_shape_by_id(self._version)
         logging.debug(f"Validating according to version: {self._version}")
+        if not self.shacl:
+            self.shacl = await ShapeService().get_shape_by_id(self._version)
         # add triples from remote predicates:
         self._expand_objects_triples()
         self._load_ontologies()
@@ -47,7 +51,7 @@ class ValidatorService:
         conforms, results_graph, results_text = validate(
             data_graph=self._g,
             ont_graph=self.ograph,
-            shacl_graph=_sg,
+            shacl_graph=self.shacl,
             inference="rdfs",
             inplace=False,
             meta_shacl=False,
@@ -57,7 +61,7 @@ class ValidatorService:
 
     def _expand_objects_triples(self) -> None:
         """Get triples of objects and add to _g."""
-        # Todo this loop should be parallellized
+        # TODO: this loop should be parallellized
         for p, o in self._g.predicate_objects(subject=None):
             # logging.debug(f"{p} a {type(p)}, {o} a {type(o)}")
             if p == RDF.type:
