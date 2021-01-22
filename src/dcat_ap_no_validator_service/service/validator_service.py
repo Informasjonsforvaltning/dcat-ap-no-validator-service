@@ -5,6 +5,7 @@ from typing import Any, Tuple
 
 from pyshacl import validate
 from rdflib import Graph, RDF, URIRef
+import requests
 
 from dcat_ap_no_validator_service.service import ShapeService
 
@@ -13,6 +14,14 @@ DEFAULT_SHACL_VERSION = "2"
 
 class ValidatorService:
     """Class representing validator service."""
+
+    __slots__ = (
+        "graph",
+        "format",
+        "version",
+        "ograph",
+        "shacl",
+    )
 
     def __init__(
         self,
@@ -23,13 +32,14 @@ class ValidatorService:
     ) -> None:
         """Initialize service instance."""
         logging.debug(f"Got request for version: {version}")
-        self._g = Graph().parse(data=graph, format=format)
+        self.graph = Graph().parse(data=graph, format=format)
+        self.format = format
         if version is None:
-            self._version = DEFAULT_SHACL_VERSION
+            self.version = DEFAULT_SHACL_VERSION
         elif version == "":
-            self._version = DEFAULT_SHACL_VERSION
+            self.version = DEFAULT_SHACL_VERSION
         else:
-            self._version = version
+            self.version = version
         self.ograph = Graph()
         # set the shape graph:
         logging.debug(f"Got input shacl: {shacl}")
@@ -37,19 +47,19 @@ class ValidatorService:
 
     async def validate(self) -> Tuple[bool, Graph, Graph, str]:
         """Validate function."""
-        if len(self._g) == 0:  # No need to validate empty graph
+        if len(self.graph) == 0:  # No need to validate empty graph
             raise ValueError("Input graph cannot be empty.")
-        logging.debug(f"Validating according to version: {self._version}")
+        logging.debug(f"Validating according to version: {self.version}")
         if not self.shacl:
-            self.shacl = await ShapeService().get_shape_by_id(self._version)
+            self.shacl = await ShapeService().get_shape_by_id(self.version)
         # add triples from remote predicates:
         self._expand_objects_triples()
         self._load_ontologies()
-        s = self._g.serialize(format="turtle")
+        s = self.graph.serialize(format="turtle")
         logging.debug(f"Ready to validate graph:\n{s.decode()}")
         # inference in {"none", "rdfs", "owlrl", "both"}
         conforms, results_graph, results_text = validate(
-            data_graph=self._g,
+            data_graph=self.graph,
             ont_graph=self.ograph,
             shacl_graph=self.shacl,
             inference="rdfs",
@@ -57,22 +67,31 @@ class ValidatorService:
             meta_shacl=False,
             debug=False,
         )
-        return (conforms, self._g, results_graph, results_text)
+        return (conforms, self.graph, results_graph, results_text)
 
     def _expand_objects_triples(self) -> None:
-        """Get triples of objects and add to _g."""
+        """Get triples of objects and add to graph."""
         # TODO: this loop should be parallellized
-        for p, o in self._g.predicate_objects(subject=None):
+        for p, o in self.graph.predicate_objects(subject=None):
             # logging.debug(f"{p} a {type(p)}, {o} a {type(o)}")
             if p == RDF.type:
                 pass
             elif type(o) is URIRef:
-                if (o, None, None) not in self._g:
+                if (o, None, None) not in self.graph:
                     if (o, None, None) not in self.ograph:
                         logging.debug(f"trying to fetch triples about {o}")
                         try:
-                            t = Graph().parse(o)
-                            self.ograph += t
+                            # Workaround to accomodate wrong content-type in responses:
+                            # Should use Graph().parse(o) directly, but this approach
+                            # breaks down when trying to fetch EU-triples:
+                            headers = {"Accept": "text/turtle"}
+                            resp = requests.get(o, headers=headers)
+                            if resp.status_code == 200:
+                                format = resp.headers["content-type"].split(";")[0]
+                                if "text/xml" in format:
+                                    format = "application/rdf+xml"
+                                t = Graph().parse(data=resp.text, format=format)
+                                self.ograph += t
                         except Exception:  # pragma: no cover
                             logging.warning(
                                 f"failed when trying to fetch triples about {o}"
