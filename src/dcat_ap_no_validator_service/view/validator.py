@@ -3,6 +3,7 @@ import logging
 import traceback
 
 from aiohttp import ClientSession, hdrs, web
+from rdflib import Graph
 from rdflib.plugin import PluginException
 
 from dcat_ap_no_validator_service.service import ValidatorService
@@ -55,7 +56,7 @@ class Validator(web.View):
                     content_type = part.headers[hdrs.CONTENT_TYPE]
                     logging.debug(f"content_type of {content_type}")
                 data = (await part.read()).decode()
-                logging.debug(f"content_type of {filename}: {data}")
+                logging.debug(f"content of {filename}:\n{data}")
         # We have got data, now validate:
         try:
             service = ValidatorService(data, format=content_type, version=version)
@@ -81,10 +82,12 @@ class Validator(web.View):
             pass  # use default
         elif accept_header:  # we try to serialize according to accept-header
             format = accept_header
-
+        response_graph = Graph()
+        response_graph += data_graph
+        response_graph += results_graph
         try:
             return web.Response(
-                body=results_graph.serialize(format=format),
+                body=response_graph.serialize(format=format),
                 content_type=format,
             )
         except PluginException:  # rdflib raises PluginException, in this context imples 406
@@ -92,7 +95,7 @@ class Validator(web.View):
             raise web.HTTPNotAcceptable()  # 406
 
 
-async def get_graph_at_url(url: str) -> tuple:
+async def get_graph_at_url(url: str) -> tuple:  # pragma: no cover
     """Get a graph to be validated at given url."""
     session = ClientSession()
     async with session.get(url) as resp:
@@ -103,5 +106,7 @@ async def get_graph_at_url(url: str) -> tuple:
     logging.debug(
         f"Got the following text from {url}/{resp.status}/{content_type}:\n {graph}"
     )
+    # format is the first part of content_type:
+    format = content_type.split(";")[0]
 
-    return graph, content_type
+    return graph, format

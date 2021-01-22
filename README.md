@@ -36,7 +36,7 @@ Response will be a RDF graph consisting of
 ```
 % curl -i \
  -H "Accept: text/turtle" \
- -X GET http://localhost:8000/validator/shapes
+ -X GET http://localhost:8000/shapes
  ```
 ## Develop and run locally
 ### Requirements

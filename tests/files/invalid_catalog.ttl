@@ -17,8 +17,9 @@
     dcat:dataset <http://dataset-publisher:8080/datasets/1> ;
     .
 
-### This dataset is lacking the mandatory property dct:desctiption
+### This dataset is lacking the mandatory properties dct:description and dcat:theme
 <http://dataset-publisher:8080/datasets/1> a dcat:Dataset ;
     dct:identifier "1" ;
     dct:title "Test dataset"@en ;
+    dct:publisher <https://organization-catalogue.fellesdatakatalog.digdir.no/organizations/961181399> ;
     .

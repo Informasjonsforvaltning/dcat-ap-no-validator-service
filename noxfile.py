@@ -2,7 +2,7 @@
 
 import nox
 from nox.sessions import Session
-import nox_poetry
+import nox_poetry.patch
 
 locations = "src", "tests", "noxfile.py"
 nox.options.stop_on_first_error = True
@@ -28,7 +28,7 @@ def unit_tests(session: Session) -> None:
     session.run(
         "pytest",
         "-m unit",
-        "-rA",
+        "-rfE",
         *args,
         env={},
     )
@@ -49,7 +49,7 @@ def integration_tests(session: Session) -> None:
     session.run(
         "pytest",
         "-m integration",
-        "-rA",
+        "-rfE",
         *args,
         env={},
     )
@@ -69,7 +69,7 @@ def contract_tests(session: Session) -> None:
     session.run(
         "pytest",
         "-m contract",
-        "-rA",
+        "-rfE",
         *args,
         env={},
     )
