@@ -60,7 +60,12 @@ class Validator(web.View):
         # We have got data, now validate:
         try:
             service = ValidatorService(data, format=content_type, version=version)
-            conforms, data_graph, results_graph, results_text = await service.validate()
+            (
+                conforms,
+                data_graph,
+                ontology_graph,
+                results_graph,
+            ) = await service.validate()
 
         except ValueError as e:
             logging.error(traceback.format_exc())
@@ -83,8 +88,10 @@ class Validator(web.View):
         elif accept_header:  # we try to serialize according to accept-header
             format = accept_header
         response_graph = Graph()
-        response_graph += data_graph
         response_graph += results_graph
+        response_graph += data_graph
+        if False:  # Placeholder for client's choice
+            response_graph += ontology_graph
         try:
             return web.Response(
                 body=response_graph.serialize(format=format),

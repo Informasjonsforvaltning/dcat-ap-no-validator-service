@@ -45,7 +45,7 @@ class ValidatorService:
         logging.debug(f"Got input shacl: {shacl}")
         self.shacl = shacl
 
-    async def validate(self) -> Tuple[bool, Graph, Graph, str]:
+    async def validate(self) -> Tuple[bool, Graph, Graph, Graph]:
         """Validate function."""
         if len(self.graph) == 0:  # No need to validate empty graph
             raise ValueError("Input graph cannot be empty.")
@@ -58,7 +58,7 @@ class ValidatorService:
         s = self.graph.serialize(format="turtle")
         logging.debug(f"Ready to validate graph:\n{s.decode()}")
         # inference in {"none", "rdfs", "owlrl", "both"}
-        conforms, results_graph, results_text = validate(
+        conforms, results_graph, _ = validate(
             data_graph=self.graph,
             ont_graph=self.ograph,
             shacl_graph=self.shacl,
@@ -67,7 +67,7 @@ class ValidatorService:
             meta_shacl=False,
             debug=False,
         )
-        return (conforms, self.graph, results_graph, results_text)
+        return (conforms, self.graph, self.ograph, results_graph)
 
     def _expand_objects_triples(self) -> None:
         """Get triples of objects and add to graph."""
@@ -91,6 +91,7 @@ class ValidatorService:
                                 if "text/xml" in format:
                                     format = "application/rdf+xml"
                                 t = Graph().parse(data=resp.text, format=format)
+                                # Add the triples to the ontology graph:
                                 self.ograph += t
                         except Exception:  # pragma: no cover
                             logging.warning(
@@ -109,8 +110,9 @@ class ValidatorService:
                 logging.debug(f"Loading remote ontology {o}")
                 try:
                     t = Graph().parse(o)
+                    # Add the triples to the ontology graph:
                     self.ograph += t
-                    # logging.debug(self.ograph.serialize(format="turtle").decode())
+                    logging.debug(self.ograph.serialize(format="turtle").decode())
                 except Exception:  # pragma: no cover
                     logging.warning(f"failed when trying to load remote ontolgy {o}")
                     logging.debug(traceback.format_exc())
