@@ -83,7 +83,7 @@ components:
     Config:
       type: object
       properties:
-        shape_id:
+        shapeId:
           type: string
           default: "2"
           description: an identifier of the set of rules (shapes) to be validated against
@@ -91,7 +91,7 @@ components:
           type: boolean
           default: false
           description: whether service should fetch remote triples referenced by input graph
-        include_expanded_triples:
+        includeExpandedTriples:
           type: boolean
           default: false
           description: whether service should return remote triples referenced by input graph
