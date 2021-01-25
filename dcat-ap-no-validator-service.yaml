@@ -22,9 +22,8 @@ paths:
             schema:
               type: object
               properties: # Request parts
-                  version:
-                    type: string
-                    description: an identifier of the version to be validated against
+                  config:
+                    $ref: '#/components/schemas/Config'
                   text:
                     type: string
                     description: a text string with serialized RDF
@@ -79,3 +78,20 @@ paths:
             text/turtle:
               schema:
                 type: string
+components:
+  schemas:
+    Config:
+      type: object
+      properties:
+        version:
+          type: string
+          default: "2"
+          description: an identifier of the version to be validated against
+        expand:
+          type: boolean
+          default: false
+          description: whether service should fetch remote triples referenced by input graph
+        include_expanded_triples:
+          type: boolean
+          default: false
+          description: whether service should return remote triples referenced by input graph
