@@ -83,10 +83,10 @@ components:
     Config:
       type: object
       properties:
-        version:
+        shape_id:
           type: string
           default: "2"
-          description: an identifier of the version to be validated against
+          description: an identifier of the set of rules (shapes) to be validated against
         expand:
           type: boolean
           default: false
