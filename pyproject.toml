@@ -21,6 +21,7 @@ python-dotenv = "^0.15.0"
 requests = "^2.25.0"
 pyshacl = "^0.14.0"
 aiohttp-middlewares = "^1.1.0"
+multidict = "^5.1.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.1.1"

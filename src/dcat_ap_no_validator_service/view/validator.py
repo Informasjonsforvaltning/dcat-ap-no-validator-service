@@ -3,6 +3,7 @@ import logging
 import traceback
 
 from aiohttp import ClientSession, hdrs, web
+from multidict import MultiDict
 from rdflib import Graph
 from rdflib.plugin import PluginException
 
@@ -104,8 +105,16 @@ class Validator(web.View):
 
 async def get_graph_at_url(url: str) -> tuple:  # pragma: no cover
     """Get a graph to be validated at given url."""
+    headers = MultiDict(
+        [
+            ("Accept", "text/turtle"),
+            ("Accept", "application/rdf+xml"),
+            ("Accept", "application/ld+json"),
+        ]
+    )
+    # MultiDict([("a", 1), ("b", 2), ("a", 3)])
     session = ClientSession()
-    async with session.get(url) as resp:
+    async with session.get(url, headers=headers) as resp:
         graph = await resp.text()
     await session.close()
 
