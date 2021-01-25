@@ -112,11 +112,15 @@ async def get_graph_at_url(url: str) -> tuple:  # pragma: no cover
             ("Accept", "application/ld+json"),
         ]
     )
-    # MultiDict([("a", 1), ("b", 2), ("a", 3)])
     session = ClientSession()
     async with session.get(url, headers=headers) as resp:
         graph = await resp.text()
     await session.close()
+
+    if resp.status != 200:
+        raise web.HTTPBadRequest(
+            reason=f"Got unsuccesful status code from {url}: {resp.status}"
+        )
 
     content_type = resp.headers[hdrs.CONTENT_TYPE]
     logging.debug(
