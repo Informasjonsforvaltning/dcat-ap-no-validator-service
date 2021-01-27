@@ -1,15 +1,27 @@
 """Module for validator service."""
+from dataclasses import dataclass
 import logging
 import traceback
 from typing import Any, Tuple
 
 from pyshacl import validate
 from rdflib import Graph, RDF, URIRef
+from rdflib.plugin import PluginException
 import requests
 
 from dcat_ap_no_validator_service.service import ShapeService
 
 DEFAULT_SHACL_VERSION = "2"
+SUPPORTED_FORMATS = set(["text/turtle", "application/ld+json", "application/rdf+xml"])
+
+
+@dataclass
+class Config:
+    """Class for keeping track of config item."""
+
+    shape_id: str = DEFAULT_SHACL_VERSION
+    expand: bool = True
+    include_expanded_triples: bool = False
 
 
 class ValidatorService:
@@ -18,7 +30,7 @@ class ValidatorService:
     __slots__ = (
         "graph",
         "format",
-        "version",
+        "config",
         "ograph",
         "shacl",
     )
@@ -26,20 +38,17 @@ class ValidatorService:
     def __init__(
         self,
         graph: Any,
-        format: str = "text/turtle",
-        version: Any = DEFAULT_SHACL_VERSION,
+        format: Any = None,
+        config: Config = None,
         shacl: Any = None,
     ) -> None:
         """Initialize service instance."""
-        logging.debug(f"Got request for version: {version}")
-        self.graph = Graph().parse(data=graph, format=format)
         self.format = format
-        if version is None:
-            self.version = DEFAULT_SHACL_VERSION
-        elif version == "":
-            self.version = DEFAULT_SHACL_VERSION
+        self.graph = parse_input_graph(format, graph)
+        if config is None:
+            self.config = Config()
         else:
-            self.version = version
+            self.config = config
         self.ograph = Graph()
         # set the shape graph:
         logging.debug(f"Got input shacl: {shacl}")
@@ -47,17 +56,20 @@ class ValidatorService:
 
     async def validate(self) -> Tuple[bool, Graph, Graph, Graph]:
         """Validate function."""
+        # Do some sanity checks on preconditions:
         if len(self.graph) == 0:  # No need to validate empty graph
             raise ValueError("Input graph cannot be empty.")
-        logging.debug(f"Validating according to version: {self.version}")
+        logging.debug(f"Validating with following config: {self.config}")
         if not self.shacl:
-            self.shacl = await ShapeService().get_shape_by_id(self.version)
-        # add triples from remote predicates:
-        self._expand_objects_triples()
-        self._load_ontologies()
-        s = self.graph.serialize(format="turtle")
-        logging.debug(f"Ready to validate graph:\n{s.decode()}")
-        # inference in {"none", "rdfs", "owlrl", "both"}
+            self.shacl = await ShapeService().get_shape_by_id(self.config.shape_id)
+        if len(self.shacl) == 0:  # No need to validate when empty shacl shapes
+            raise ValueError("SHACL graph cannot be empty.")
+        # Add triples from remote predicates if user has asked for that:
+        if self.config.expand is True:
+            self._expand_objects_triples()
+            self._load_ontologies()
+        # Validate!
+        # `inference` should be set to one of the followoing {"none", "rdfs", "owlrl", "both"}
         conforms, results_graph, _ = validate(
             data_graph=self.graph,
             ont_graph=self.ograph,
@@ -112,8 +124,26 @@ class ValidatorService:
                     t = Graph().parse(o)
                     # Add the triples to the ontology graph:
                     self.ograph += t
-                    logging.debug(self.ograph.serialize(format="turtle").decode())
                 except Exception:  # pragma: no cover
                     logging.warning(f"failed when trying to load remote ontolgy {o}")
                     logging.debug(traceback.format_exc())
                     pass
+
+
+def parse_input_graph(format: Any, input_graph: Any) -> Graph:
+    """Try to parse input_graph."""
+    # If format is valid, we go ahead with parsing:
+    if format.lower() in SUPPORTED_FORMATS:
+        return Graph().parse(data=input_graph, format=format)
+    # Else we try the valid format one after the other:
+    else:
+        for _format in SUPPORTED_FORMATS:
+            # the following is flagged by S110 Try, Except, Pass. But there is
+            # no easy way to catch specific errors from the parse function.
+            # TODO: find a way to solve this without ignoring S110
+            try:
+                return Graph().parse(data=input_graph, format=_format)
+            except Exception:
+                pass
+        # If we reached this point, we did not succeed with parsing:
+        raise PluginException(f"Format not supported: {format}")

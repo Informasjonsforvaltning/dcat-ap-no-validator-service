@@ -7,7 +7,7 @@ from multidict import MultiDict
 from rdflib import Graph
 from rdflib.plugin import PluginException
 
-from dcat_ap_no_validator_service.service import ValidatorService
+from dcat_ap_no_validator_service.service import Config, ValidatorService
 
 
 class Validator(web.View):
@@ -19,15 +19,17 @@ class Validator(web.View):
         logging.debug(f"Got following accept-headers: {accept_header}")
         # Iterate through each part of MultipartReader
         data = None
-        version = None
+        config = None
         filename = None
-        content_type = "text/turtle"  # default content
+        content_type = None
+        input_matrix = dict()
         async for part in (await self.request.multipart()):
             logging.debug(f"part.name {part.name}")
-            if part.name == "version":
-                # Get version of input from version:
-                version = (await part.read()).decode()
-                logging.debug(f"Got version: {version}")
+            if part.name == "config":
+                # Get config:
+                config_json = await part.json()
+                logging.debug(f"Got config: {config_json}")
+                config = _create_config(config_json)
                 pass
 
             if part.name == "url":
@@ -35,9 +37,7 @@ class Validator(web.View):
                 url = (await part.read()).decode()
                 logging.debug(f"Got url: {url}")
                 data, content_type = await get_graph_at_url(url)
-                # Since we do not support text/plain, we assume turtle in this case:
-                if "text/plain" in content_type:
-                    content_type = "text/turtle"
+                input_matrix[part.name] = url
                 pass
 
             if part.name == "text":
@@ -47,6 +47,7 @@ class Validator(web.View):
                     logging.debug(f"content_type of {content_type}")
                 data = (await part.read()).decode()
                 logging.debug(f"Got text: {data}")
+                input_matrix[part.name] = "text"
                 pass
 
             if part.name == "file":
@@ -58,9 +59,15 @@ class Validator(web.View):
                     logging.debug(f"content_type of {content_type}")
                 data = (await part.read()).decode()
                 logging.debug(f"content of {filename}:\n{data}")
+                input_matrix[part.name] = filename
+        # We need to check that user sendt one, and only one, input graph:
+        if len(input_matrix) != 1:
+            logging.info(f"Ambigious user input: {input_matrix}")
+            raise web.HTTPBadRequest(reason="Multiple inputs for validation.")
+
         # We have got data, now validate:
         try:
-            service = ValidatorService(data, format=content_type, version=version)
+            service = ValidatorService(data, format=content_type, config=config)
             (
                 conforms,
                 data_graph,
@@ -91,7 +98,7 @@ class Validator(web.View):
         response_graph = Graph()
         response_graph += results_graph
         response_graph += data_graph
-        if False:  # Placeholder for client's choice
+        if config and config.include_expanded_triples is True:
             response_graph += ontology_graph
         try:
             return web.Response(
@@ -130,3 +137,20 @@ async def get_graph_at_url(url: str) -> tuple:  # pragma: no cover
     format = content_type.split(";")[0]
 
     return graph, format
+
+
+def _create_config(config: dict) -> Config:
+    c = Config()
+    if "shapeId" in config:
+        c.shape_id = config["shapeId"]
+    if "expand" in config:
+        if config["expand"] == "true":
+            c.expand = True
+        else:
+            c.expand = False
+    if "includeExpandedTriples" in config:
+        if config["includeExpandedTriples"] == "true":
+            c.include_expanded_triples = True
+        else:
+            c.include_expanded_triples = False
+    return c

@@ -1,4 +1,5 @@
 """Contract test cases for ready."""
+import json
 from typing import Any
 
 from aiohttp import ClientSession, hdrs, MultipartWriter
@@ -315,17 +316,62 @@ async def test_validator_with_file_content_encoding(http_service: Any) -> None:
 
 @pytest.mark.contract
 @pytest.mark.asyncio
-async def test_validator_with_not_valid_file(http_service: Any) -> None:
-    """Should return OK and unsuccessful validation."""
+async def test_validator_with_default_config(http_service: Any) -> None:
+    """Should return OK and successful validation."""
     url = f"{http_service}/validator"
-    filename = "tests/files/invalid_catalog.ttl"
-    version = "2"
+    filename = "tests/files/valid_catalog.ttl"
+
+    config = {"shapeId": "2", "expand": "true", "includeExpandedTriples": "false"}
 
     with MultipartWriter("mixed") as mpwriter:
         p = mpwriter.append(open(filename, "rb"))
         p.set_content_disposition("attachment", name="file", filename=filename)
-        p = mpwriter.append(version)
-        p.set_content_disposition("inline", name="version")
+        p.headers[hdrs.CONTENT_ENCODING] = "gzip"
+        p = mpwriter.append(json.dumps(config))
+        p.set_content_disposition("inline", name="config")
+
+    session = ClientSession()
+    async with session.post(url, data=mpwriter) as resp:
+        body = await resp.text()
+    await session.close()
+
+    assert resp.status == 200
+    assert "text/turtle" in resp.headers[hdrs.CONTENT_TYPE]
+
+    # results_graph (validation report) should be isomorphic to the following:
+    src = """
+    @prefix sh: <http://www.w3.org/ns/shacl#> .
+    @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+    [] a sh:ValidationReport ;
+         sh:conforms true
+         .
+    """
+    with open(filename, "r") as file:
+        text = file.read()
+
+    g0 = Graph().parse(data=text, format="text/turtle")
+    g1 = g0 + Graph().parse(data=src, format="text/turtle")
+    g2 = Graph().parse(data=body, format="text/turtle")
+
+    _isomorphic = isomorphic(g1, g2)
+    if not _isomorphic:
+        _dump_diff(g1, g2)
+        pass
+    assert _isomorphic, "results_graph is incorrect"
+
+
+# --- bad cases ---
+@pytest.mark.contract
+@pytest.mark.asyncio
+async def test_validator_with_not_valid_file(http_service: Any) -> None:
+    """Should return OK and unsuccessful validation."""
+    url = f"{http_service}/validator"
+    filename = "tests/files/invalid_catalog.ttl"
+
+    with MultipartWriter("mixed") as mpwriter:
+        p = mpwriter.append(open(filename, "rb"))
+        p.set_content_disposition("attachment", name="file", filename=filename)
 
     session = ClientSession()
     async with session.post(url, data=mpwriter) as resp:
@@ -377,7 +423,6 @@ async def test_validator_with_not_valid_file(http_service: Any) -> None:
     assert _isomorphic, "results_graph is incorrect"
 
 
-# --- bad cases ---
 @pytest.mark.contract
 @pytest.mark.asyncio
 async def test_validator_notexisting_url(http_service: Any) -> None:
@@ -400,7 +445,7 @@ async def test_validator_notexisting_url(http_service: Any) -> None:
 @pytest.mark.contract
 @pytest.mark.asyncio
 async def test_validator_url_to_invalid_rdf(http_service: Any) -> None:
-    """Should return 400."""
+    """Should return 415."""
     url = f"{http_service}/validator"
 
     url_to_graph = "https://raw.githubusercontent.com/Informasjonsforvaltning/dcat-ap-no-validator-service/main/tests/files/invalid_rdf.txt"  # noqa: B950
@@ -413,7 +458,7 @@ async def test_validator_url_to_invalid_rdf(http_service: Any) -> None:
         _ = await resp.text()
     await session.close()
 
-    assert resp.status == 400
+    assert resp.status == 415
 
 
 # ---------------------------------------------------------------------- #
