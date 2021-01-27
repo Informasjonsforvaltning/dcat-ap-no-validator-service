@@ -62,7 +62,7 @@ class Validator(web.View):
                 input_matrix[part.name] = filename
         # We need to check that user sendt one, and only one, input graph:
         if len(input_matrix) != 1:
-            logging.info(f"Ambigious user input: {input_matrix}")
+            logging.debug(f"Ambigious user input: {input_matrix}")
             raise web.HTTPBadRequest(reason="Multiple inputs for validation.")
 
         # We have got data, now validate:
@@ -76,15 +76,15 @@ class Validator(web.View):
             ) = await service.validate()
 
         except ValueError as e:
-            logging.error(traceback.format_exc())
+            logging.debug(traceback.format_exc())
             raise web.HTTPBadRequest(reason=str(e))
 
         except SyntaxError:
-            logging.error(traceback.format_exc())
+            logging.debug(traceback.format_exc())
             raise web.HTTPBadRequest(reason="Bad syntax in input graph.")
 
         except PluginException:
-            logging.error(traceback.format_exc())
+            logging.debug(traceback.format_exc())
             raise web.HTTPUnsupportedMediaType(
                 reason=f"Input graph format not supported: {content_type}"
             )
@@ -106,7 +106,7 @@ class Validator(web.View):
                 content_type=format,
             )
         except PluginException:  # rdflib raises PluginException, in this context imples 406
-            logging.error(traceback.format_exc())
+            logging.debug(traceback.format_exc())
             raise web.HTTPNotAcceptable()  # 406
 
 

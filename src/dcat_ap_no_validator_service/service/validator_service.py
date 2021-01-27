@@ -106,9 +106,6 @@ class ValidatorService:
                                 # Add the triples to the ontology graph:
                                 self.ograph += t
                         except Exception:  # pragma: no cover
-                            logging.warning(
-                                f"failed when trying to fetch triples about {o}"
-                            )
                             logging.debug(traceback.format_exc())
                             pass
 
@@ -125,7 +122,6 @@ class ValidatorService:
                     # Add the triples to the ontology graph:
                     self.ograph += t
                 except Exception:  # pragma: no cover
-                    logging.warning(f"failed when trying to load remote ontolgy {o}")
                     logging.debug(traceback.format_exc())
                     pass
 
