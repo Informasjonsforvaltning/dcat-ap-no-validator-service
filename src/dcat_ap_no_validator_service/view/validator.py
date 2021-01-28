@@ -126,7 +126,7 @@ async def get_graph_at_url(url: str) -> tuple:  # pragma: no cover
 
     if resp.status != 200:
         raise web.HTTPBadRequest(
-            reason=f"Got unsuccesful status code from {url}: {resp.status}"
+            reason=f'Got unsuccesful status code when requesting "{url}": {resp.status}'
         )
 
     content_type = resp.headers[hdrs.CONTENT_TYPE]
