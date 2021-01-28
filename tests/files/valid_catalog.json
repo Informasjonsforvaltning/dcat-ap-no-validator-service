@@ -9,17 +9,14 @@
   },
   "@graph": [
     {
-      "@id": "http://dataset-publisher:8080/datasets/1",
-      "@type": "dcat:Dataset",
-      "dcat:theme": {
-        "@id": "http://publications.europa.eu/resource/authority/data-theme/GOVE"
-      },
-      "dct:creator": {
-        "@id": "https://organization-catalogue.fellesdatakatalog.digdir.no/organizations/991825827"
+      "@id": "http://dataset-publisher:8080/catalogs/1",
+      "@type": "dcat:Catalog",
+      "dcat:dataset": {
+        "@id": "http://dataset-publisher:8080/datasets/1"
       },
       "dct:description": {
         "@language": "en",
-        "@value": "A valid test dataset"
+        "@value": "A test catalog that is valid according to dcat-ap-no v2"
       },
       "dct:identifier": "1",
       "dct:publisher": {
@@ -27,11 +24,10 @@
       },
       "dct:title": {
         "@language": "en",
-        "@value": "Test dataset"
+        "@value": "Testcatalog"
       }
     },
     {
-
       "@id": "http://dataset-publisher:8080/datasets/1",
       "@type": "dcat:Dataset",
       "dcat:theme": [
@@ -44,11 +40,10 @@
       ],
       "dct:creator": {
         "@id": "https://organization-catalogue.fellesdatakatalog.digdir.no/organizations/991825827"
-
       },
       "dct:description": {
         "@language": "en",
-        "@value": "A test catalog that is valid according to dcat-ap-no v2"
+        "@value": "A valid test dataset"
       },
       "dct:identifier": "1",
       "dct:publisher": {
