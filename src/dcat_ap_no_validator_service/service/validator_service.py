@@ -102,6 +102,8 @@ class ValidatorService:
                                 format = resp.headers["content-type"].split(";")[0]
                                 if "text/xml" in format:
                                     format = "application/rdf+xml"
+                                if "application/xml" in format:
+                                    format = "application/rdf+xml"
                                 t = Graph().parse(data=resp.text, format=format)
                                 # Add the triples to the ontology graph:
                                 self.ograph += t

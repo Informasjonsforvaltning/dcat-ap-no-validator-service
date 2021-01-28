@@ -257,8 +257,10 @@ async def test_validator_url(http_service: Any) -> None:
          sh:conforms true
          .
     """
-    with open("tests/files/valid_catalog.ttl", "r") as file:
-        text = file.read()
+    session = ClientSession()
+    async with session.get(url_to_graph) as resp:
+        text = await resp.text()
+    await session.close()
 
     g0 = Graph().parse(data=text, format="text/turtle")
     g1 = g0 + Graph().parse(data=src, format="text/turtle")

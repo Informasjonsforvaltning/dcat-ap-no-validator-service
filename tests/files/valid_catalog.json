@@ -9,28 +9,6 @@
   },
   "@graph": [
     {
-      "@id": "http://dataset-publisher:8080/datasets/1",
-      "@type": "dcat:Dataset",
-      "dcat:theme": {
-        "@id": "http://publications.europa.eu/resource/authority/data-theme/GOVE"
-      },
-      "dct:creator": {
-        "@id": "https://organization-catalogue.fellesdatakatalog.digdir.no/organizations/991825827"
-      },
-      "dct:description": {
-        "@language": "en",
-        "@value": "A valid test dataset"
-      },
-      "dct:identifier": "1",
-      "dct:publisher": {
-        "@id": "https://organization-catalogue.fellesdatakatalog.digdir.no/organizations/961181399"
-      },
-      "dct:title": {
-        "@language": "en",
-        "@value": "Test dataset"
-      }
-    },
-    {
       "@id": "http://dataset-publisher:8080/catalogs/1",
       "@type": "dcat:Catalog",
       "dcat:dataset": {
@@ -47,6 +25,33 @@
       "dct:title": {
         "@language": "en",
         "@value": "Testcatalog"
+      }
+    },
+    {
+      "@id": "http://dataset-publisher:8080/datasets/1",
+      "@type": "dcat:Dataset",
+      "dcat:theme": [
+        {
+          "@id": "https://psi.norge.no/los/tema/barnehage"
+        },
+        {
+          "@id": "http://publications.europa.eu/resource/authority/data-theme/GOVE"
+        }
+      ],
+      "dct:creator": {
+        "@id": "https://organization-catalogue.fellesdatakatalog.digdir.no/organizations/991825827"
+      },
+      "dct:description": {
+        "@language": "en",
+        "@value": "A valid test dataset"
+      },
+      "dct:identifier": "1",
+      "dct:publisher": {
+        "@id": "https://organization-catalogue.fellesdatakatalog.digdir.no/organizations/961181399"
+      },
+      "dct:title": {
+        "@language": "en",
+        "@value": "Test dataset"
       }
     }
   ]
