@@ -44,15 +44,16 @@ class ValidatorService:
     ) -> None:
         """Initialize service instance."""
         self.format = format
-        self.graph = parse_input_graph(format, graph)
+        self.graph = parse_input_graph(graph, format)
         if config is None:
             self.config = Config()
         else:
             self.config = config
         self.ograph = Graph()
-        # set the shape graph:
-        logging.debug(f"Got input shacl: {shacl}")
         self.shacl = shacl
+        if self.shacl is not None:
+            logging.debug("Got user supplied shacl")
+            self.shacl = parse_input_graph(shacl)
 
     async def validate(self) -> Tuple[bool, Graph, Graph, Graph]:
         """Validate function."""
@@ -128,10 +129,10 @@ class ValidatorService:
                     pass
 
 
-def parse_input_graph(format: Any, input_graph: Any) -> Graph:
+def parse_input_graph(input_graph: Any, format: Any = None) -> Graph:
     """Try to parse input_graph."""
     # If format is valid, we go ahead with parsing:
-    if format.lower() in SUPPORTED_FORMATS:
+    if format and format.lower() in SUPPORTED_FORMATS:
         return Graph().parse(data=input_graph, format=format)
     # Else we try the valid format one after the other:
     else:

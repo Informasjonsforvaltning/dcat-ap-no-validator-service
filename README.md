@@ -40,6 +40,15 @@ curl -i \
  -F "config={\"shapeId\":\"2\", \"expand\":\"true\", \"includeExpandedTriples\":\"true\"};type=application/json" \
 -X POST http://localhost:8000/validator
 ```
+### Validate file and supply your own shacl file (will override shapeId):
+```
+% curl -i \
+ -H "Accept: text/turtle" \
+ -H "Content-Type: multipart/form-data" \
+ -F "file=@tests/files/valid_catalog.ttl;type=text/turtle" \
+ -F "shacl-file=@dcat-ap-no-shacl_shapes_2.00.ttl" \
+ -X POST http://localhost:8000/validator
+```
 ### List all available shacl shapes (Not implemented yet)
 ```
 % curl -i \

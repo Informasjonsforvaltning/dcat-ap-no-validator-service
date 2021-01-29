@@ -22,6 +22,7 @@ class Validator(web.View):
         config = None
         filename = None
         content_type = None
+        shacl = None
         input_matrix = dict()
         async for part in (await self.request.multipart()):
             logging.debug(f"part.name {part.name}")
@@ -35,7 +36,7 @@ class Validator(web.View):
             if part.name == "url":
                 # Get data from url:
                 url = (await part.read()).decode()
-                logging.debug(f"Got url: {url}")
+                logging.debug(f"Got reference to input graph with url: {url}")
                 data, content_type = await get_graph_at_url(url)
                 input_matrix[part.name] = url
                 pass
@@ -46,28 +47,42 @@ class Validator(web.View):
                     content_type = part.headers[hdrs.CONTENT_TYPE]
                     logging.debug(f"content_type of {content_type}")
                 data = (await part.read()).decode()
-                logging.debug(f"Got text: {data}")
+                logging.debug(f"Got ingput graph as text: {data}")
                 input_matrix[part.name] = "text"
                 pass
 
             if part.name == "file":
                 # Process any files you uploaded
                 filename = part.filename
-                logging.debug(f"got filename: {filename}")
+                logging.debug(f"got input graph as file with filename: {filename}")
                 if part.headers[hdrs.CONTENT_TYPE]:
                     content_type = part.headers[hdrs.CONTENT_TYPE]
                     logging.debug(f"content_type of {content_type}")
                 data = (await part.read()).decode()
                 logging.debug(f"content of {filename}:\n{data}")
                 input_matrix[part.name] = filename
-        # We need to check that user sendt one, and only one, input graph:
+
+            if part.name == "shacl-file":
+                # Process any files you uploaded
+                filename = part.filename
+                logging.debug(f"got shacl from user with filename: {filename}")
+                if part.headers[hdrs.CONTENT_TYPE]:
+                    content_type = part.headers[hdrs.CONTENT_TYPE]
+                    logging.debug(f"content_type of {content_type}")
+                shacl = (await part.read()).decode()
+                logging.debug(f"content of {filename}:\n{data}")
+
         if len(input_matrix) != 1:
             logging.debug(f"Ambigious user input: {input_matrix}")
             raise web.HTTPBadRequest(reason="Multiple inputs for validation.")
 
         # We have got data, now validate:
         try:
-            service = ValidatorService(data, format=content_type, config=config)
+            # instantiate validator service:
+            service = ValidatorService(
+                graph=data, shacl=shacl, format=content_type, config=config
+            )
+            # validate:
             (
                 conforms,
                 data_graph,

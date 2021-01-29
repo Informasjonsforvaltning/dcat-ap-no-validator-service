@@ -421,6 +421,30 @@ async def test_validator_text_no_content_type(client: _TestClient) -> None:
     )
 
 
+@pytest.mark.integration
+async def test_validator_file_and_shacl(client: _TestClient) -> None:
+    """Should return OK."""
+    graph = "tests/files/valid_catalog.ttl"
+    shacl = "dcat-ap-no-shacl_shapes_2.00.ttl"
+
+    with MultipartWriter("mixed") as mpwriter:
+        p = mpwriter.append(open(graph, "rb"))
+        p.set_content_disposition("attachment", name="file", filename=graph)
+        p = mpwriter.append(open(shacl, "rb"))
+        p.set_content_disposition("attachment", name="shacl-file", filename=shacl)
+
+    resp = await client.post("/validator", data=mpwriter)
+    assert resp.status == 200
+    assert resp.headers[hdrs.CONTENT_TYPE] == "text/turtle"
+
+    body = await resp.text()
+    with open("tests/files/valid_catalog.ttl", "r") as file:
+        text = file.read()
+    await _assess_response_body_successful(
+        data=text, format="text/turtle", body=body, content_type="text/turtle"
+    )
+
+
 # -- Bad cases
 
 
