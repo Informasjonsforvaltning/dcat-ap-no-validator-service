@@ -2,7 +2,7 @@
 import logging
 import traceback
 
-from aiohttp import ClientSession, hdrs, web
+from aiohttp import ClientConnectorError, ClientSession, hdrs, web
 from multidict import MultiDict
 from rdflib import Graph
 from rdflib.plugin import PluginException
@@ -120,9 +120,13 @@ async def get_graph_at_url(url: str) -> tuple:  # pragma: no cover
         ]
     )
     session = ClientSession()
-    async with session.get(url, headers=headers) as resp:
-        graph = await resp.text()
-    await session.close()
+    try:
+        async with session.get(url, headers=headers) as resp:
+            graph = await resp.text()
+        await session.close()
+    except ClientConnectorError:
+        logging.debug(traceback.format_exc())
+        raise web.HTTPBadRequest(reason=f"Could not connect to url {url}")
 
     if resp.status != 200:
         raise web.HTTPBadRequest(
