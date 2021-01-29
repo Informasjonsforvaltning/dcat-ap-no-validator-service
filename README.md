@@ -20,7 +20,6 @@ Response will be a RDF graph consisting of
 % curl -i \
  -H "Accept: text/turtle" \
  -H "Content-Type: multipart/form-data" \
- -F "version=2" \
  -F "file=@tests/files/valid_catalog.ttl;type=text/turtle" \
  -X POST http://localhost:8000/validator
 ```
@@ -32,11 +31,20 @@ Response will be a RDF graph consisting of
  -F "url=https://example.com/mygraph" \
  -X POST http://localhost:8000/validator
 ```
+### With config parameters:
+```
+curl -i \
+ -H "Accept: text/turtle" \
+ -H "Content-Type: multipart/form-data" \
+ -F "file=@tests/files/valid_catalog.ttl;type=text/turtle" \
+ -F "config={\"shapeId\":\"2\", \"expand\":\"true\", \"includeExpandedTriples\":\"true\"};type=application/json" \
+-X POST http://localhost:8000/validator
+```
 ### List all available shacl shapes (Not implemented yet)
 ```
 % curl -i \
  -H "Accept: text/turtle" \
- -X GET http://localhost:8000/validator/shapes
+ -X GET http://localhost:8000/shapes
  ```
 ## Develop and run locally
 ### Requirements

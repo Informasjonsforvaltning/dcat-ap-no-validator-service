@@ -1,4 +1,5 @@
 """Contract test cases for ready."""
+import json
 from typing import Any
 
 from aiohttp import ClientSession, hdrs, MultipartWriter
@@ -35,8 +36,13 @@ async def test_validator_with_file(http_service: Any) -> None:
          sh:conforms true
          .
     """
-    g1 = Graph().parse(data=body, format="text/turtle")
-    g2 = Graph().parse(data=src, format="text/turtle")
+    with open("tests/files/valid_catalog.ttl", "r") as file:
+        text = file.read()
+
+    # body is graph of both the input data and the validation report
+    g0 = Graph().parse(data=text, format="text/turtle")
+    g1 = g0 + Graph().parse(data=src, format="turtle")
+    g2 = Graph().parse(data=body, format="text/turtle")
 
     _isomorphic = isomorphic(g1, g2)
     if not _isomorphic:
@@ -74,8 +80,10 @@ async def test_validator_with_text(http_service: Any) -> None:
          sh:conforms true
          .
     """
-    g1 = Graph().parse(data=body, format="text/turtle")
-    g2 = Graph().parse(data=src, format="text/turtle")
+
+    g0 = Graph().parse(data=text, format="text/turtle")
+    g1 = g0 + Graph().parse(data=src, format="turtle")
+    g2 = Graph().parse(data=body, format="text/turtle")
 
     _isomorphic = isomorphic(g1, g2)
     if not _isomorphic:
@@ -113,8 +121,9 @@ async def test_validator_with_text_json_ld(http_service: Any) -> None:
          sh:conforms true
          .
     """
-    g1 = Graph().parse(data=body, format="text/turtle")
-    g2 = Graph().parse(data=src, format="text/turtle")
+    g0 = Graph().parse(data=text, format="application/ld+json")
+    g1 = g0 + Graph().parse(data=src, format="turtle")
+    g2 = Graph().parse(data=body, format="text/turtle")
 
     _isomorphic = isomorphic(g1, g2)
     if not _isomorphic:
@@ -162,8 +171,12 @@ async def test_validator_accept_json_ld(http_service: Any) -> None:
       }
     ]
     """
-    g1 = Graph().parse(data=body, format="application/ld+json")
-    g2 = Graph().parse(data=src, format="application/ld+json")
+    with open(filename, "r") as file:
+        text = file.read()
+
+    g0 = Graph().parse(data=text, format="text/turtle")
+    g1 = g0 + Graph().parse(data=src, format="application/ld+json")
+    g2 = Graph().parse(data=body, format="application/ld+json")
 
     _isomorphic = isomorphic(g1, g2)
     if not _isomorphic:
@@ -202,8 +215,56 @@ async def test_validator_file_content_type_json_ld(http_service: Any) -> None:
          sh:conforms true
          .
     """
-    g1 = Graph().parse(data=body, format="text/turtle")
-    g2 = Graph().parse(data=src, format="text/turtle")
+    with open(filename, "r") as file:
+        text = file.read()
+
+    g0 = Graph().parse(data=text, format="application/ld+json")
+    g1 = g0 + Graph().parse(data=src, format="text/turtle")
+    g2 = Graph().parse(data=body, format="text/turtle")
+
+    _isomorphic = isomorphic(g1, g2)
+    if not _isomorphic:
+        _dump_diff(g1, g2)
+        pass
+    assert _isomorphic, "results_graph is incorrect"
+
+
+@pytest.mark.contract
+@pytest.mark.asyncio
+async def test_validator_file_content_type_rdf_xml(http_service: Any) -> None:
+    """Should return OK and successful validation."""
+    url = f"{http_service}/validator"
+    filename = "tests/files/valid_catalog.xml"
+
+    with MultipartWriter("mixed") as mpwriter:
+        p = mpwriter.append(
+            open(filename, "rb"), {"CONTENT-TYPE": "application/rdf+xml"}
+        )
+        p.set_content_disposition("attachment", name="file", filename=filename)
+
+    session = ClientSession()
+    async with session.post(url, data=mpwriter) as resp:
+        body = await resp.text()
+    await session.close()
+
+    assert resp.status == 200
+    assert "text/turtle" in resp.headers[hdrs.CONTENT_TYPE]
+
+    # results_graph (validation report) should be isomorphic to the following:
+    src = """
+    @prefix sh: <http://www.w3.org/ns/shacl#> .
+    @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+    [] a sh:ValidationReport ;
+         sh:conforms true
+         .
+    """
+    with open(filename, "r") as file:
+        text = file.read()
+
+    g0 = Graph().parse(data=text, format="application/rdf+xml")
+    g1 = g0 + Graph().parse(data=src, format="text/turtle")
+    g2 = Graph().parse(data=body, format="text/turtle")
 
     _isomorphic = isomorphic(g1, g2)
     if not _isomorphic:
@@ -240,9 +301,14 @@ async def test_validator_url(http_service: Any) -> None:
          sh:conforms true
          .
     """
+    session = ClientSession()
+    async with session.get(url_to_graph) as resp:
+        text = await resp.text()
+    await session.close()
 
-    g1 = Graph().parse(data=body, format="text/turtle")
-    g2 = Graph().parse(data=src, format="text/turtle")
+    g0 = Graph().parse(data=text, format="text/turtle")
+    g1 = g0 + Graph().parse(data=src, format="text/turtle")
+    g2 = Graph().parse(data=body, format="text/turtle")
 
     _isomorphic = isomorphic(g1, g2)
     if not _isomorphic:
@@ -280,8 +346,12 @@ async def test_validator_with_file_content_encoding(http_service: Any) -> None:
          sh:conforms true
          .
     """
-    g1 = Graph().parse(data=body, format="text/turtle")
-    g2 = Graph().parse(data=src, format="text/turtle")
+    with open(filename, "r") as file:
+        text = file.read()
+
+    g0 = Graph().parse(data=text, format="text/turtle")
+    g1 = g0 + Graph().parse(data=src, format="text/turtle")
+    g2 = Graph().parse(data=body, format="text/turtle")
 
     _isomorphic = isomorphic(g1, g2)
     if not _isomorphic:
@@ -292,17 +362,62 @@ async def test_validator_with_file_content_encoding(http_service: Any) -> None:
 
 @pytest.mark.contract
 @pytest.mark.asyncio
-async def test_validator_with_not_valid_file(http_service: Any) -> None:
-    """Should return OK and unsuccessful validation."""
+async def test_validator_with_default_config(http_service: Any) -> None:
+    """Should return OK and successful validation."""
     url = f"{http_service}/validator"
-    filename = "tests/files/invalid_catalog.ttl"
-    version = "2"
+    filename = "tests/files/valid_catalog.ttl"
+
+    config = {"shapeId": "2", "expand": "true", "includeExpandedTriples": "false"}
 
     with MultipartWriter("mixed") as mpwriter:
         p = mpwriter.append(open(filename, "rb"))
         p.set_content_disposition("attachment", name="file", filename=filename)
-        p = mpwriter.append(version)
-        p.set_content_disposition("inline", name="version")
+        p.headers[hdrs.CONTENT_ENCODING] = "gzip"
+        p = mpwriter.append(json.dumps(config))
+        p.set_content_disposition("inline", name="config")
+
+    session = ClientSession()
+    async with session.post(url, data=mpwriter) as resp:
+        body = await resp.text()
+    await session.close()
+
+    assert resp.status == 200
+    assert "text/turtle" in resp.headers[hdrs.CONTENT_TYPE]
+
+    # results_graph (validation report) should be isomorphic to the following:
+    src = """
+    @prefix sh: <http://www.w3.org/ns/shacl#> .
+    @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+    [] a sh:ValidationReport ;
+         sh:conforms true
+         .
+    """
+    with open(filename, "r") as file:
+        text = file.read()
+
+    g0 = Graph().parse(data=text, format="text/turtle")
+    g1 = g0 + Graph().parse(data=src, format="text/turtle")
+    g2 = Graph().parse(data=body, format="text/turtle")
+
+    _isomorphic = isomorphic(g1, g2)
+    if not _isomorphic:
+        _dump_diff(g1, g2)
+        pass
+    assert _isomorphic, "results_graph is incorrect"
+
+
+# --- bad cases ---
+@pytest.mark.contract
+@pytest.mark.asyncio
+async def test_validator_with_not_valid_file(http_service: Any) -> None:
+    """Should return OK and unsuccessful validation."""
+    url = f"{http_service}/validator"
+    filename = "tests/files/invalid_catalog.ttl"
+
+    with MultipartWriter("mixed") as mpwriter:
+        p = mpwriter.append(open(filename, "rb"))
+        p.set_content_disposition("attachment", name="file", filename=filename)
 
     session = ClientSession()
     async with session.post(url, data=mpwriter) as resp:
@@ -337,34 +452,15 @@ async def test_validator_with_not_valid_file(http_service: Any) -> None:
                 sh:sourceShape [ sh:minCount 1 ;
                         sh:nodeKind sh:Literal ;
                         sh:path <http://purl.org/dc/terms/description> ;
-                        sh:severity sh:Violation ] ],
-            [ a sh:ValidationResult ;
-                sh:focusNode <http://dataset-publisher:8080/datasets/1> ;
-                sh:resultMessage "Less than 1 values on <http://dataset-publisher:8080/datasets/1>->dct:publisher" ;
-                sh:resultPath <http://purl.org/dc/terms/publisher> ;
-                sh:resultSeverity sh:Violation ;
-                sh:sourceConstraintComponent sh:MinCountConstraintComponent ;
-                sh:sourceShape [ sh:class <http://xmlns.com/foaf/0.1/Agent> ;
-                        sh:maxCount 1 ;
-                        sh:minCount 1 ;
-                        sh:path <http://purl.org/dc/terms/publisher> ;
-                        sh:severity sh:Violation ] ],
-            [ a sh:ValidationResult ;
-                sh:focusNode <http://dataset-publisher:8080/catalogs/1> ;
-                sh:resultMessage "Value does not have class foaf:Agent" ;
-                sh:resultPath <http://purl.org/dc/terms/publisher> ;
-                sh:resultSeverity sh:Violation ;
-                sh:sourceConstraintComponent sh:ClassConstraintComponent ;
-                sh:sourceShape [ sh:class <http://xmlns.com/foaf/0.1/Agent> ;
-                        sh:maxCount 1 ;
-                        sh:minCount 1 ;
-                        sh:path <http://purl.org/dc/terms/publisher> ;
-                        sh:severity sh:Violation ] ;
-                sh:value <https://organization-catalogue.fellesdatakatalog.digdir.no/organizations/961181399> ]
+                        sh:severity sh:Violation ] ]
     .
     """
-    g1 = Graph().parse(data=body, format="text/turtle")
-    g2 = Graph().parse(data=src, format="text/turtle")
+    with open(filename, "r") as file:
+        text = file.read()
+
+    g0 = Graph().parse(data=text, format="text/turtle")
+    g1 = g0 + Graph().parse(data=src, format="text/turtle")
+    g2 = Graph().parse(data=body, format="text/turtle")
 
     _isomorphic = isomorphic(g1, g2)
     if not _isomorphic:
@@ -373,7 +469,6 @@ async def test_validator_with_not_valid_file(http_service: Any) -> None:
     assert _isomorphic, "results_graph is incorrect"
 
 
-# --- bad cases ---
 @pytest.mark.contract
 @pytest.mark.asyncio
 async def test_validator_notexisting_url(http_service: Any) -> None:
@@ -396,7 +491,7 @@ async def test_validator_notexisting_url(http_service: Any) -> None:
 @pytest.mark.contract
 @pytest.mark.asyncio
 async def test_validator_url_to_invalid_rdf(http_service: Any) -> None:
-    """Should return 400."""
+    """Should return 415."""
     url = f"{http_service}/validator"
 
     url_to_graph = "https://raw.githubusercontent.com/Informasjonsforvaltning/dcat-ap-no-validator-service/main/tests/files/invalid_rdf.txt"  # noqa: B950
@@ -409,7 +504,7 @@ async def test_validator_url_to_invalid_rdf(http_service: Any) -> None:
         _ = await resp.text()
     await session.close()
 
-    assert resp.status == 400
+    assert resp.status == 415
 
 
 # ---------------------------------------------------------------------- #

@@ -1,6 +1,6 @@
 [flake8]
 select = ANN,A50,B,B9,BLK,C,D,E,F,I,S,W,N
-ignore = ANN101,E501,W503
+ignore = ANN101,E501,W503,S110
 max-line-length = 120
 per-file-ignores = __init__.py: F401,tests/*:S101
 application-import-names = dcat_ap_no_validator_service, tests

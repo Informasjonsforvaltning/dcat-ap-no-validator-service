@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+   xmlns:dcat="http://www.w3.org/ns/dcat#"
+   xmlns:dct="http://purl.org/dc/terms/"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+>
+  <rdf:Description rdf:about="http://dataset-publisher:8080/catalogs/1">
+    <dcat:dataset rdf:resource="http://dataset-publisher:8080/datasets/1"/>
+    <rdf:type rdf:resource="http://www.w3.org/ns/dcat#Catalog"/>
+    <dct:description xml:lang="en">A test catalog that is valid according to dcat-ap-no v2</dct:description>
+    <dct:title xml:lang="en">Testcatalog</dct:title>
+    <dct:identifier>1</dct:identifier>
+    <dct:publisher rdf:resource="https://organization-catalogue.fellesdatakatalog.digdir.no/organizations/961181399"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://dataset-publisher:8080/datasets/1">
+    <dct:creator rdf:resource="https://organization-catalogue.fellesdatakatalog.digdir.no/organizations/991825827"/>
+    <dct:publisher rdf:resource="https://organization-catalogue.fellesdatakatalog.digdir.no/organizations/961181399"/>
+    <dct:identifier>1</dct:identifier>
+    <dct:description xml:lang="en">A valid test dataset</dct:description>
+    <dcat:theme rdf:resource="http://publications.europa.eu/resource/authority/data-theme/GOVE"/>
+    <dcat:theme rdf:resource="https://psi.norge.no/los/tema/barnehage"/>
+    <dct:title xml:lang="en">Test dataset</dct:title>
+    <rdf:type rdf:resource="http://www.w3.org/ns/dcat#Dataset"/>
+  </rdf:Description>
+</rdf:RDF>
