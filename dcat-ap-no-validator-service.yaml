@@ -26,15 +26,19 @@ paths:
                     $ref: '#/components/schemas/Config'
                   text:
                     type: string
-                    description: a text string with serialized RDF
+                    description: a text string with the [data graph](https://www.w3.org/TR/shacl/#data-graph)
                   url:
                     type: string
                     format: uri
-                    description: a url pointing to an RDF graph on the internet
+                    description: a url pointing to the [data graph](https://www.w3.org/TR/shacl/#data-graph) on the internet
                   file:
                     type: string
                     format: binary
-                    description: a file containing serialized RDF
+                    description: a file containing the [data graph](https://www.w3.org/TR/shacl/#data-graph)
+                  shacl-file:
+                    type: string
+                    format: binary
+                    description: a file containing one or more [SHACL-shapes](https://www.w3.org/TR/shacl/#shapes-graph) the data graph should be validated against
             encoding:
               file:
                 contentType: text/turtle
