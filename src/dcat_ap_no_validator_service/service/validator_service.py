@@ -82,7 +82,7 @@ class ValidatorService:
         )
         return (conforms, self.graph, self.ograph, results_graph)
 
-    def _expand_objects_triples(self) -> None:
+    def _expand_objects_triples(self) -> None:  # pragma: no cover
         """Get triples of objects and add to graph."""
         # TODO: this loop should be parallellized
         for p, o in self.graph.predicate_objects(subject=None):
@@ -108,7 +108,7 @@ class ValidatorService:
                                 t = Graph().parse(data=resp.text, format=format)
                                 # Add the triples to the ontology graph:
                                 self.ograph += t
-                        except Exception:  # pragma: no cover
+                        except Exception:
                             logging.debug(traceback.format_exc())
                             pass
 
