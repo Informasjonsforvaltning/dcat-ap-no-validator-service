@@ -1,4 +1,5 @@
 """Integration test cases for the ready route."""
+from collections import namedtuple
 from typing import Any
 
 from aiohttp import hdrs, MultipartWriter
@@ -445,6 +446,80 @@ async def test_validator_file_and_shacl(client: _TestClient) -> None:
     )
 
 
+@pytest.mark.integration
+async def test_validator_graph_references_non_parsable_graph(
+    client: _TestClient, mocker: MockFixture
+) -> None:
+    """Should return OK and unsuccessful validation."""
+    # Set up the mock
+    mocker.patch(
+        "dcat_ap_no_validator_service.adapter.remote_graph_adapter.requests.get",
+        return_value=_mock_non_parsable_graph_at_url(),
+    )
+
+    filename = "tests/files/valid_catalog_references_bad_graph.ttl"
+    config: dict = {
+        "shapeId": "2",
+        "expand": "true",
+        "includeExpandedTriples": "false",
+    }
+
+    with MultipartWriter("mixed") as mpwriter:
+        p = mpwriter.append(open(filename, "rb"))
+        p.set_content_disposition("attachment", name="file", filename=filename)
+        p = mpwriter.append_json(config)
+        p.set_content_disposition("inline", name="config")
+
+    resp = await client.post("/validator", data=mpwriter)
+    assert resp.status == 200
+    assert resp.headers[hdrs.CONTENT_TYPE] == "text/turtle"
+
+    body = await resp.text()
+
+    with open("tests/files/valid_catalog_references_bad_graph.ttl", "r") as file:
+        text = file.read()
+    await _assess_response_body_unsuccessful(
+        data=text, format="text/turtle", body=body, content_type="text/turtle"
+    )
+
+
+@pytest.mark.integration
+async def test_validator_graph_references_no_response_graph(
+    client: _TestClient, mocker: MockFixture
+) -> None:
+    """Should return OK and unsuccessful validation."""
+    # Set up the mock
+    mocker.patch(
+        "dcat_ap_no_validator_service.adapter.remote_graph_adapter.requests.get",
+        return_value=_mock_non_successful_status_code_from_url(),
+    )
+
+    filename = "tests/files/valid_catalog_references_bad_graph.ttl"
+    config: dict = {
+        "shapeId": "2",
+        "expand": "true",
+        "includeExpandedTriples": "false",
+    }
+
+    with MultipartWriter("mixed") as mpwriter:
+        p = mpwriter.append(open(filename, "rb"))
+        p.set_content_disposition("attachment", name="file", filename=filename)
+        p = mpwriter.append_json(config)
+        p.set_content_disposition("inline", name="config")
+
+    resp = await client.post("/validator", data=mpwriter)
+    assert resp.status == 200
+    assert resp.headers[hdrs.CONTENT_TYPE] == "text/turtle"
+
+    body = await resp.text()
+
+    with open("tests/files/valid_catalog_references_bad_graph.ttl", "r") as file:
+        text = file.read()
+    await _assess_response_body_unsuccessful(
+        data=text, format="text/turtle", body=body, content_type="text/turtle"
+    )
+
+
 # -- Bad cases
 
 
@@ -550,6 +625,18 @@ def _mock_graph_at_url_json_ld() -> tuple:
     with open("tests/files/valid_catalog.json", "r") as file:
         text = file.read()
     return text, "text/plain"
+
+
+def _mock_non_parsable_graph_at_url() -> tuple:
+    t = namedtuple("t", ("text", "status_code", "headers"))
+    with open("tests/files/invalid_rdf.txt", "r") as file:
+        text = file.read()
+    return t(text=text, status_code=200, headers={"content-type": "application/json"})
+
+
+def _mock_non_successful_status_code_from_url() -> tuple:
+    t = namedtuple("t", ("text", "status_code", "headers"))
+    return t(text=None, status_code=406, headers=None)
 
 
 # ---------------------------------------------------------------------- #

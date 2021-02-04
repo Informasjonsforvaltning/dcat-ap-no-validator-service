@@ -1,14 +1,13 @@
 """Module for validator service."""
 from dataclasses import dataclass
 import logging
-import traceback
 from typing import Any, Tuple
 
 from pyshacl import validate
 from rdflib import Graph, RDF, URIRef
-from rdflib.plugin import PluginException
-import requests
 
+
+from dcat_ap_no_validator_service.adapter import fetch_graph, parse_text
 from dcat_ap_no_validator_service.service import ShapeService
 
 DEFAULT_SHACL_VERSION = "2"
@@ -44,7 +43,7 @@ class ValidatorService:
     ) -> None:
         """Initialize service instance."""
         self.format = format
-        self.graph = parse_input_graph(graph, format)
+        self.graph = parse_text(graph, format)
         if config is None:
             self.config = Config()
         else:
@@ -53,7 +52,7 @@ class ValidatorService:
         self.shacl = shacl
         if self.shacl is not None:
             logging.debug("Got user supplied shacl")
-            self.shacl = parse_input_graph(shacl)
+            self.shacl = parse_text(shacl)
 
     async def validate(self) -> Tuple[bool, Graph, Graph, Graph]:
         """Validate function."""
@@ -70,6 +69,10 @@ class ValidatorService:
             self._expand_objects_triples()
             self._load_ontologies()
         # Validate!
+        format = "turtle"
+        logging.debug(
+            f"Ready to validate graph:\n{self.graph.serialize(format=format).decode()}"
+        )
         # `inference` should be set to one of the followoing {"none", "rdfs", "owlrl", "both"}
         conforms, results_graph, _ = validate(
             data_graph=self.graph,
@@ -92,25 +95,9 @@ class ValidatorService:
             elif type(o) is URIRef:
                 if (o, None, None) not in self.graph:
                     if (o, None, None) not in self.ograph:
-                        logging.debug(f"trying to fetch triples about {o}")
-                        try:
-                            # Workaround to accomodate wrong content-type in responses:
-                            # Should use Graph().parse(o) directly, but this approach
-                            # breaks down when trying to fetch EU-triples:
-                            headers = {"Accept": "text/turtle"}
-                            resp = requests.get(o, headers=headers)
-                            if resp.status_code == 200:
-                                format = resp.headers["content-type"].split(";")[0]
-                                if "text/xml" in format:
-                                    format = "application/rdf+xml"
-                                if "application/xml" in format:
-                                    format = "application/rdf+xml"
-                                t = Graph().parse(data=resp.text, format=format)
-                                # Add the triples to the ontology graph:
-                                self.ograph += t
-                        except Exception:
-                            logging.debug(traceback.format_exc())
-                            pass
+                        logging.debug(f"Trying to fetch remote triples about {o}")
+                        g = fetch_graph(o)
+                        self.ograph += g
 
     def _load_ontologies(self) -> None:
         """Load relevant ontologies into ograph."""
@@ -119,30 +106,6 @@ class ValidatorService:
         ontologies = ["https://www.w3.org/ns/regorg", "https://www.w3.org/ns/org"]
         for o in ontologies:
             if (o, None, None) not in self.ograph:
-                logging.debug(f"Loading remote ontology {o}")
-                try:
-                    t = Graph().parse(o)
-                    # Add the triples to the ontology graph:
-                    self.ograph += t
-                except Exception:  # pragma: no cover
-                    logging.debug(traceback.format_exc())
-                    pass
-
-
-def parse_input_graph(input_graph: Any, format: Any = None) -> Graph:
-    """Try to parse input_graph."""
-    # If format is valid, we go ahead with parsing:
-    if format and format.lower() in SUPPORTED_FORMATS:
-        return Graph().parse(data=input_graph, format=format)
-    # Else we try the valid format one after the other:
-    else:
-        for _format in SUPPORTED_FORMATS:
-            # the following is flagged by S110 Try, Except, Pass. But there is
-            # no easy way to catch specific errors from the parse function.
-            # TODO: find a way to solve this without ignoring S110
-            try:
-                return Graph().parse(data=input_graph, format=_format)
-            except Exception:
-                pass
-        # If we reached this point, we did not succeed with parsing:
-        raise PluginException(f"Format not supported: {format}")
+                logging.debug(f"Trying to add remote ontology {o}")
+                g = fetch_graph(o)
+                self.ograph += g
