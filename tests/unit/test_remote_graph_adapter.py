@@ -10,8 +10,13 @@ from dcat_ap_no_validator_service.adapter import fetch_graph
 
 
 @pytest.mark.unit
-async def test_fetch_graph_that_has_rdf_content_type() -> None:
+async def test_fetch_graph_that_has_rdf_content_type(mocker: MockFixture) -> None:
     """Should return a non-empyt graph."""
+    # Set up the mock
+    mocker.patch(
+        "dcat_ap_no_validator_service.adapter.remote_graph_adapter.requests.get",
+        return_value=_mock_rdf_response(),
+    )
     url = "https://www.w3.org/ns/regorg"
     o = fetch_graph(url)
     assert type(o) == Graph
@@ -19,8 +24,15 @@ async def test_fetch_graph_that_has_rdf_content_type() -> None:
 
 
 @pytest.mark.unit
-async def test_fetch_graph_that_does_not_have_rdf_content_type() -> None:
+async def test_fetch_graph_that_does_not_have_rdf_content_type(
+    mocker: MockFixture,
+) -> None:
     """Should return a non-empty graph."""
+    # Set up the mock
+    mocker.patch(
+        "dcat_ap_no_validator_service.adapter.remote_graph_adapter.requests.get",
+        return_value=_mock_rdf_with_non_standard_content_type_response(),
+    )
     url = "https://data.norge.no/vocabulary/modelldcatno/modelldcatno.ttl"
     o = fetch_graph(url)
     assert type(o) == Graph
@@ -33,7 +45,7 @@ async def test_fetch_graph_that_is_not_parsable_as_rdf(mocker: MockFixture) -> N
     # Set up the mock
     mocker.patch(
         "dcat_ap_no_validator_service.adapter.remote_graph_adapter.requests.get",
-        return_value=_mock_no_response_at_url(),
+        return_value=_mock_no_response(),
     )
     url = "https://data.brreg.no/enhetsregisteret/api/enheter/961181399"
     o = fetch_graph(url)
@@ -49,7 +61,7 @@ async def test_fetch_graph_that_gives_unsuccessful_response(
     # Set up the mock
     mocker.patch(
         "dcat_ap_no_validator_service.adapter.remote_graph_adapter.requests.get",
-        return_value=_mock_non_parsable_response_at_url(),
+        return_value=_mock_non_parsable_response(),
     )
     url = "https://data.brreg.no/enhetsregisteret/api/enheter/961181399"
     o = fetch_graph(url)
@@ -57,14 +69,29 @@ async def test_fetch_graph_that_gives_unsuccessful_response(
     assert len(o) == 0
 
 
-def _mock_non_parsable_response_at_url() -> tuple:
+# --- mocks
+def _mock_rdf_response() -> tuple:
+    t = namedtuple("t", ("text", "status_code", "headers"))
+    with open("tests/files/valid_catalog.ttl", "r") as file:
+        text = file.read()
+    return t(text=text, status_code=200, headers={"content-type": "text/turtle"})
+
+
+def _mock_rdf_with_non_standard_content_type_response() -> tuple:
+    t = namedtuple("t", ("text", "status_code", "headers"))
+    with open("tests/files/valid_catalog.ttl", "r") as file:
+        text = file.read()
+    return t(text=text, status_code=200, headers={"content-type": "text/plain"})
+
+
+def _mock_non_parsable_response() -> tuple:
     t = namedtuple("t", ("text", "status_code", "headers"))
     with open("tests/files/invalid_rdf.txt", "r") as file:
         text = file.read()
     return t(text=text, status_code=200, headers={"content-type": "application/json"})
 
 
-def _mock_no_response_at_url() -> tuple:
+def _mock_no_response() -> tuple:
     t = namedtuple("t", ("text", "status_code", "headers"))
     return t(text=None, status_code=406, headers=None)
 
