@@ -19,7 +19,7 @@ def fetch_graph(url: str) -> Graph:
         try:
             g = parse_text(input_graph=resp.text, format=format)
             logging.debug(
-                f"Got valid remote graph from parse_text {g.serialize().decode()}"
+                f"Got valid remote graph from parse_text\n{g.serialize().decode()}"
             )
             return g
         except PluginException:

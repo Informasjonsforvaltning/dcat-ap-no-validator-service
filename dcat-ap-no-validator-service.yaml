@@ -93,7 +93,7 @@ components:
           description: an identifier of the set of rules (shapes) to be validated against
         expand:
           type: boolean
-          default: false
+          default: true
           description: whether service should fetch remote triples referenced by input graph
         includeExpandedTriples:
           type: boolean

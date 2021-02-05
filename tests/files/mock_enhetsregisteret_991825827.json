@@ -1,0 +1,63 @@
+{
+  "organisasjonsnummer": "991825827",
+  "navn": "DIGITALISERINGSDIREKTORATET",
+  "organisasjonsform": {
+    "kode": "ORGL",
+    "beskrivelse": "Organisasjonsledd",
+    "_links": {
+      "self": {
+        "href": "https://data.brreg.no/enhetsregisteret/api/organisasjonsformer/ORGL"
+      }
+    }
+  },
+  "hjemmeside": "www.digdir.no",
+  "postadresse": {
+    "land": "Norge",
+    "landkode": "NO",
+    "postnummer": "0114",
+    "poststed": "OSLO",
+    "adresse": [
+      "Postboks 1382 Vika"
+    ],
+    "kommune": "OSLO",
+    "kommunenummer": "0301"
+  },
+  "registreringsdatoEnhetsregisteret": "2007-10-15",
+  "registrertIMvaregisteret": false,
+  "naeringskode1": {
+    "beskrivelse": "Generell offentlig administrasjon",
+    "kode": "84.110"
+  },
+  "antallAnsatte": 345,
+  "overordnetEnhet": "972417858",
+  "forretningsadresse": {
+    "land": "Norge",
+    "landkode": "NO",
+    "postnummer": "0151",
+    "poststed": "OSLO",
+    "adresse": [
+      "Grev Wedels plass 9"
+    ],
+    "kommune": "OSLO",
+    "kommunenummer": "0301"
+  },
+  "institusjonellSektorkode": {
+    "kode": "6100",
+    "beskrivelse": "Statsforvaltningen"
+  },
+  "registrertIForetaksregisteret": false,
+  "registrertIStiftelsesregisteret": false,
+  "registrertIFrivillighetsregisteret": false,
+  "konkurs": false,
+  "underAvvikling": false,
+  "underTvangsavviklingEllerTvangsopplosning": false,
+  "maalform": "Bokmål",
+  "_links": {
+    "self": {
+      "href": "https://data.brreg.no/enhetsregisteret/api/enheter/991825827"
+    },
+    "overordnetEnhet": {
+      "href": "https://data.brreg.no/enhetsregisteret/api/enheter/972417858"
+    }
+  }
+}

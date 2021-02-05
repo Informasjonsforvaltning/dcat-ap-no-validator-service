@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<rdf:RDF
+	xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+	xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+	xmlns:ns2="http://purl.org/dc/terms/"
+	xmlns:owl="http://www.w3.org/2002/07/owl#"
+	xmlns:skos="http://www.w3.org/2004/02/skos/core#"
+	xmlns:ns5="http://publications.europa.eu/ontology/euvoc#"
+	xmlns:ns6="http://lemon-model.net/lemon#"
+	xmlns:ns7="http://www.w3.org/2008/05/skos-xl#"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:ns9="http://publications.europa.eu/ontology/authority/"
+	xmlns:ns10="http://publications.europa.eu/resource/authority/" >
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/data-theme/GOVE">
+    <rdf:type rdf:resource="http://publications.europa.eu/ontology/euvoc#DataTheme" />
+    <rdf:type rdf:resource="http://www.w3.org/2004/02/skos/core#Concept" />
+    <ns2:created rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2015-10-01</ns2:created>
+    <owl:versionInfo>20200923-0</owl:versionInfo>
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/data-theme" />
+    <skos:prefLabel xml:lang="en">Government and public sector</skos:prefLabel>
+    <skos:prefLabel xml:lang="et">Valitsus ja avalik sektor</skos:prefLabel>
+    <skos:prefLabel xml:lang="it">Governo e settore pubblico</skos:prefLabel>
+    <skos:prefLabel xml:lang="el">Κυβέρνηση και δημόσιος τομέας</skos:prefLabel>
+    <skos:prefLabel xml:lang="nn">Forvaltning og offentleg sektor</skos:prefLabel>
+    <skos:prefLabel xml:lang="es">Gobierno y sector público</skos:prefLabel>
+    <skos:prefLabel xml:lang="lv">Valdība un sabiedriskais sektors</skos:prefLabel>
+    <skos:prefLabel xml:lang="hu">Kormányzat és közszféra</skos:prefLabel>
+    <skos:prefLabel xml:lang="mt">Gvern u settur pubbliku</skos:prefLabel>
+    <skos:prefLabel xml:lang="sl">Vlada in javni sektor</skos:prefLabel>
+    <skos:prefLabel xml:lang="fi">Valtioneuvosto ja julkinen sektori</skos:prefLabel>
+    <skos:prefLabel xml:lang="hr">Vlada i javni sektor</skos:prefLabel>
+    <skos:prefLabel xml:lang="cs">Vláda a veřejný sektor</skos:prefLabel>
+    <skos:prefLabel xml:lang="nl">Overheid en publieke sector</skos:prefLabel>
+    <skos:prefLabel xml:lang="ga">Rialtas agus earnáil phoiblí</skos:prefLabel>
+    <skos:prefLabel xml:lang="no">Forvaltning og offentlig sektor</skos:prefLabel>
+    <skos:prefLabel xml:lang="sv">Regeringen och den offentliga sektorn</skos:prefLabel>
+    <skos:prefLabel xml:lang="sk">Vláda a verejný sektor</skos:prefLabel>
+    <skos:prefLabel xml:lang="pl">Rząd i sektor publiczny</skos:prefLabel>
+    <skos:prefLabel xml:lang="de">Regierung und öffentlicher Sektor</skos:prefLabel>
+    <skos:prefLabel xml:lang="da">Regeringen og den offentlige sektor</skos:prefLabel>
+    <skos:prefLabel xml:lang="pt">Governo e setor público</skos:prefLabel>
+    <skos:prefLabel xml:lang="ro">Guvern şi sector public</skos:prefLabel>
+    <skos:prefLabel xml:lang="bg">Правителство и публичен сектор</skos:prefLabel>
+    <skos:prefLabel xml:lang="lt">Vyriausybė ir viešasis sektorius</skos:prefLabel>
+    <skos:prefLabel xml:lang="nb">Forvaltning og offentlig sektor</skos:prefLabel>
+    <skos:prefLabel xml:lang="fr">Gouvernement et secteur public</skos:prefLabel>
+    <ns5:startDate rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2015-10-01</ns5:startDate>
+    <ns6:context rdf:resource="http://publications.europa.eu/resource/authority/use-context/IMMC" />
+    <ns6:context rdf:resource="http://publications.europa.eu/resource/authority/use-context/DCAT_AP" />
+    <ns6:context rdf:resource="http://publications.europa.eu/resource/authority/use-context/ODP" />
+    <ns7:prefLabel rdf:nodeID="b54544817" />
+    <ns7:prefLabel rdf:nodeID="b54544782" />
+    <ns7:prefLabel rdf:nodeID="b54544692" />
+    <ns7:prefLabel rdf:nodeID="b54544570" />
+    <ns7:prefLabel rdf:nodeID="b54544781" />
+    <ns7:prefLabel rdf:nodeID="b54544505" />
+    <ns7:prefLabel rdf:nodeID="b54544502" />
+    <ns7:prefLabel rdf:nodeID="b54544712" />
+    <ns7:prefLabel rdf:nodeID="b54544524" />
+    <ns7:prefLabel rdf:nodeID="b54544462" />
+    <ns7:prefLabel rdf:nodeID="b54544796" />
+    <ns7:prefLabel rdf:nodeID="b54544734" />
+    <ns7:prefLabel rdf:nodeID="b54544733" />
+    <ns7:prefLabel rdf:nodeID="b54544606" />
+    <ns7:prefLabel rdf:nodeID="b54544665" />
+    <ns7:prefLabel rdf:nodeID="b54544538" />
+    <ns7:prefLabel rdf:nodeID="b54544601" />
+    <ns7:prefLabel rdf:nodeID="b54544534" />
+    <ns7:prefLabel rdf:nodeID="b54544533" />
+    <ns7:prefLabel rdf:nodeID="b54544593" />
+    <ns7:prefLabel rdf:nodeID="b54544808" />
+    <ns7:prefLabel rdf:nodeID="b54544749" />
+    <ns7:prefLabel rdf:nodeID="b54544680" />
+    <ns7:prefLabel rdf:nodeID="b54544494" />
+    <ns7:prefLabel rdf:nodeID="b54544676" />
+    <ns7:prefLabel rdf:nodeID="b54544736" />
+    <ns7:prefLabel rdf:nodeID="b54544825" />
+    <ns2:dateAccepted rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2015-10-09</ns2:dateAccepted>
+    <ns2:dateSubmitted rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2015-10-09</ns2:dateSubmitted>
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/data-theme" />
+    <ns5:status rdf:resource="http://publications.europa.eu/resource/authority/concept-status/CURRENT" />
+    <ns5:xlDefinition rdf:nodeID="b54544640" />
+    <skos:definition xml:lang="en">This concept identifies datasets covering such domains as government or public sector. A government is the system or group of people governing an organised community, often a state. The public sector is the part of the economy composed of both public services and public enterprises. Public sector services and enterprises can be controlled by central government, regional or local authorities. Organisations that are not part of the public sector are either a part of the private sector or voluntary sector. Dataset examples: Candidate countries and potential candidates: Government statistics; Transparency Register.</skos:definition>
+    <dc:identifier>GOVE</dc:identifier>
+    <ns9:authority-code>GOVE</ns9:authority-code>
+    <ns9:deprecated>false</ns9:deprecated>
+    <ns9:op-code>GOVE</ns9:op-code>
+    <ns9:start.use>2015-10-01</ns9:start.use>
+    <ns10:op-code>GOVE</ns10:op-code>
+  </rdf:Description>
+</rdf:RDF>
