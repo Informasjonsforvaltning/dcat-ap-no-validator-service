@@ -44,7 +44,7 @@ jobs:
           docker tag eu.gcr.io/digdir-fdk-infra/dcat-ap-no-validator-service:test eu.gcr.io/digdir-fdk-infra/dcat-ap-no-validator-service:$GITHUB_SHA
           docker tag eu.gcr.io/digdir-fdk-infra/dcat-ap-no-validator-service:test eu.gcr.io/digdir-fdk-infra/dcat-ap-no-validator-service:staging_latest
           docker rmi eu.gcr.io/digdir-fdk-infra/dcat-ap-no-validator-service:test
-          docker -- push eu.gcr.io/digdir-fdk-infra/dcat-ap-no-validator-service
+          docker -- push eu.gcr.io/digdir-fdk-infra/dcat-ap-no-validator-service -a
 
       - name: Apply Helm template
         run: |
