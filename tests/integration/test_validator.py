@@ -30,7 +30,9 @@ async def test_validator_file_no_config(
 
     with MultipartWriter("mixed") as mpwriter:
         p = mpwriter.append(open(filename, "rb"))
-        p.set_content_disposition("attachment", name="file", filename=filename)
+        p.set_content_disposition(
+            "attachment", name="data-graph-file", filename=filename
+        )
 
     resp = await client.post("/validator", data=mpwriter)
     assert resp.status == 200
@@ -54,7 +56,9 @@ async def test_validator_file_empty_config(
 
     with MultipartWriter("mixed") as mpwriter:
         p = mpwriter.append(open(filename, "rb"))
-        p.set_content_disposition("attachment", name="file", filename=filename)
+        p.set_content_disposition(
+            "attachment", name="data-graph-file", filename=filename
+        )
         p = mpwriter.append_json(config)
         p.set_content_disposition("inline", name="config")
 
@@ -85,7 +89,9 @@ async def test_validator_file_full_config_with_default_values(
 
     with MultipartWriter("mixed") as mpwriter:
         p = mpwriter.append(open(filename, "rb"))
-        p.set_content_disposition("attachment", name="file", filename=filename)
+        p.set_content_disposition(
+            "attachment", name="data-graph-file", filename=filename
+        )
         p = mpwriter.append_json(config)
         p.set_content_disposition("inline", name="config")
 
@@ -112,7 +118,9 @@ async def test_validator_file_full_config_all_true(
 
     with MultipartWriter("mixed") as mpwriter:
         p = mpwriter.append(open(filename, "rb"))
-        p.set_content_disposition("attachment", name="file", filename=filename)
+        p.set_content_disposition(
+            "attachment", name="data-graph-file", filename=filename
+        )
         p = mpwriter.append_json(config)
         p.set_content_disposition("inline", name="config")
 
@@ -141,7 +149,9 @@ async def test_validator_file_full_config_all_false(
 
     with MultipartWriter("mixed") as mpwriter:
         p = mpwriter.append(open(filename, "rb"))
-        p.set_content_disposition("attachment", name="file", filename=filename)
+        p.set_content_disposition(
+            "attachment", name="data-graph-file", filename=filename
+        )
         p = mpwriter.append_json(config)
         p.set_content_disposition("inline", name="config")
 
@@ -169,7 +179,9 @@ async def test_validator_file_content_negotiation_json_ld(
 
     with MultipartWriter("mixed") as mpwriter:
         p = mpwriter.append(open(filename, "rb"))
-        p.set_content_disposition("attachment", name="file", filename=filename)
+        p.set_content_disposition(
+            "attachment", name="data-graph-file", filename=filename
+        )
 
     resp = await client.post("/validator", headers=headers, data=mpwriter)
     assert resp.status == 200
@@ -195,7 +207,9 @@ async def test_validator_file_content_type_json_ld(
         p = mpwriter.append(
             open(filename, "rb"), {"CONTENT-TYPE": "application/ld+json"}
         )
-        p.set_content_disposition("attachment", name="file", filename=filename)
+        p.set_content_disposition(
+            "attachment", name="data-graph-file", filename=filename
+        )
 
     resp = await client.post("/validator", data=mpwriter)
     assert resp.status == 200
@@ -219,7 +233,9 @@ async def test_validator_file_content_encoding(
 
     with MultipartWriter("mixed") as mpwriter:
         p = mpwriter.append(open(filename, "rb"))
-        p.set_content_disposition("attachment", name="file", filename=filename)
+        p.set_content_disposition(
+            "attachment", name="data-graph-file", filename=filename
+        )
         p.headers[hdrs.CONTENT_ENCODING] = "gzip"
 
     resp = await client.post("/validator", data=mpwriter)
@@ -243,7 +259,7 @@ async def test_validator_url(client: _TestClient, mocked_response: Any) -> None:
 
     with MultipartWriter("mixed") as mpwriter:
         p = mpwriter.append(url_to_graph)
-        p.set_content_disposition("inline", name="url")
+        p.set_content_disposition("inline", name="data-graph-url")
 
     resp = await client.post("/validator", data=mpwriter)
     assert resp.status == 200
@@ -268,7 +284,7 @@ async def test_validator_url_to_json_ld_file(
 
     with MultipartWriter("mixed") as mpwriter:
         p = mpwriter.append(url_to_graph)
-        p.set_content_disposition("inline", name="url")
+        p.set_content_disposition("inline", name="data-graph-url")
 
     resp = await client.post("/validator", data=mpwriter)
     assert resp.status == 200
@@ -291,7 +307,7 @@ async def test_validator_text(client: _TestClient, mocked_response: Any) -> None
 
     with MultipartWriter("mixed") as mpwriter:
         p = mpwriter.append(text, {"CONTENT-TYPE": "text/turtle"})
-        p.set_content_disposition("inline", name="text")
+        p.set_content_disposition("inline", name="data-graph-text")
 
     resp = await client.post("/validator", data=mpwriter)
     assert resp.status == 200
@@ -313,7 +329,7 @@ async def test_validator_text_format_json_ld(
 
     with MultipartWriter("mixed") as mpwriter:
         p = mpwriter.append(text, {"CONTENT-TYPE": "application/ld+json"})
-        p.set_content_disposition("inline", name="text")
+        p.set_content_disposition("inline", name="data-graph-text")
 
     resp = await client.post("/validator", data=mpwriter)
     assert resp.status == 200
@@ -335,7 +351,7 @@ async def test_validator_text_supported_content_unsupported_content_type(
 
     with MultipartWriter("mixed") as mpwriter:
         p = mpwriter.append(text, {"CONTENT-TYPE": "unsupported/content+type"})
-        p.set_content_disposition("inline", name="text")
+        p.set_content_disposition("inline", name="data-graph-text")
 
     resp = await client.post("/validator", data=mpwriter)
     assert resp.status == 200
@@ -357,7 +373,7 @@ async def test_validator_text_no_content_type(
 
     with MultipartWriter("mixed") as mpwriter:
         p = mpwriter.append(text)
-        p.set_content_disposition("inline", name="text")
+        p.set_content_disposition("inline", name="data-graph-text")
 
     resp = await client.post("/validator", data=mpwriter)
     assert resp.status == 200
@@ -379,9 +395,11 @@ async def test_validator_file_and_shacl(
 
     with MultipartWriter("mixed") as mpwriter:
         p = mpwriter.append(open(graph, "rb"))
-        p.set_content_disposition("attachment", name="file", filename=graph)
+        p.set_content_disposition("attachment", name="data-graph-file", filename=graph)
         p = mpwriter.append(open(shacl, "rb"))
-        p.set_content_disposition("attachment", name="shacl-file", filename=shacl)
+        p.set_content_disposition(
+            "attachment", name="shapes-graph-file", filename=shacl
+        )
 
     resp = await client.post("/validator", data=mpwriter)
     assert resp.status == 200
@@ -409,7 +427,9 @@ async def test_validator_graph_references_non_parsable_graph(
 
     with MultipartWriter("mixed") as mpwriter:
         p = mpwriter.append(open(filename, "rb"))
-        p.set_content_disposition("attachment", name="file", filename=filename)
+        p.set_content_disposition(
+            "attachment", name="data-graph-file", filename=filename
+        )
         p = mpwriter.append_json(config)
         p.set_content_disposition("inline", name="config")
 
@@ -440,7 +460,9 @@ async def test_validator_graph_references_no_response_graph(
 
     with MultipartWriter("mixed") as mpwriter:
         p = mpwriter.append(open(filename, "rb"))
-        p.set_content_disposition("attachment", name="file", filename=filename)
+        p.set_content_disposition(
+            "attachment", name="data-graph-file", filename=filename
+        )
         p = mpwriter.append_json(config)
         p.set_content_disposition("inline", name="config")
 
@@ -468,9 +490,11 @@ async def test_validator_url_and_file(
 
     with MultipartWriter("mixed") as mpwriter:
         p = mpwriter.append(url_to_graph)
-        p.set_content_disposition("inline", name="url")
+        p.set_content_disposition("inline", name="data-graph-url")
         p = mpwriter.append(open(filename, "rb"))
-        p.set_content_disposition("attachment", name="file", filename=filename)
+        p.set_content_disposition(
+            "attachment", name="data-graph-file", filename=filename
+        )
 
     resp = await client.post("/validator", data=mpwriter)
     assert resp.status == 400
@@ -487,7 +511,9 @@ async def test_validator_file_accept_header_not_valid(
 
     with MultipartWriter("mixed") as mpwriter:
         p = mpwriter.append(open(filename, "rb"))
-        p.set_content_disposition("attachment", name="file", filename=filename)
+        p.set_content_disposition(
+            "attachment", name="data-graph-file", filename=filename
+        )
 
     resp = await client.post("/validator", headers=headers, data=mpwriter)
     assert resp.status == 406
@@ -503,7 +529,9 @@ async def test_validator_file_not_existing_shacl(
 
     with MultipartWriter("mixed") as mpwriter:
         p = mpwriter.append(open(filename, "rb"))
-        p.set_content_disposition("attachment", name="file", filename=filename)
+        p.set_content_disposition(
+            "attachment", name="data-graph-file", filename=filename
+        )
         p = mpwriter.append_json(config)
         p.set_content_disposition("inline", name="config")
 
@@ -520,7 +548,7 @@ async def test_validator_bad_syntax_valid_content_type(
 
     with MultipartWriter("mixed") as mpwriter:
         p = mpwriter.append(data, {"CONTENT-TYPE": "text/turtle"})
-        p.set_content_disposition("attachment", name="text")
+        p.set_content_disposition("attachment", name="data-graph-text")
 
     resp = await client.post("/validator", data=mpwriter)
     assert resp.status == 400
@@ -535,7 +563,9 @@ async def test_validator_file_bad_syntax_no_content_type(
 
     with MultipartWriter("mixed") as mpwriter:
         p = mpwriter.append(open(filename, "rb"))
-        p.set_content_disposition("attachment", name="file", filename=filename)
+        p.set_content_disposition(
+            "attachment", name="data-graph-file", filename=filename
+        )
 
     resp = await client.post("/validator", data=mpwriter)
     assert resp.status == 415
@@ -548,7 +578,7 @@ async def test_validator_empty(client: _TestClient, mocked_response: Any) -> Non
 
     with MultipartWriter("mixed") as mpwriter:
         p = mpwriter.append(data, {"CONTENT-TYPE": "text/turtle"})
-        p.set_content_disposition("attachment", name="text")
+        p.set_content_disposition("attachment", name="data-graph-text")
 
     resp = await client.post("/validator", data=mpwriter)
     assert resp.status == 400

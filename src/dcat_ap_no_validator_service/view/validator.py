@@ -33,15 +33,15 @@ class Validator(web.View):
                 config = _create_config(config_json)
                 pass
 
-            if part.name == "url":
-                # Get data from url:
+            if part.name == "data-graph-url":
+                # Get data graph from url:
                 url = (await part.read()).decode()
                 logging.debug(f"Got reference to input graph with url: {url}")
                 data, content_type = await get_graph_at_url(url)
                 input_matrix[part.name] = url
                 pass
 
-            if part.name == "text":
+            if part.name == "data-graph-text":
                 # Get data from text input:
                 if part.headers[hdrs.CONTENT_TYPE]:
                     content_type = part.headers[hdrs.CONTENT_TYPE]
@@ -51,7 +51,7 @@ class Validator(web.View):
                 input_matrix[part.name] = "text"
                 pass
 
-            if part.name == "file":
+            if part.name == "data-graph-file":
                 # Process any files you uploaded
                 filename = part.filename
                 logging.debug(f"got input graph as file with filename: {filename}")
@@ -62,7 +62,7 @@ class Validator(web.View):
                 logging.debug(f"content of {filename}:\n{data}")
                 input_matrix[part.name] = filename
 
-            if part.name == "shacl-file":
+            if part.name == "shapes-graph-file":
                 # Process any files you uploaded
                 filename = part.filename
                 logging.debug(f"got shacl from user with filename: {filename}")

@@ -17,7 +17,9 @@ async def test_validator_with_file(http_service: Any) -> None:
 
     with MultipartWriter("mixed") as mpwriter:
         p = mpwriter.append(open(filename, "rb"))
-        p.set_content_disposition("attachment", name="file", filename=filename)
+        p.set_content_disposition(
+            "attachment", name="data-graph-file", filename=filename
+        )
 
     session = ClientSession()
     async with session.post(url, data=mpwriter) as resp:
@@ -61,7 +63,7 @@ async def test_validator_with_text(http_service: Any) -> None:
 
     with MultipartWriter("mixed") as mpwriter:
         p = mpwriter.append(text, {"CONTENT-TYPE": "text/turtle"})
-        p.set_content_disposition("inline", name="text")
+        p.set_content_disposition("inline", name="data-graph-text")
 
     session = ClientSession()
     async with session.post(url, data=mpwriter) as resp:
@@ -102,7 +104,7 @@ async def test_validator_with_text_json_ld(http_service: Any) -> None:
 
     with MultipartWriter("mixed") as mpwriter:
         p = mpwriter.append(text, {"CONTENT-TYPE": "application/ld+json"})
-        p.set_content_disposition("inline", name="text")
+        p.set_content_disposition("inline", name="data-graph-text")
 
     session = ClientSession()
     async with session.post(url, data=mpwriter) as resp:
@@ -142,7 +144,9 @@ async def test_validator_accept_json_ld(http_service: Any) -> None:
 
     with MultipartWriter("mixed") as mpwriter:
         p = mpwriter.append(open(filename, "rb"))
-        p.set_content_disposition("attachment", name="file", filename=filename)
+        p.set_content_disposition(
+            "attachment", name="data-graph-file", filename=filename
+        )
 
     session = ClientSession()
     async with session.post(url, headers=headers, data=mpwriter) as resp:
@@ -196,7 +200,9 @@ async def test_validator_file_content_type_json_ld(http_service: Any) -> None:
         p = mpwriter.append(
             open(filename, "rb"), {"CONTENT-TYPE": "application/ld+json"}
         )
-        p.set_content_disposition("attachment", name="file", filename=filename)
+        p.set_content_disposition(
+            "attachment", name="data-graph-file", filename=filename
+        )
 
     session = ClientSession()
     async with session.post(url, data=mpwriter) as resp:
@@ -240,7 +246,9 @@ async def test_validator_file_content_type_rdf_xml(http_service: Any) -> None:
         p = mpwriter.append(
             open(filename, "rb"), {"CONTENT-TYPE": "application/rdf+xml"}
         )
-        p.set_content_disposition("attachment", name="file", filename=filename)
+        p.set_content_disposition(
+            "attachment", name="data-graph-file", filename=filename
+        )
 
     session = ClientSession()
     async with session.post(url, data=mpwriter) as resp:
@@ -282,7 +290,7 @@ async def test_validator_url(http_service: Any) -> None:
     url_to_graph = "https://raw.githubusercontent.com/Informasjonsforvaltning/dcat-ap-no-validator-service/main/tests/files/valid_catalog.ttl"  # noqa: B950
     with MultipartWriter("mixed") as mpwriter:
         p = mpwriter.append(url_to_graph)
-        p.set_content_disposition("inline", name="url")
+        p.set_content_disposition("inline", name="data-graph-url")
 
     session = ClientSession()
     async with session.post(url, data=mpwriter) as resp:
@@ -326,7 +334,9 @@ async def test_validator_with_file_content_encoding(http_service: Any) -> None:
 
     with MultipartWriter("mixed") as mpwriter:
         p = mpwriter.append(open(filename, "rb"))
-        p.set_content_disposition("attachment", name="file", filename=filename)
+        p.set_content_disposition(
+            "attachment", name="data-graph-file", filename=filename
+        )
         p.headers[hdrs.CONTENT_ENCODING] = "gzip"
 
     session = ClientSession()
@@ -371,7 +381,9 @@ async def test_validator_with_default_config(http_service: Any) -> None:
 
     with MultipartWriter("mixed") as mpwriter:
         p = mpwriter.append(open(filename, "rb"))
-        p.set_content_disposition("attachment", name="file", filename=filename)
+        p.set_content_disposition(
+            "attachment", name="data-graph-file", filename=filename
+        )
         p.headers[hdrs.CONTENT_ENCODING] = "gzip"
         p = mpwriter.append(json.dumps(config))
         p.set_content_disposition("inline", name="config")
@@ -417,9 +429,11 @@ async def test_validator_with_file_and_shacl(http_service: Any) -> None:
 
     with MultipartWriter("mixed") as mpwriter:
         p = mpwriter.append(open(graph, "rb"))
-        p.set_content_disposition("attachment", name="file", filename=graph)
+        p.set_content_disposition("attachment", name="data-graph-file", filename=graph)
         p = mpwriter.append(open(shacl, "rb"))
-        p.set_content_disposition("attachment", name="shacl-file", filename=shacl)
+        p.set_content_disposition(
+            "attachment", name="shapes-graph-file", filename=shacl
+        )
 
     session = ClientSession()
     async with session.post(url, data=mpwriter) as resp:
@@ -463,7 +477,9 @@ async def test_validator_with_not_valid_file(http_service: Any) -> None:
 
     with MultipartWriter("mixed") as mpwriter:
         p = mpwriter.append(open(filename, "rb"))
-        p.set_content_disposition("attachment", name="file", filename=filename)
+        p.set_content_disposition(
+            "attachment", name="data-graph-file", filename=filename
+        )
 
     session = ClientSession()
     async with session.post(url, data=mpwriter) as resp:
@@ -524,7 +540,7 @@ async def test_validator_notexisting_url(http_service: Any) -> None:
     url_to_graph = "https://raw.githubusercontent.com/Informasjonsforvaltning/dcat-ap-no-validator-service/main/tests/files/does_not_exist.ttl"  # noqa: B950
     with MultipartWriter("mixed") as mpwriter:
         p = mpwriter.append(url_to_graph)
-        p.set_content_disposition("inline", name="url")
+        p.set_content_disposition("inline", name="data-graph-url")
 
     session = ClientSession()
     async with session.post(url, data=mpwriter) as resp:
@@ -543,7 +559,7 @@ async def test_validator_illformed_url(http_service: Any) -> None:
     url_to_graph = "http://slfkjasdf"  # noqa: B950
     with MultipartWriter("mixed") as mpwriter:
         p = mpwriter.append(url_to_graph)
-        p.set_content_disposition("inline", name="url")
+        p.set_content_disposition("inline", name="data-graph-url")
 
     session = ClientSession()
     async with session.post(url, data=mpwriter) as resp:
@@ -562,7 +578,7 @@ async def test_validator_url_to_invalid_rdf(http_service: Any) -> None:
     url_to_graph = "https://raw.githubusercontent.com/Informasjonsforvaltning/dcat-ap-no-validator-service/main/tests/files/invalid_rdf.txt"  # noqa: B950
     with MultipartWriter("mixed") as mpwriter:
         p = mpwriter.append(url_to_graph)
-        p.set_content_disposition("inline", name="url")
+        p.set_content_disposition("inline", name="data-graph-url")
 
     session = ClientSession()
     async with session.post(url, data=mpwriter) as resp:
