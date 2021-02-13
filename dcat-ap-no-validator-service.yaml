@@ -24,9 +24,6 @@ paths:
               properties: # Request parts
                   config:
                     $ref: '#/components/schemas/Config'
-                  data-graph-text:
-                    type: string
-                    description: a text string with the [data graph](https://www.w3.org/TR/shacl/#data-graph)
                   data-graph-url:
                     type: string
                     format: uri
@@ -87,7 +84,7 @@ components:
     Config:
       type: object
       properties:
-        shapeId:
+        shapesId:
           type: string
           default: "2"
           description: an identifier of the set of rules (shapes) to be validated against

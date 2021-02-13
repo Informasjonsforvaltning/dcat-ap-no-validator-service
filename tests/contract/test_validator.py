@@ -55,87 +55,6 @@ async def test_validator_with_file(http_service: Any) -> None:
 
 @pytest.mark.contract
 @pytest.mark.asyncio
-async def test_validator_with_text(http_service: Any) -> None:
-    """Should return OK and successful validation."""
-    url = f"{http_service}/validator"
-    with open("tests/files/valid_catalog.ttl", "r") as file:
-        text = file.read()
-
-    with MultipartWriter("mixed") as mpwriter:
-        p = mpwriter.append(text, {"CONTENT-TYPE": "text/turtle"})
-        p.set_content_disposition("inline", name="data-graph-text")
-
-    session = ClientSession()
-    async with session.post(url, data=mpwriter) as resp:
-        body = await resp.text()
-    await session.close()
-
-    assert resp.status == 200
-    assert "text/turtle" in resp.headers[hdrs.CONTENT_TYPE]
-
-    # results_graph (validation report) should be isomorphic to the following:
-    src = """
-    @prefix sh: <http://www.w3.org/ns/shacl#> .
-    @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
-
-    [] a sh:ValidationReport ;
-         sh:conforms true
-         .
-    """
-
-    g0 = Graph().parse(data=text, format="text/turtle")
-    g1 = g0 + Graph().parse(data=src, format="turtle")
-    g2 = Graph().parse(data=body, format="text/turtle")
-
-    _isomorphic = isomorphic(g1, g2)
-    if not _isomorphic:
-        _dump_diff(g1, g2)
-        pass
-    assert _isomorphic, "results_graph is incorrect"
-
-
-@pytest.mark.contract
-@pytest.mark.asyncio
-async def test_validator_with_text_json_ld(http_service: Any) -> None:
-    """Should return OK and successful validation."""
-    url = f"{http_service}/validator"
-    with open("tests/files/valid_catalog.json", "r") as file:
-        text = file.read()
-
-    with MultipartWriter("mixed") as mpwriter:
-        p = mpwriter.append(text, {"CONTENT-TYPE": "application/ld+json"})
-        p.set_content_disposition("inline", name="data-graph-text")
-
-    session = ClientSession()
-    async with session.post(url, data=mpwriter) as resp:
-        body = await resp.text()
-    await session.close()
-
-    assert resp.status == 200
-    assert "text/turtle" in resp.headers[hdrs.CONTENT_TYPE]
-
-    # results_graph (validation report) should be isomorphic to the following:
-    src = """
-    @prefix sh: <http://www.w3.org/ns/shacl#> .
-    @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
-
-    [] a sh:ValidationReport ;
-         sh:conforms true
-         .
-    """
-    g0 = Graph().parse(data=text, format="application/ld+json")
-    g1 = g0 + Graph().parse(data=src, format="turtle")
-    g2 = Graph().parse(data=body, format="text/turtle")
-
-    _isomorphic = isomorphic(g1, g2)
-    if not _isomorphic:
-        _dump_diff(g1, g2)
-        pass
-    assert _isomorphic, "results_graph is incorrect"
-
-
-@pytest.mark.contract
-@pytest.mark.asyncio
 async def test_validator_accept_json_ld(http_service: Any) -> None:
     """Should return OK and successful validation and content-type should be json-ld."""
     url = f"{http_service}/validator"
@@ -377,7 +296,7 @@ async def test_validator_with_default_config(http_service: Any) -> None:
     url = f"{http_service}/validator"
     filename = "tests/files/valid_catalog.ttl"
 
-    config = {"shapeId": "2", "expand": "true", "includeExpandedTriples": "false"}
+    config = {"shapesId": "2", "expand": "true", "includeExpandedTriples": "false"}
 
     with MultipartWriter("mixed") as mpwriter:
         p = mpwriter.append(open(filename, "rb"))
@@ -572,7 +491,7 @@ async def test_validator_illformed_url(http_service: Any) -> None:
 @pytest.mark.contract
 @pytest.mark.asyncio
 async def test_validator_url_to_invalid_rdf(http_service: Any) -> None:
-    """Should return 415."""
+    """Should return 400."""
     url = f"{http_service}/validator"
 
     url_to_graph = "https://raw.githubusercontent.com/Informasjonsforvaltning/dcat-ap-no-validator-service/main/tests/files/invalid_rdf.txt"  # noqa: B950
@@ -585,7 +504,7 @@ async def test_validator_url_to_invalid_rdf(http_service: Any) -> None:
         _ = await resp.text()
     await session.close()
 
-    assert resp.status == 415
+    assert resp.status == 400
 
 
 # ---------------------------------------------------------------------- #

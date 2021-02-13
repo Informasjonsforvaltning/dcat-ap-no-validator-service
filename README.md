@@ -20,7 +20,7 @@ Response will be a RDF graph consisting of
 % curl -i \
  -H "Accept: text/turtle" \
  -H "Content-Type: multipart/form-data" \
- -F "file=@tests/files/valid_catalog.ttl;type=text/turtle" \
+ -F "data-graph-file=@tests/files/valid_catalog.ttl;type=text/turtle" \
  -X POST http://localhost:8000/validator
 ```
 ### Validate endpoint(url)
@@ -28,7 +28,7 @@ Response will be a RDF graph consisting of
 % curl -i \
  -H "Accept: text/turtle" \
  -H "Content-Type: multipart/form-data" \
- -F "url=https://example.com/mygraph" \
+ -F "data-graph-url=https://example.com/mygraph" \
  -X POST http://localhost:8000/validator
 ```
 ### With config parameters:
@@ -36,25 +36,25 @@ Response will be a RDF graph consisting of
 curl -i \
  -H "Accept: text/turtle" \
  -H "Content-Type: multipart/form-data" \
- -F "file=@tests/files/valid_catalog.ttl;type=text/turtle" \
+ -F "data-graph-file=@tests/files/valid_catalog.ttl;type=text/turtle" \
  -F "config=@tests/files/config.json;type=application/json" \
 -X POST http://localhost:8000/validator
 ```
 Where `config.json` file may have the following properties, ref [the openAPI specification](./dcat_ap_no_validator_service.yaml) :
 ```
 {
-  "shapeId": "2",
+  "shapesId": "2",
   "expand": "true",
   "includeExpandedTriples": "true"
 }
 ```
-### Validate file and supply your own shacl file (will override shapeId):
+### Validate file and supply your own shacl file (will override shapesId):
 ```
 % curl -i \
  -H "Accept: text/turtle" \
  -H "Content-Type: multipart/form-data" \
- -F "file=@tests/files/valid_catalog.ttl;type=text/turtle" \
- -F "shacl-file=@dcat-ap-no-shacl_shapes_2.00.ttl" \
+ -F "data-graph-file=@tests/files/valid_catalog.ttl;type=text/turtle" \
+ -F "shapes-graph-file=@dcat-ap-no-shacl_shapes_2.00.ttl" \
  -X POST http://localhost:8000/validator
 ```
 ### List all available shacl shapes (Not implemented yet)
