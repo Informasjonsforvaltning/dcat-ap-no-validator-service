@@ -107,5 +107,4 @@ class ValidatorService:
         for o in ontologies:
             if (o, None, None) not in self.ontology:
                 logging.debug(f"Trying to add remote ontology {o}")
-                g = fetch_graph(o)
-                self.ontology += g
+                self.ontology += fetch_graph(o)
