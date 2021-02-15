@@ -296,7 +296,7 @@ async def test_validator_with_default_config(http_service: Any) -> None:
     url = f"{http_service}/validator"
     filename = "tests/files/valid_catalog.ttl"
 
-    config = {"shapesId": "2", "expand": "true", "includeExpandedTriples": "false"}
+    config = {"shapesId": "2", "expand": True, "includeExpandedTriples": False}
 
     with MultipartWriter("mixed") as mpwriter:
         p = mpwriter.append(open(filename, "rb"))

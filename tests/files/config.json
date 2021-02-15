@@ -1,4 +1,4 @@
 {
-  "expand": "true",
-  "includeExpandedTriples": "true"
+  "expand": true,
+  "includeExpandedTriples": false
 }

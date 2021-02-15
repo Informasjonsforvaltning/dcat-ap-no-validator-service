@@ -1,5 +1,6 @@
 """Integration test cases for the ready route."""
 from collections import namedtuple
+import json
 import logging
 from typing import Any
 
@@ -84,8 +85,8 @@ async def test_validator_file_full_config_with_default_values(
     filename = "tests/files/valid_catalog.ttl"
     config: dict = {
         "shapesId": "2",
-        "expand": "true",
-        "includeExpandedTriples": "false",
+        "expand": True,
+        "includeExpandedTriples": False,
     }
 
     with MultipartWriter("mixed") as mpwriter:
@@ -115,7 +116,7 @@ async def test_validator_file_full_config_all_true(
 ) -> None:
     """Should return OK."""
     filename = "tests/files/valid_catalog.ttl"
-    config: dict = {"shapesId": "2", "expand": "true", "includeExpandedTriples": "true"}
+    config: dict = {"shapesId": "2", "expand": True, "includeExpandedTriples": False}
 
     with MultipartWriter("mixed") as mpwriter:
         p = mpwriter.append(open(filename, "rb"))
@@ -144,8 +145,8 @@ async def test_validator_file_full_config_all_false(
     filename = "tests/files/valid_catalog.ttl"
     config: dict = {
         "shapesId": "2",
-        "expand": "false",
-        "includeExpandedTriples": "false",
+        "expand": False,
+        "includeExpandedTriples": False,
     }
 
     with MultipartWriter("mixed") as mpwriter:
@@ -165,6 +166,40 @@ async def test_validator_file_full_config_all_false(
     with open(filename, "r") as file:
         text = file.read()
     await _assess_response_body_unsuccessful(
+        data=text, format="text/turtle", body=body, content_type="text/turtle"
+    )
+
+
+@pytest.mark.integration
+async def test_validator_file_full_config_from_json_str(
+    client: _TestClient, mocked_response: Any
+) -> None:
+    """Should return OK and successful validation."""
+    filename = "tests/files/valid_catalog.ttl"
+    config = """
+    {
+        "expand": true,
+        "includeExpandedTriples": false
+    }
+    """
+
+    with MultipartWriter("mixed") as mpwriter:
+        p = mpwriter.append(open(filename, "rb"))
+        p.set_content_disposition(
+            "attachment", name="data-graph-file", filename=filename
+        )
+        p = mpwriter.append_json(json.loads(config))
+        p.set_content_disposition("inline", name="config")
+
+    resp = await client.post("/validator", data=mpwriter)
+    assert resp.status == 200
+    assert resp.headers[hdrs.CONTENT_TYPE] == "text/turtle"
+
+    body = await resp.text()
+
+    with open(filename, "r") as file:
+        text = file.read()
+    await _assess_response_body_successful(
         data=text, format="text/turtle", body=body, content_type="text/turtle"
     )
 

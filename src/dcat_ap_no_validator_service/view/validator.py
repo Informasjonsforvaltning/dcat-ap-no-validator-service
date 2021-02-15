@@ -130,12 +130,12 @@ def _create_config(config: dict) -> Config:
     if "shapesId" in config:
         c.shapes_id = config["shapesId"]
     if "expand" in config:
-        if config["expand"] == "true":
+        if config["expand"]:
             c.expand = True
         else:
             c.expand = False
     if "includeExpandedTriples" in config:
-        if config["includeExpandedTriples"] == "true":
+        if config["includeExpandedTriples"]:
             c.include_expanded_triples = True
         else:
             c.include_expanded_triples = False
