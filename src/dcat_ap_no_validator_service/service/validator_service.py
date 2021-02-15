@@ -10,7 +10,7 @@ from rdflib import Graph, RDF, URIRef
 from dcat_ap_no_validator_service.adapter import fetch_graph, parse_text
 from dcat_ap_no_validator_service.service import ShapesService
 
-DEFAULT_SHAPE_GRAPH = "2"
+DEFAULT_SHAPES_GRAPH = "2"
 SUPPORTED_FORMATS = set(["text/turtle", "application/ld+json", "application/rdf+xml"])
 
 
