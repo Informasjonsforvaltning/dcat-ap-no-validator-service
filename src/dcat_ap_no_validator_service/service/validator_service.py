@@ -43,7 +43,7 @@ class ValidatorService:
     ) -> None:
         """Initialize service instance."""
         self.url = url
-        self.data = fetch_graph(url) if self.url or parse_text(data)
+        self.data = fetch_graph(url) if self.url else parse_text(data)
         if config is None:
             self.config = Config()
         else:
