@@ -93,8 +93,7 @@ class ValidatorService:
                 if (o, None, None) not in self.data:
                     if (o, None, None) not in self.ontology:
                         logging.debug(f"Trying to fetch remote triples about {o}")
-                        g = fetch_graph(o)
-                        self.ontology += g
+                        self.ontology += fetch_graph(o)
 
     def _load_ontologies(self) -> None:
         """Load relevant ontologies into ontology."""
