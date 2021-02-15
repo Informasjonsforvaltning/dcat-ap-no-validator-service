@@ -18,7 +18,7 @@ SUPPORTED_FORMATS = set(["text/turtle", "application/ld+json", "application/rdf+
 class Config:
     """Class for keeping track of config item."""
 
-    shapes_id: str = DEFAULT_SHAPE_GRAPH
+    shapes_id: str = DEFAULT_SHAPES_GRAPH
     expand: bool = True
     include_expanded_triples: bool = False
 
