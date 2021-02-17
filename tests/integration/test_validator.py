@@ -429,6 +429,39 @@ async def test_validator_graph_references_no_response_graph(
     )
 
 
+@pytest.mark.integration
+async def test_validator_graph_references_not_found_graph(
+    client: _TestClient, mocked_response: Any
+) -> None:
+    """Should return OK and unsuccessful validation."""
+    filename = "tests/files/valid_catalog_references_not_found_graph.ttl"
+    config: dict = {
+        "shapesId": "2",
+        "expand": "true",
+        "includeExpandedTriples": "false",
+    }
+
+    with MultipartWriter("mixed") as mpwriter:
+        p = mpwriter.append(open(filename, "rb"))
+        p.set_content_disposition(
+            "attachment", name="data-graph-file", filename=filename
+        )
+        p = mpwriter.append_json(config)
+        p.set_content_disposition("inline", name="config")
+
+    resp = await client.post("/validator", data=mpwriter)
+    assert resp.status == 200
+    assert resp.headers[hdrs.CONTENT_TYPE] == "text/turtle"
+
+    body = await resp.text()
+
+    with open(filename, "r") as file:
+        text = file.read()
+    await _assess_response_body_unsuccessful(
+        data=text, format="text/turtle", body=body, content_type="text/turtle"
+    )
+
+
 # -- Bad cases
 @pytest.mark.integration
 async def test_validator_url_and_file(
@@ -436,7 +469,7 @@ async def test_validator_url_and_file(
 ) -> None:
     """Should return status 400."""
     filename = "tests/files/valid_catalog.ttl"
-    url_to_graph = "https://raw.githubusercontent.com/Informasjonsforvaltning/dcat-ap-no-validator-service/main/tests/files/valid_catalog.ttl"  # noqa: B950
+    url_to_graph = "gttp://example.com/graphs/1"
 
     with MultipartWriter("mixed") as mpwriter:
         p = mpwriter.append(url_to_graph)
@@ -509,21 +542,6 @@ async def test_validator_shapes_not_existing_shacl(
 
 
 @pytest.mark.integration
-async def test_validator_bad_syntax_valid_content_type(
-    client: _TestClient, mocked_response: Any
-) -> None:
-    """Should return status 400."""
-    data = "Bad syntax. No turtle here."
-
-    with MultipartWriter("mixed") as mpwriter:
-        p = mpwriter.append(data, {"CONTENT-TYPE": "text/turtle"})
-        p.set_content_disposition("attachment", name="data-graph-file")
-
-    resp = await client.post("/validator", data=mpwriter)
-    assert resp.status == 400
-
-
-@pytest.mark.integration
 async def test_validator_file_bad_syntax_no_content_type(
     client: _TestClient, mocked_response: Any
 ) -> None:
@@ -555,6 +573,21 @@ async def test_validator_empty(client: _TestClient, mocked_response: Any) -> Non
 
 @pytest.mark.integration
 async def test_validator_connection_error_caused_by_bad_url(
+    client: _TestClient, mocked_response: Any
+) -> None:
+    """Should return status 400."""
+    url_to_graph = "http://slfkjasdf"
+
+    with MultipartWriter("mixed") as mpwriter:
+        p = mpwriter.append(url_to_graph)
+        p.set_content_disposition("inline", name="data-graph-url")
+
+    resp = await client.post("/validator", data=mpwriter)
+    assert resp.status == 400
+
+
+@pytest.mark.integration
+async def test_validator_references_not_found_url(
     client: _TestClient, mocked_response: Any
 ) -> None:
     """Should return status 400."""
@@ -670,7 +703,9 @@ def _mock_response(url: str, headers: dict) -> tuple:
             text = file.read()
         content_type = "application/json"
     elif str(url) == "https://example.com/nograph":
-        status_code = 406
+        raise RequestException(f"Failure in name resolution for {url}")
+    elif str(url) == "https://example.com/graphs/not_found":
+        status_code = 404
     elif str(url) == "https://example.com/non_parsable_graph":
         with open("tests/files/invalid_rdf.txt", "r") as file:
             text = file.read()

@@ -33,7 +33,7 @@ Response will be a RDF graph consisting of
 ```
 ### With config parameters:
 ```
-curl -i \
+% curl -i \
  -H "Accept: text/turtle" \
  -H "Content-Type: multipart/form-data" \
  -F "data-graph-file=@tests/files/valid_catalog.ttl;type=text/turtle" \

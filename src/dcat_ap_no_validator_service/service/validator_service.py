@@ -1,10 +1,12 @@
 """Module for validator service."""
 from dataclasses import dataclass
 import logging
+import traceback
 from typing import Any, Tuple
 
 from pyshacl import validate
 from rdflib import Graph, RDF, URIRef
+from requests.exceptions import RequestException
 
 
 from dcat_ap_no_validator_service.adapter import fetch_graph, parse_text
@@ -51,7 +53,6 @@ class ValidatorService:
         self.ontology = Graph()
         self.shapes = shapes
         if self.shapes is not None:
-            logging.debug("Got user supplied shapes")
             self.shapes = parse_text(shapes)
 
     async def validate(self) -> Tuple[bool, Graph, Graph, Graph]:
@@ -82,8 +83,8 @@ class ValidatorService:
         )
         return (conforms, self.data, self.ontology, results_graph)
 
-    def _expand_objects_triples(self) -> None:  # pragma: no cover
-        """Get triples of objects and add to graph."""
+    def _expand_objects_triples(self) -> None:
+        """Get triples of objects and add to ontology graph."""
         # TODO: this loop should be parallellized
         for p, o in self.data.predicate_objects(subject=None):
             # logging.debug(f"{p} a {type(p)}, {o} a {type(o)}")
@@ -93,14 +94,23 @@ class ValidatorService:
                 if (o, None, None) not in self.data:
                     if (o, None, None) not in self.ontology:
                         logging.debug(f"Trying to fetch remote triples about {o}")
-                        self.ontology += fetch_graph(o)
+                        try:
+                            self.ontology += fetch_graph(o)
+                        except RequestException:
+                            logging.debug(traceback.format_exc())
+                            pass
 
-    def _load_ontologies(self) -> None:
-        """Load relevant ontologies into ontology."""
+    def _load_ontologies(self) -> None:  # pragma: no cover
+        """Load relevant ontologies into ontology graph."""
         # TODO: this loop should be parallellized
         # TODO: discover relevant ontologies dynamically, should be cached
+        # TODO: cover with proper tests
         ontologies = ["https://www.w3.org/ns/regorg", "https://www.w3.org/ns/org"]
         for o in ontologies:
             if (o, None, None) not in self.ontology:
                 logging.debug(f"Trying to add remote ontology {o}")
-                self.ontology += fetch_graph(o)
+                try:
+                    self.ontology += fetch_graph(o)
+                except RequestException:
+                    logging.debug(traceback.format_exc())
+                    pass

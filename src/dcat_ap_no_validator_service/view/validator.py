@@ -79,6 +79,14 @@ class Validator(web.View):
         try:
             # instantiate validator service:
             service = ValidatorService(url=url, data=data, shapes=shapes, config=config)
+        except RequestException:
+            logging.debug(traceback.format_exc())
+            raise web.HTTPBadRequest(reason=f"Could not connect to {url}")
+        except SyntaxError:
+            logging.debug(traceback.format_exc())
+            raise web.HTTPBadRequest(reason="Bad syntax in input graph.")
+
+        try:
             # validate:
             (
                 conforms,
@@ -87,17 +95,9 @@ class Validator(web.View):
                 results_graph,
             ) = await service.validate()
 
-        except RequestException:
-            logging.debug(traceback.format_exc())
-            raise web.HTTPBadRequest(reason=f"Could not connect to {url}")
-
         except ValueError as e:
             logging.debug(traceback.format_exc())
             raise web.HTTPBadRequest(reason=str(e))
-
-        except SyntaxError:
-            logging.debug(traceback.format_exc())
-            raise web.HTTPBadRequest(reason="Bad syntax in input graph.")
 
         # Try to content-negotiate:
         logging.debug(
