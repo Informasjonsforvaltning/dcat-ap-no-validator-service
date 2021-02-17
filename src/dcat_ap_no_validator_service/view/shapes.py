@@ -4,7 +4,7 @@ import logging
 from aiohttp import hdrs, web
 from rdflib.plugin import PluginException
 
-from dcat_ap_no_validator_service.service import ShapeService
+from dcat_ap_no_validator_service.service import ShapesService
 
 
 class Shapes(web.View):
@@ -13,7 +13,7 @@ class Shapes(web.View):
     async def get(self) -> web.Response:
         """Shapes route function."""
         try:
-            shapes = await ShapeService().get_all_shapes()
+            shapes = await ShapesService().get_all_shapes()
         except Exception as e:
             logging.error(f"Exception: {e}")
             raise web.HTTPInternalServerError
@@ -39,7 +39,7 @@ class Shape(web.View):
         """Shape route function."""
         id = self.request.match_info["id"]
         try:
-            shape = await ShapeService().get_shape_by_id(id)
+            shape = await ShapesService().get_shapes_by_id(id)
         except Exception as e:
             logging.error(f"Exception: {e}")
             raise web.HTTPInternalServerError

@@ -24,17 +24,18 @@ paths:
               properties: # Request parts
                   config:
                     $ref: '#/components/schemas/Config'
-                  text:
-                    type: string
-                    description: a text string with serialized RDF
-                  url:
+                  data-graph-url:
                     type: string
                     format: uri
-                    description: a url pointing to an RDF graph on the internet
-                  file:
+                    description: a url pointing to the [data graph](https://www.w3.org/TR/shacl/#data-graph) on the internet
+                  data-graph-file:
                     type: string
                     format: binary
-                    description: a file containing serialized RDF
+                    description: a file containing the [data graph](https://www.w3.org/TR/shacl/#data-graph)
+                  shapes-graph-file:
+                    type: string
+                    format: binary
+                    description: a file containing one or more [SHACL-shapes](https://www.w3.org/TR/shacl/#shapes-graph) the data graph should be validated against
             encoding:
               file:
                 contentType: text/turtle
@@ -83,13 +84,13 @@ components:
     Config:
       type: object
       properties:
-        shapeId:
+        shapesId:
           type: string
           default: "2"
           description: an identifier of the set of rules (shapes) to be validated against
         expand:
           type: boolean
-          default: false
+          default: true
           description: whether service should fetch remote triples referenced by input graph
         includeExpandedTriples:
           type: boolean

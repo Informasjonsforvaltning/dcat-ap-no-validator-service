@@ -1,4 +1,7 @@
 """Integration test cases for the ready route."""
+from collections import namedtuple
+import json
+import logging
 from typing import Any
 
 from aiohttp import hdrs, MultipartWriter
@@ -7,23 +10,38 @@ import pytest
 from pytest_mock import MockFixture
 from rdflib import Graph
 from rdflib.compare import graph_diff, isomorphic
+from requests.exceptions import RequestException
+
+
+@pytest.fixture(scope="function")
+def mocked_response(mocker: MockFixture) -> Any:
+    """Patch the call to requests.get."""
+    # Set up the mock
+    mocker.patch(
+        "dcat_ap_no_validator_service.adapter.remote_graph_adapter.requests.get",
+        side_effect=_mock_response,
+    )
 
 
 @pytest.mark.integration
-async def test_validator_file(client: _TestClient) -> None:
+async def test_validator_file_no_config(
+    client: _TestClient, mocked_response: Any
+) -> None:
     """Should return OK."""
     filename = "tests/files/valid_catalog.ttl"
 
     with MultipartWriter("mixed") as mpwriter:
         p = mpwriter.append(open(filename, "rb"))
-        p.set_content_disposition("attachment", name="file", filename=filename)
+        p.set_content_disposition(
+            "attachment", name="data-graph-file", filename=filename
+        )
 
     resp = await client.post("/validator", data=mpwriter)
     assert resp.status == 200
     assert resp.headers[hdrs.CONTENT_TYPE] == "text/turtle"
 
     body = await resp.text()
-    with open("tests/files/valid_catalog.ttl", "r") as file:
+    with open(filename, "r") as file:
         text = file.read()
     await _assess_response_body_successful(
         data=text, format="text/turtle", body=body, content_type="text/turtle"
@@ -31,36 +49,18 @@ async def test_validator_file(client: _TestClient) -> None:
 
 
 @pytest.mark.integration
-async def test_validator_file_no_config(client: _TestClient) -> None:
-    """Should return OK."""
-    filename = "tests/files/valid_catalog.ttl"
-
-    with MultipartWriter("mixed") as mpwriter:
-        p = mpwriter.append(open(filename, "rb"))
-        p.set_content_disposition("attachment", name="file", filename=filename)
-
-    resp = await client.post("/validator", data=mpwriter)
-    assert resp.status == 200
-    assert resp.headers[hdrs.CONTENT_TYPE] == "text/turtle"
-
-    body = await resp.text()
-
-    with open("tests/files/valid_catalog.ttl", "r") as file:
-        text = file.read()
-    await _assess_response_body_successful(
-        data=text, format="text/turtle", body=body, content_type="text/turtle"
-    )
-
-
-@pytest.mark.integration
-async def test_validator_file_empty_config(client: _TestClient) -> None:
+async def test_validator_file_empty_config(
+    client: _TestClient, mocked_response: Any
+) -> None:
     """Should return OK."""
     filename = "tests/files/valid_catalog.ttl"
     config: dict = {}
 
     with MultipartWriter("mixed") as mpwriter:
         p = mpwriter.append(open(filename, "rb"))
-        p.set_content_disposition("attachment", name="file", filename=filename)
+        p.set_content_disposition(
+            "attachment", name="data-graph-file", filename=filename
+        )
         p = mpwriter.append_json(config)
         p.set_content_disposition("inline", name="config")
 
@@ -70,7 +70,7 @@ async def test_validator_file_empty_config(client: _TestClient) -> None:
 
     body = await resp.text()
 
-    with open("tests/files/valid_catalog.ttl", "r") as file:
+    with open(filename, "r") as file:
         text = file.read()
     await _assess_response_body_successful(
         data=text, format="text/turtle", body=body, content_type="text/turtle"
@@ -79,19 +79,21 @@ async def test_validator_file_empty_config(client: _TestClient) -> None:
 
 @pytest.mark.integration
 async def test_validator_file_full_config_with_default_values(
-    client: _TestClient,
+    client: _TestClient, mocked_response: Any
 ) -> None:
     """Should return OK."""
     filename = "tests/files/valid_catalog.ttl"
     config: dict = {
-        "shapeId": "2",
-        "expand": "true",
-        "includeExpandedTriples": "false",
+        "shapesId": "2",
+        "expand": True,
+        "includeExpandedTriples": False,
     }
 
     with MultipartWriter("mixed") as mpwriter:
         p = mpwriter.append(open(filename, "rb"))
-        p.set_content_disposition("attachment", name="file", filename=filename)
+        p.set_content_disposition(
+            "attachment", name="data-graph-file", filename=filename
+        )
         p = mpwriter.append_json(config)
         p.set_content_disposition("inline", name="config")
 
@@ -101,7 +103,7 @@ async def test_validator_file_full_config_with_default_values(
 
     body = await resp.text()
 
-    with open("tests/files/valid_catalog.ttl", "r") as file:
+    with open(filename, "r") as file:
         text = file.read()
     await _assess_response_body_successful(
         data=text, format="text/turtle", body=body, content_type="text/turtle"
@@ -109,14 +111,18 @@ async def test_validator_file_full_config_with_default_values(
 
 
 @pytest.mark.integration
-async def test_validator_file_full_config_all_true(client: _TestClient) -> None:
+async def test_validator_file_full_config_all_true(
+    client: _TestClient, mocked_response: Any
+) -> None:
     """Should return OK."""
     filename = "tests/files/valid_catalog.ttl"
-    config: dict = {"shapeId": "2", "expand": "true", "includeExpandedTriples": "true"}
+    config: dict = {"shapesId": "2", "expand": True, "includeExpandedTriples": False}
 
     with MultipartWriter("mixed") as mpwriter:
         p = mpwriter.append(open(filename, "rb"))
-        p.set_content_disposition("attachment", name="file", filename=filename)
+        p.set_content_disposition(
+            "attachment", name="data-graph-file", filename=filename
+        )
         p = mpwriter.append_json(config)
         p.set_content_disposition("inline", name="config")
 
@@ -132,18 +138,22 @@ async def test_validator_file_full_config_all_true(client: _TestClient) -> None:
 
 
 @pytest.mark.integration
-async def test_validator_file_full_config_all_false(client: _TestClient) -> None:
+async def test_validator_file_full_config_all_false(
+    client: _TestClient, mocked_response: Any
+) -> None:
     """Should return OK and unsuccessful validation."""
     filename = "tests/files/valid_catalog.ttl"
     config: dict = {
-        "shapeId": "2",
-        "expand": "false",
-        "includeExpandedTriples": "false",
+        "shapesId": "2",
+        "expand": False,
+        "includeExpandedTriples": False,
     }
 
     with MultipartWriter("mixed") as mpwriter:
         p = mpwriter.append(open(filename, "rb"))
-        p.set_content_disposition("attachment", name="file", filename=filename)
+        p.set_content_disposition(
+            "attachment", name="data-graph-file", filename=filename
+        )
         p = mpwriter.append_json(config)
         p.set_content_disposition("inline", name="config")
 
@@ -153,7 +163,7 @@ async def test_validator_file_full_config_all_false(client: _TestClient) -> None
 
     body = await resp.text()
 
-    with open("tests/files/valid_catalog.ttl", "r") as file:
+    with open(filename, "r") as file:
         text = file.read()
     await _assess_response_body_unsuccessful(
         data=text, format="text/turtle", body=body, content_type="text/turtle"
@@ -161,39 +171,25 @@ async def test_validator_file_full_config_all_false(client: _TestClient) -> None
 
 
 @pytest.mark.integration
-async def test_validator_file_content_negotiation_json_ld(client: _TestClient) -> None:
-    """Should return OK."""
+async def test_validator_file_full_config_from_json_str(
+    client: _TestClient, mocked_response: Any
+) -> None:
+    """Should return OK and successful validation."""
     filename = "tests/files/valid_catalog.ttl"
-    accept = "application/ld+json"
-    headers = {"Accept": accept}
+    config = """
+    {
+        "expand": true,
+        "includeExpandedTriples": false
+    }
+    """
 
     with MultipartWriter("mixed") as mpwriter:
         p = mpwriter.append(open(filename, "rb"))
-        p.set_content_disposition("attachment", name="file", filename=filename)
-
-    resp = await client.post("/validator", headers=headers, data=mpwriter)
-    assert resp.status == 200
-    assert resp.headers[hdrs.CONTENT_TYPE] == accept
-
-    body = await resp.text()
-
-    with open("tests/files/valid_catalog.ttl", "r") as file:
-        text = file.read()
-    await _assess_response_body_successful(
-        data=text, format="text/turtle", body=body, content_type=accept
-    )
-
-
-@pytest.mark.integration
-async def test_validator_file_content_type_json_ld(client: _TestClient) -> None:
-    """Should return OK and successful validation."""
-    filename = "tests/files/valid_catalog.json"
-
-    with MultipartWriter("mixed") as mpwriter:
-        p = mpwriter.append(
-            open(filename, "rb"), {"CONTENT-TYPE": "application/ld+json"}
+        p.set_content_disposition(
+            "attachment", name="data-graph-file", filename=filename
         )
-        p.set_content_disposition("attachment", name="file", filename=filename)
+        p = mpwriter.append_json(json.loads(config))
+        p.set_content_disposition("inline", name="config")
 
     resp = await client.post("/validator", data=mpwriter)
     assert resp.status == 200
@@ -201,7 +197,63 @@ async def test_validator_file_content_type_json_ld(client: _TestClient) -> None:
 
     body = await resp.text()
 
-    with open("tests/files/valid_catalog.json", "r") as file:
+    with open(filename, "r") as file:
+        text = file.read()
+    await _assess_response_body_successful(
+        data=text, format="text/turtle", body=body, content_type="text/turtle"
+    )
+
+
+@pytest.mark.integration
+async def test_validator_file_content_negotiation_json_ld(
+    client: _TestClient, mocked_response: Any
+) -> None:
+    """Should return OK."""
+    filename = "tests/files/valid_catalog.ttl"
+    accept = "application/ld+json"
+    headers = {"Accept": accept}
+
+    with MultipartWriter("mixed") as mpwriter:
+        p = mpwriter.append(open(filename, "rb"))
+        p.set_content_disposition(
+            "attachment", name="data-graph-file", filename=filename
+        )
+
+    resp = await client.post("/validator", headers=headers, data=mpwriter)
+    assert resp.status == 200
+    assert resp.headers[hdrs.CONTENT_TYPE] == accept
+
+    body = await resp.text()
+
+    with open(filename, "r") as file:
+        text = file.read()
+    await _assess_response_body_successful(
+        data=text, format="text/turtle", body=body, content_type=accept
+    )
+
+
+@pytest.mark.integration
+async def test_validator_file_content_type_json_ld(
+    client: _TestClient, mocked_response: Any
+) -> None:
+    """Should return OK and successful validation."""
+    filename = "tests/files/valid_catalog.json"
+
+    with MultipartWriter("mixed") as mpwriter:
+        p = mpwriter.append(
+            open(filename, "rb"), {"CONTENT-TYPE": "application/ld+json"}
+        )
+        p.set_content_disposition(
+            "attachment", name="data-graph-file", filename=filename
+        )
+
+    resp = await client.post("/validator", data=mpwriter)
+    assert resp.status == 200
+    assert resp.headers[hdrs.CONTENT_TYPE] == "text/turtle"
+
+    body = await resp.text()
+
+    with open(filename, "r") as file:
         text = file.read()
     await _assess_response_body_successful(
         data=text, format="application/ld+json", body=body, content_type="text/turtle"
@@ -209,44 +261,17 @@ async def test_validator_file_content_type_json_ld(client: _TestClient) -> None:
 
 
 @pytest.mark.integration
-async def test_validator_file_accept_header_not_valid(client: _TestClient) -> None:
-    """Should return status_code 406."""
-    filename = "tests/files/valid_catalog.ttl"
-    content_type = "not_valid"
-    headers = {"Accept": content_type}
-
-    with MultipartWriter("mixed") as mpwriter:
-        p = mpwriter.append(open(filename, "rb"))
-        p.set_content_disposition("attachment", name="file", filename=filename)
-
-    resp = await client.post("/validator", headers=headers, data=mpwriter)
-    assert resp.status == 406
-
-
-@pytest.mark.integration
-async def test_validator_file_not_existing_shacl(client: _TestClient) -> None:
-    """Should return status_code 406."""
-    filename = "tests/files/valid_catalog.ttl"
-    config: dict = {"shapeId": "not_existing"}
-
-    with MultipartWriter("mixed") as mpwriter:
-        p = mpwriter.append(open(filename, "rb"))
-        p.set_content_disposition("attachment", name="file", filename=filename)
-        p = mpwriter.append_json(config)
-        p.set_content_disposition("inline", name="config")
-
-    resp = await client.post("/validator", data=mpwriter)
-    assert resp.status == 400
-
-
-@pytest.mark.integration
-async def test_validator_file_content_encoding(client: _TestClient) -> None:
+async def test_validator_file_content_encoding(
+    client: _TestClient, mocked_response: Any
+) -> None:
     """Should return OK."""
     filename = "tests/files/valid_catalog.ttl"
 
     with MultipartWriter("mixed") as mpwriter:
         p = mpwriter.append(open(filename, "rb"))
-        p.set_content_disposition("attachment", name="file", filename=filename)
+        p.set_content_disposition(
+            "attachment", name="data-graph-file", filename=filename
+        )
         p.headers[hdrs.CONTENT_ENCODING] = "gzip"
 
     resp = await client.post("/validator", data=mpwriter)
@@ -255,7 +280,7 @@ async def test_validator_file_content_encoding(client: _TestClient) -> None:
 
     body = await resp.text()
 
-    with open("tests/files/valid_catalog.ttl", "r") as file:
+    with open(filename, "r") as file:
         text = file.read()
     await _assess_response_body_successful(
         data=text, format="text/turtle", body=body, content_type="text/turtle"
@@ -263,18 +288,14 @@ async def test_validator_file_content_encoding(client: _TestClient) -> None:
 
 
 @pytest.mark.integration
-async def test_validator_url(client: _TestClient, mocker: MockFixture) -> None:
+async def test_validator_url(client: _TestClient, mocked_response: Any) -> None:
     """Should return status 200 and successful validation."""
-    # Set up the mock
-    mocker.patch(
-        "dcat_ap_no_validator_service.view.validator.get_graph_at_url",
-        return_value=_mock_graph_at_url(),
-    )
+    url_to_graph = "https://example.com/datagraphs/valid_catalog.ttl"
+    filename = "tests/files/valid_catalog.ttl"
 
-    url_to_graph = "https://raw.githubusercontent.com/Informasjonsforvaltning/dcat-ap-no-validator-service/main/tests/files/valid_catalog.ttl"  # noqa: B950
     with MultipartWriter("mixed") as mpwriter:
         p = mpwriter.append(url_to_graph)
-        p.set_content_disposition("inline", name="url")
+        p.set_content_disposition("inline", name="data-graph-url")
 
     resp = await client.post("/validator", data=mpwriter)
     assert resp.status == 200
@@ -282,7 +303,7 @@ async def test_validator_url(client: _TestClient, mocker: MockFixture) -> None:
     body = await resp.text()
 
     # need to get the text from url, which actually is content of file:
-    with open("tests/files/valid_catalog.ttl", "r") as file:
+    with open(filename, "r") as file:
         text = file.read()
     await _assess_response_body_successful(
         data=text, format="text/turtle", body=body, content_type="text/turtle"
@@ -291,19 +312,15 @@ async def test_validator_url(client: _TestClient, mocker: MockFixture) -> None:
 
 @pytest.mark.integration
 async def test_validator_url_to_json_ld_file(
-    client: _TestClient, mocker: MockFixture
+    client: _TestClient, mocked_response: Any
 ) -> None:
     """Should return status 200 and successful validation."""
-    # Set up the mock
-    mocker.patch(
-        "dcat_ap_no_validator_service.view.validator.get_graph_at_url",
-        return_value=_mock_graph_at_url_json_ld(),
-    )
+    url_to_graph = "https://example.com/datagraphs/valid_catalog.json"
+    filename = "tests/files/valid_catalog.ttl"
 
-    url_to_graph = "https://raw.githubusercontent.com/Informasjonsforvaltning/dcat-ap-no-validator-service/main/tests/files/valid_catalog.json"  # noqa: B950
     with MultipartWriter("mixed") as mpwriter:
         p = mpwriter.append(url_to_graph)
-        p.set_content_disposition("inline", name="url")
+        p.set_content_disposition("inline", name="data-graph-url")
 
     resp = await client.post("/validator", data=mpwriter)
     assert resp.status == 200
@@ -311,7 +328,7 @@ async def test_validator_url_to_json_ld_file(
     body = await resp.text()
 
     # need to get the text from url, which actually is content of file:
-    with open("tests/files/valid_catalog.ttl", "r") as file:
+    with open(filename, "r") as file:
         text = file.read()
     await _assess_response_body_successful(
         data=text, format="text/turtle", body=body, content_type="text/turtle"
@@ -319,145 +336,266 @@ async def test_validator_url_to_json_ld_file(
 
 
 @pytest.mark.integration
-async def test_validator_url_and_file(client: _TestClient, mocker: MockFixture) -> None:
-    """Should return status 400."""
-    # Set up the mock
-    mocker.patch(
-        "dcat_ap_no_validator_service.view.validator.get_graph_at_url",
-        return_value=_mock_graph_at_url(),
-    )
-
-    filename = "tests/files/valid_catalog.ttl"
-    url_to_graph = "https://raw.githubusercontent.com/Informasjonsforvaltning/dcat-ap-no-validator-service/main/tests/files/valid_catalog.ttl"  # noqa: B950
-    with MultipartWriter("mixed") as mpwriter:
-        p = mpwriter.append(url_to_graph)
-        p.set_content_disposition("inline", name="url")
-        p = mpwriter.append(open(filename, "rb"))
-        p.set_content_disposition("attachment", name="file", filename=filename)
-
-    resp = await client.post("/validator", data=mpwriter)
-    assert resp.status == 400
-
-
-@pytest.mark.integration
-async def test_validator_text(client: _TestClient) -> None:
-    """Should return status 200 and turtle body."""
-    with open("tests/files/valid_catalog.ttl", "r") as file:
-        text = file.read()
-
-    with MultipartWriter("mixed") as mpwriter:
-        p = mpwriter.append(text, {"CONTENT-TYPE": "text/turtle"})
-        p.set_content_disposition("inline", name="text")
-
-    resp = await client.post("/validator", data=mpwriter)
-    assert resp.status == 200
-    assert resp.headers[hdrs.CONTENT_TYPE] == "text/turtle"
-    body = await resp.text()
-
-    await _assess_response_body_successful(
-        data=text, format="text/turtle", body=body, content_type="text/turtle"
-    )
-
-
-@pytest.mark.integration
-async def test_validator_text_format_json_ld(client: _TestClient) -> None:
-    """Should return status 200 and turtle body."""
-    with open("tests/files/valid_catalog.json", "r") as file:
-        text = file.read()
-
-    with MultipartWriter("mixed") as mpwriter:
-        p = mpwriter.append(text, {"CONTENT-TYPE": "application/ld+json"})
-        p.set_content_disposition("inline", name="text")
-
-    resp = await client.post("/validator", data=mpwriter)
-    assert resp.status == 200
-    assert resp.headers[hdrs.CONTENT_TYPE] == "text/turtle"
-    body = await resp.text()
-
-    await _assess_response_body_successful(
-        data=text, format="application/ld+json", body=body, content_type="text/turtle"
-    )
-
-
-@pytest.mark.integration
-async def test_validator_text_supported_content_unsupported_content_type(
-    client: _TestClient,
+async def test_validator_file_and_shacl(
+    client: _TestClient, mocked_response: Any
 ) -> None:
-    """Should return status 200."""
-    with open("tests/files/valid_catalog.json", "r") as file:
-        text = file.read()
+    """Should return OK."""
+    graph = "tests/files/valid_catalog.ttl"
+    shacl = "dcat-ap-no-shacl_shapes_2.00.ttl"
 
     with MultipartWriter("mixed") as mpwriter:
-        p = mpwriter.append(text, {"CONTENT-TYPE": "unsupported/content+type"})
-        p.set_content_disposition("inline", name="text")
+        p = mpwriter.append(open(graph, "rb"))
+        p.set_content_disposition("attachment", name="data-graph-file", filename=graph)
+        p = mpwriter.append(open(shacl, "rb"))
+        p.set_content_disposition(
+            "attachment", name="shapes-graph-file", filename=shacl
+        )
 
     resp = await client.post("/validator", data=mpwriter)
     assert resp.status == 200
     assert resp.headers[hdrs.CONTENT_TYPE] == "text/turtle"
-    body = await resp.text()
 
+    body = await resp.text()
+    with open("tests/files/valid_catalog.ttl", "r") as file:
+        text = file.read()
     await _assess_response_body_successful(
-        data=text, format="application/ld+json", body=body, content_type="text/turtle"
+        data=text, format="text/turtle", body=body, content_type="text/turtle"
     )
 
 
 @pytest.mark.integration
-async def test_validator_text_no_content_type(client: _TestClient) -> None:
-    """Should return status 200."""
-    with open("tests/files/valid_catalog.json", "r") as file:
-        text = file.read()
+async def test_validator_graph_references_non_parsable_graph(
+    client: _TestClient, mocked_response: Any
+) -> None:
+    """Should return OK and unsuccessful validation."""
+    filename = "tests/files/valid_catalog_references_non_parsable_graph.ttl"
+    config: dict = {
+        "shapesId": "2",
+        "expand": "true",
+        "includeExpandedTriples": "false",
+    }
 
     with MultipartWriter("mixed") as mpwriter:
-        p = mpwriter.append(text)
-        p.set_content_disposition("inline", name="text")
+        p = mpwriter.append(open(filename, "rb"))
+        p.set_content_disposition(
+            "attachment", name="data-graph-file", filename=filename
+        )
+        p = mpwriter.append_json(config)
+        p.set_content_disposition("inline", name="config")
 
     resp = await client.post("/validator", data=mpwriter)
     assert resp.status == 200
     assert resp.headers[hdrs.CONTENT_TYPE] == "text/turtle"
+
     body = await resp.text()
 
-    await _assess_response_body_successful(
-        data=text, format="application/ld+json", body=body, content_type="text/turtle"
+    with open(filename, "r") as file:
+        text = file.read()
+    await _assess_response_body_unsuccessful(
+        data=text, format="text/turtle", body=body, content_type="text/turtle"
+    )
+
+
+@pytest.mark.integration
+async def test_validator_graph_references_no_response_graph(
+    client: _TestClient, mocked_response: Any
+) -> None:
+    """Should return OK and unsuccessful validation."""
+    filename = "tests/files/valid_catalog_references_no_graph.ttl"
+    config: dict = {
+        "shapesId": "2",
+        "expand": "true",
+        "includeExpandedTriples": "false",
+    }
+
+    with MultipartWriter("mixed") as mpwriter:
+        p = mpwriter.append(open(filename, "rb"))
+        p.set_content_disposition(
+            "attachment", name="data-graph-file", filename=filename
+        )
+        p = mpwriter.append_json(config)
+        p.set_content_disposition("inline", name="config")
+
+    resp = await client.post("/validator", data=mpwriter)
+    assert resp.status == 200
+    assert resp.headers[hdrs.CONTENT_TYPE] == "text/turtle"
+
+    body = await resp.text()
+
+    with open(filename, "r") as file:
+        text = file.read()
+    await _assess_response_body_unsuccessful(
+        data=text, format="text/turtle", body=body, content_type="text/turtle"
+    )
+
+
+@pytest.mark.integration
+async def test_validator_graph_references_not_found_graph(
+    client: _TestClient, mocked_response: Any
+) -> None:
+    """Should return OK and unsuccessful validation."""
+    filename = "tests/files/valid_catalog_references_not_found_graph.ttl"
+    config: dict = {
+        "shapesId": "2",
+        "expand": "true",
+        "includeExpandedTriples": "false",
+    }
+
+    with MultipartWriter("mixed") as mpwriter:
+        p = mpwriter.append(open(filename, "rb"))
+        p.set_content_disposition(
+            "attachment", name="data-graph-file", filename=filename
+        )
+        p = mpwriter.append_json(config)
+        p.set_content_disposition("inline", name="config")
+
+    resp = await client.post("/validator", data=mpwriter)
+    assert resp.status == 200
+    assert resp.headers[hdrs.CONTENT_TYPE] == "text/turtle"
+
+    body = await resp.text()
+
+    with open(filename, "r") as file:
+        text = file.read()
+    await _assess_response_body_unsuccessful(
+        data=text, format="text/turtle", body=body, content_type="text/turtle"
     )
 
 
 # -- Bad cases
-
-
 @pytest.mark.integration
-async def test_validator_bad_syntax_valid_content_type(client: _TestClient) -> None:
+async def test_validator_url_and_file(
+    client: _TestClient, mocked_response: Any
+) -> None:
     """Should return status 400."""
-    data = "Bad syntax. No turtle here."
+    filename = "tests/files/valid_catalog.ttl"
+    url_to_graph = "gttp://example.com/graphs/1"
 
     with MultipartWriter("mixed") as mpwriter:
-        p = mpwriter.append(data, {"CONTENT-TYPE": "text/turtle"})
-        p.set_content_disposition("attachment", name="text")
+        p = mpwriter.append(url_to_graph)
+        p.set_content_disposition("inline", name="data-graph-url")
+        p = mpwriter.append(open(filename, "rb"))
+        p.set_content_disposition(
+            "attachment", name="data-graph-file", filename=filename
+        )
 
     resp = await client.post("/validator", data=mpwriter)
     assert resp.status == 400
 
 
 @pytest.mark.integration
-async def test_validator_file_bad_syntax_no_content_type(client: _TestClient) -> None:
+async def test_validator_empty_multipart(
+    client: _TestClient, mocked_response: Any
+) -> None:
+    """Should return status 400."""
+    with MultipartWriter("mixed") as mpwriter:
+        pass
+
+    resp = await client.post("/validator", data=mpwriter)
+    assert resp.status == 400
+
+
+@pytest.mark.integration
+async def test_validator_no_input(client: _TestClient, mocked_response: Any) -> None:
+    """Should return status 415."""
+    resp = await client.post("/validator")
+    assert resp.status == 415
+
+
+@pytest.mark.integration
+async def test_validator_file_accept_header_not_valid(
+    client: _TestClient, mocked_response: Any
+) -> None:
+    """Should return status_code 406."""
+    filename = "tests/files/valid_catalog.ttl"
+    content_type = "not_valid"
+    headers = {"Accept": content_type}
+
+    with MultipartWriter("mixed") as mpwriter:
+        p = mpwriter.append(open(filename, "rb"))
+        p.set_content_disposition(
+            "attachment", name="data-graph-file", filename=filename
+        )
+
+    resp = await client.post("/validator", headers=headers, data=mpwriter)
+    assert resp.status == 406
+
+
+@pytest.mark.integration
+async def test_validator_shapes_not_existing_shacl(
+    client: _TestClient, mocked_response: Any
+) -> None:
+    """Should return status_code 406."""
+    filename = "tests/files/valid_catalog.ttl"
+    config: dict = {"shapesId": "not_existing"}
+
+    with MultipartWriter("mixed") as mpwriter:
+        p = mpwriter.append(open(filename, "rb"))
+        p.set_content_disposition(
+            "attachment", name="data-graph-file", filename=filename
+        )
+        p = mpwriter.append_json(config)
+        p.set_content_disposition("inline", name="config")
+
+    resp = await client.post("/validator", data=mpwriter)
+    assert resp.status == 400
+
+
+@pytest.mark.integration
+async def test_validator_file_bad_syntax_no_content_type(
+    client: _TestClient, mocked_response: Any
+) -> None:
     """Should return status 415."""
     filename = "tests/files/invalid_rdf.txt"
 
     with MultipartWriter("mixed") as mpwriter:
         p = mpwriter.append(open(filename, "rb"))
-        p.set_content_disposition("attachment", name="file", filename=filename)
+        p.set_content_disposition(
+            "attachment", name="data-graph-file", filename=filename
+        )
 
     resp = await client.post("/validator", data=mpwriter)
-    assert resp.status == 415
+    assert resp.status == 400
 
 
 @pytest.mark.integration
-async def test_validator_empty(client: _TestClient) -> None:
+async def test_validator_empty(client: _TestClient, mocked_response: Any) -> None:
     """Should return status 400."""
     data = ""
 
     with MultipartWriter("mixed") as mpwriter:
         p = mpwriter.append(data, {"CONTENT-TYPE": "text/turtle"})
-        p.set_content_disposition("attachment", name="text")
+        p.set_content_disposition("attachment", name="data-graph-file")
+
+    resp = await client.post("/validator", data=mpwriter)
+    assert resp.status == 400
+
+
+@pytest.mark.integration
+async def test_validator_connection_error_caused_by_bad_url(
+    client: _TestClient, mocked_response: Any
+) -> None:
+    """Should return status 400."""
+    url_to_graph = "http://slfkjasdf"
+
+    with MultipartWriter("mixed") as mpwriter:
+        p = mpwriter.append(url_to_graph)
+        p.set_content_disposition("inline", name="data-graph-url")
+
+    resp = await client.post("/validator", data=mpwriter)
+    assert resp.status == 400
+
+
+@pytest.mark.integration
+async def test_validator_references_not_found_url(
+    client: _TestClient, mocked_response: Any
+) -> None:
+    """Should return status 400."""
+    url_to_graph = "http://slfkjasdf"
+
+    with MultipartWriter("mixed") as mpwriter:
+        p = mpwriter.append(url_to_graph)
+        p.set_content_disposition("inline", name="data-graph-url")
 
     resp = await client.post("/validator", data=mpwriter)
     assert resp.status == 400
@@ -516,16 +654,78 @@ async def _assess_response_body_unsuccessful(
 
 # ------------------ #
 # Mocks
-def _mock_graph_at_url() -> tuple:
-    with open("tests/files/valid_catalog.ttl", "r") as file:
-        text = file.read()
-    return text, "text/plain"
 
 
-def _mock_graph_at_url_json_ld() -> tuple:
-    with open("tests/files/valid_catalog.json", "r") as file:
-        text = file.read()
-    return text, "text/plain"
+def _mock_response(url: str, headers: dict) -> tuple:
+    """Return mocked response depending on input url."""
+    t = namedtuple("t", ("text", "status_code", "headers"))
+    text = ""
+    status_code = 200
+    content_type = None
+    # breakpoint()
+    logging.debug(f"Got request for url {url}")
+    if (
+        str(url)
+        == "https://organization-catalogue.fellesdatakatalog.digdir.no/organizations/961181399"
+    ):
+        with open("tests/files/mock_organization_catalogue_961181399.ttl", "r") as file:
+            text = file.read()
+        content_type = "text/turtle"
+    elif (
+        str(url)
+        == "https://organization-catalogue.fellesdatakatalog.digdir.no/organizations/991825827"
+    ):
+        with open("tests/files/mock_organization_catalogue_991825827.ttl", "r") as file:
+            text = file.read()
+        content_type = "text/turtle"
+    elif str(url) == "http://publications.europa.eu/resource/authority/data-theme/GOVE":
+        with open("tests/files/mock_data_theme_GOVE.xml", "r") as file:
+            text = file.read()
+        content_type = "application/rdf+xml"
+    elif str(url) == "https://psi.norge.no/los/tema/barnehage":
+        with open("tests/files/mock_los_tema_barnehage.xml", "r") as file:
+            text = file.read()
+        content_type = "application/rdf+xml"
+    elif str(url) == "https://www.w3.org/ns/regorg":
+        with open("tests/files/mock_regorg.ttl", "r") as file:
+            text = file.read()
+        content_type = "text/turtle"
+    elif str(url) == "https://www.w3.org/ns/org":
+        with open("tests/files/mock_org.ttl", "r") as file:
+            text = file.read()
+        content_type = "text/turtle"
+    elif str(url) == "https://data.brreg.no/enhetsregisteret/api/enheter/961181399":
+        with open("tests/files/mock_enhetsregisteret_961181399.json", "r") as file:
+            text = file.read()
+        content_type = "application/json"
+    elif str(url) == "https://data.brreg.no/enhetsregisteret/api/enheter/991825827":
+        with open("tests/files/mock_enhetsregisteret_991825827.json", "r") as file:
+            text = file.read()
+        content_type = "application/json"
+    elif str(url) == "https://example.com/nograph":
+        raise RequestException(f"Failure in name resolution for {url}")
+    elif str(url) == "https://example.com/graphs/not_found":
+        status_code = 404
+    elif str(url) == "https://example.com/non_parsable_graph":
+        with open("tests/files/invalid_rdf.txt", "r") as file:
+            text = file.read()
+        status_code = 200
+        content_type = "text/plain"
+    elif str(url) == "https://example.com/datagraphs/valid_catalog.ttl":
+        with open("tests/files/valid_catalog.ttl", "r") as file:
+            text = file.read()
+        status_code = 200
+        content_type = "text/turtle"
+    elif str(url) == "https://example.com/datagraphs/valid_catalog.json":
+        with open("tests/files/valid_catalog.json", "r") as file:
+            text = file.read()
+        status_code = 200
+        content_type = "application/ld+json"
+    elif str(url) == "http://slfkjasdf":
+        raise RequestException(f"Failure in name resolution for {url}")
+    else:
+        raise Exception(f"Not able to return mock response for url {url}")
+    return t(text=text, status_code=status_code, headers={"content-type": content_type})
 
 
 # ---------------------------------------------------------------------- #

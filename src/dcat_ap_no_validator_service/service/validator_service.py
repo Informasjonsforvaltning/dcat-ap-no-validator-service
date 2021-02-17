@@ -6,12 +6,13 @@ from typing import Any, Tuple
 
 from pyshacl import validate
 from rdflib import Graph, RDF, URIRef
-from rdflib.plugin import PluginException
-import requests
+from requests.exceptions import RequestException
 
-from dcat_ap_no_validator_service.service import ShapeService
 
-DEFAULT_SHACL_VERSION = "2"
+from dcat_ap_no_validator_service.adapter import fetch_graph, parse_text
+from dcat_ap_no_validator_service.service import ShapesService
+
+DEFAULT_SHAPES_GRAPH = "2"
 SUPPORTED_FORMATS = set(["text/turtle", "application/ld+json", "application/rdf+xml"])
 
 
@@ -19,7 +20,7 @@ SUPPORTED_FORMATS = set(["text/turtle", "application/ld+json", "application/rdf+
 class Config:
     """Class for keeping track of config item."""
 
-    shape_id: str = DEFAULT_SHACL_VERSION
+    shapes_id: str = DEFAULT_SHAPES_GRAPH
     expand: bool = True
     include_expanded_triples: bool = False
 
@@ -28,120 +29,88 @@ class ValidatorService:
     """Class representing validator service."""
 
     __slots__ = (
-        "graph",
-        "format",
+        "url",
+        "data",
+        "shapes",
         "config",
-        "ograph",
-        "shacl",
+        "ontology",
     )
 
     def __init__(
         self,
-        graph: Any,
-        format: Any = None,
+        url: Any,
+        data: Any,
+        shapes: Any,
         config: Config = None,
-        shacl: Any = None,
     ) -> None:
         """Initialize service instance."""
-        self.format = format
-        self.graph = parse_input_graph(format, graph)
+        self.url = url
+        self.data = fetch_graph(url) if self.url else parse_text(data)
         if config is None:
             self.config = Config()
         else:
             self.config = config
-        self.ograph = Graph()
-        # set the shape graph:
-        logging.debug(f"Got input shacl: {shacl}")
-        self.shacl = shacl
+        self.ontology = Graph()
+        self.shapes = shapes
+        if self.shapes is not None:
+            self.shapes = parse_text(shapes)
 
     async def validate(self) -> Tuple[bool, Graph, Graph, Graph]:
         """Validate function."""
         # Do some sanity checks on preconditions:
-        if len(self.graph) == 0:  # No need to validate empty graph
+        if len(self.data) == 0:  # No need to validate empty graph
             raise ValueError("Input graph cannot be empty.")
         logging.debug(f"Validating with following config: {self.config}")
-        if not self.shacl:
-            self.shacl = await ShapeService().get_shape_by_id(self.config.shape_id)
-        if len(self.shacl) == 0:  # No need to validate when empty shacl shapes
+        if not self.shapes:
+            self.shapes = await ShapesService().get_shapes_by_id(self.config.shapes_id)
+        if len(self.shapes) == 0:  # No need to validate when empty shapes shapes
             raise ValueError("SHACL graph cannot be empty.")
         # Add triples from remote predicates if user has asked for that:
         if self.config.expand is True:
             self._expand_objects_triples()
             self._load_ontologies()
+
         # Validate!
         # `inference` should be set to one of the followoing {"none", "rdfs", "owlrl", "both"}
         conforms, results_graph, _ = validate(
-            data_graph=self.graph,
-            ont_graph=self.ograph,
-            shacl_graph=self.shacl,
+            data_graph=self.data,
+            ont_graph=self.ontology,
+            shacl_graph=self.shapes,
             inference="rdfs",
             inplace=False,
             meta_shacl=False,
             debug=False,
         )
-        return (conforms, self.graph, self.ograph, results_graph)
+        return (conforms, self.data, self.ontology, results_graph)
 
     def _expand_objects_triples(self) -> None:
-        """Get triples of objects and add to graph."""
+        """Get triples of objects and add to ontology graph."""
         # TODO: this loop should be parallellized
-        for p, o in self.graph.predicate_objects(subject=None):
+        for p, o in self.data.predicate_objects(subject=None):
             # logging.debug(f"{p} a {type(p)}, {o} a {type(o)}")
             if p == RDF.type:
                 pass
             elif type(o) is URIRef:
-                if (o, None, None) not in self.graph:
-                    if (o, None, None) not in self.ograph:
-                        logging.debug(f"trying to fetch triples about {o}")
+                if (o, None, None) not in self.data:
+                    if (o, None, None) not in self.ontology:
+                        logging.debug(f"Trying to fetch remote triples about {o}")
                         try:
-                            # Workaround to accomodate wrong content-type in responses:
-                            # Should use Graph().parse(o) directly, but this approach
-                            # breaks down when trying to fetch EU-triples:
-                            headers = {"Accept": "text/turtle"}
-                            resp = requests.get(o, headers=headers)
-                            if resp.status_code == 200:
-                                format = resp.headers["content-type"].split(";")[0]
-                                if "text/xml" in format:
-                                    format = "application/rdf+xml"
-                                if "application/xml" in format:
-                                    format = "application/rdf+xml"
-                                t = Graph().parse(data=resp.text, format=format)
-                                # Add the triples to the ontology graph:
-                                self.ograph += t
-                        except Exception:  # pragma: no cover
+                            self.ontology += fetch_graph(o)
+                        except RequestException:
                             logging.debug(traceback.format_exc())
                             pass
 
-    def _load_ontologies(self) -> None:
-        """Load relevant ontologies into ograph."""
+    def _load_ontologies(self) -> None:  # pragma: no cover
+        """Load relevant ontologies into ontology graph."""
         # TODO: this loop should be parallellized
         # TODO: discover relevant ontologies dynamically, should be cached
+        # TODO: cover with proper tests
         ontologies = ["https://www.w3.org/ns/regorg", "https://www.w3.org/ns/org"]
         for o in ontologies:
-            if (o, None, None) not in self.ograph:
-                logging.debug(f"Loading remote ontology {o}")
+            if (o, None, None) not in self.ontology:
+                logging.debug(f"Trying to add remote ontology {o}")
                 try:
-                    t = Graph().parse(o)
-                    # Add the triples to the ontology graph:
-                    self.ograph += t
-                except Exception:  # pragma: no cover
+                    self.ontology += fetch_graph(o)
+                except RequestException:
                     logging.debug(traceback.format_exc())
                     pass
-
-
-def parse_input_graph(format: Any, input_graph: Any) -> Graph:
-    """Try to parse input_graph."""
-    # If format is valid, we go ahead with parsing:
-    if format.lower() in SUPPORTED_FORMATS:
-        return Graph().parse(data=input_graph, format=format)
-    # Else we try the valid format one after the other:
-    else:
-        for _format in SUPPORTED_FORMATS:
-            # the following is flagged by S110 Try, Except, Pass. But there is
-            # no easy way to catch specific errors from the parse function.
-            # TODO: find a way to solve this without ignoring S110
-            try:
-                return Graph().parse(data=input_graph, format=_format)
-            except Exception:
-                pass
-        # If we reached this point, we did not succeed with parsing:
-        raise PluginException(f"Format not supported: {format}")

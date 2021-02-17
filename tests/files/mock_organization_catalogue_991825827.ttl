@@ -1,0 +1,27 @@
+@prefix br:    <https://github.com/Informasjonsforvaltning/organization-catalogue/blob/develop/src/main/resources/ontology/organization-catalogue.owl#> .
+@prefix dct:   <http://purl.org/dc/terms/> .
+@prefix adms:  <http://www.w3.org/ns/adms#> .
+@prefix org:   <http://www.w3.org/ns/org#> .
+@prefix rov:   <http://www.w3.org/ns/regorg#> .
+@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+
+<https://organization-catalogue.fellesdatakatalog.digdir.no/organizations/991825827>
+        a                      rov:RegisteredOrganization ;
+        dct:identifier         "991825827" ;
+        org:subOrganizationOf  <https://organization-catalogue.fellesdatakatalog.digdir.no/organizations/972417858> ;
+        rov:legalName          "DIGITALISERINGSDIREKTORATET" ;
+        rov:orgType            [ a               skos:Concept ;
+                                 skos:prefLabel  "ORGL"
+                               ] ;
+        rov:registration       [ a                  adms:Identifier ;
+                                 dct:issued         "2007-10-15" ;
+                                 skos:notation      "991825827" ;
+                                 adms:schemaAgency  "Brønnøysundregistrene"
+                               ] ;
+        foaf:name              "DIGITALISERINGSDIREKTORATET"@nb ;
+        br:municipality        <https://data.geonorge.no/administrativeEnheter/kommune/id/173018> ;
+        br:nace                "84.110" ;
+        br:norwegianRegistry   <https://data.brreg.no/enhetsregisteret/api/enheter/991825827> ;
+        br:orgPath             "/STAT/972417858/991825827" ;
+        br:sectorCode          "6100" .

@@ -12,7 +12,7 @@ Input should be one of the following
  - dcat-ap-no v2: 2
 
 Response will be a RDF graph consisting of
- - the report as a graph according to a SHACL (validation report)[https://www.w3.org/TR/shacl/#validation-report]
+ - the report as a graph according to a SHACL [validation report](https://www.w3.org/TR/shacl/#validation-report)
 
 ## Usage by curl examples
 ### Validate file
@@ -20,7 +20,7 @@ Response will be a RDF graph consisting of
 % curl -i \
  -H "Accept: text/turtle" \
  -H "Content-Type: multipart/form-data" \
- -F "file=@tests/files/valid_catalog.ttl;type=text/turtle" \
+ -F "data-graph-file=@tests/files/valid_catalog.ttl;type=text/turtle" \
  -X POST http://localhost:8000/validator
 ```
 ### Validate endpoint(url)
@@ -28,17 +28,34 @@ Response will be a RDF graph consisting of
 % curl -i \
  -H "Accept: text/turtle" \
  -H "Content-Type: multipart/form-data" \
- -F "url=https://example.com/mygraph" \
+ -F "data-graph-url=https://example.com/mygraph" \
  -X POST http://localhost:8000/validator
 ```
 ### With config parameters:
 ```
-curl -i \
+% curl -i \
  -H "Accept: text/turtle" \
  -H "Content-Type: multipart/form-data" \
- -F "file=@tests/files/valid_catalog.ttl;type=text/turtle" \
- -F "config={\"shapeId\":\"2\", \"expand\":\"true\", \"includeExpandedTriples\":\"true\"};type=application/json" \
+ -F "data-graph-file=@tests/files/valid_catalog.ttl;type=text/turtle" \
+ -F "config=@tests/files/config.json;type=application/json" \
 -X POST http://localhost:8000/validator
+```
+Where `config.json` file may have the following properties, ref [the openAPI specification](./dcat_ap_no_validator_service.yaml) :
+```
+{
+  "shapesId": "2",
+  "expand": "true",
+  "includeExpandedTriples": "true"
+}
+```
+### Validate file and supply your own shacl file (will override shapesId):
+```
+% curl -i \
+ -H "Accept: text/turtle" \
+ -H "Content-Type: multipart/form-data" \
+ -F "data-graph-file=@tests/files/valid_catalog.ttl;type=text/turtle" \
+ -F "shapes-graph-file=@dcat-ap-no-shacl_shapes_2.00.ttl" \
+ -X POST http://localhost:8000/validator
 ```
 ### List all available shacl shapes (Not implemented yet)
 ```
@@ -90,4 +107,8 @@ We use [pytest](https://docs.pytest.org/en/latest/) for contract testing.
 To run linters, checkers and tests:
 ```
 % nox
+```
+To run tests with logging, do:
+```
+% nox -s integration_tests -- --log-cli-level=DEBUG
 ```

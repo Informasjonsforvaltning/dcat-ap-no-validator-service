@@ -1,13 +1,23 @@
 """Resource module for liveness resources."""
+from enum import Enum
 import logging
 import traceback
 
-from aiohttp import ClientConnectorError, ClientSession, hdrs, web
-from multidict import MultiDict
+from aiohttp import hdrs, web
 from rdflib import Graph
 from rdflib.plugin import PluginException
+from requests.exceptions import RequestException
 
 from dcat_ap_no_validator_service.service import Config, ValidatorService
+
+
+class Part(str, Enum):
+    """Enum representing different valid part names."""
+
+    CONFIG = "config"
+    DATA_GRAPH_URL = "data-graph-url"
+    DATA_GRAPH_FILE = "data-graph-file"
+    SHAPES_GRAPH_FILE = "shapes-graph-file"
 
 
 class Validator(web.View):
@@ -15,59 +25,69 @@ class Validator(web.View):
 
     async def post(self) -> web.Response:
         """Validate route function."""
-        accept_header = self.request.headers["Accept"]
-        logging.debug(f"Got following accept-headers: {accept_header}")
+        logging.debug(
+            f"Got following content-type-headers: {self.request.headers[hdrs.CONTENT_TYPE]}"
+        )
+        if "multipart/" not in self.request.headers[hdrs.CONTENT_TYPE].lower():
+            raise web.HTTPUnsupportedMediaType(
+                reason=f"multipart/* content type expected, got {hdrs.CONTENT_TYPE}"
+            )
         # Iterate through each part of MultipartReader
+        url = None
         data = None
+        shapes = None
         config = None
-        filename = None
-        content_type = None
-        input_matrix = dict()
+        data_graph_matrix = dict()
         async for part in (await self.request.multipart()):
             logging.debug(f"part.name {part.name}")
-            if part.name == "config":
+            if Part(part.name) is Part.CONFIG:
                 # Get config:
                 config_json = await part.json()
                 logging.debug(f"Got config: {config_json}")
                 config = _create_config(config_json)
                 pass
 
-            if part.name == "url":
-                # Get data from url:
+            if Part(part.name) is Part.DATA_GRAPH_URL:
+                # Get data graph from url:
                 url = (await part.read()).decode()
-                logging.debug(f"Got url: {url}")
-                data, content_type = await get_graph_at_url(url)
-                input_matrix[part.name] = url
+                logging.debug(f"Got reference to data graph with url: {url}")
+                data_graph_matrix[part.name] = url
                 pass
 
-            if part.name == "text":
-                # Get data from text input:
-                if part.headers[hdrs.CONTENT_TYPE]:
-                    content_type = part.headers[hdrs.CONTENT_TYPE]
-                    logging.debug(f"content_type of {content_type}")
-                data = (await part.read()).decode()
-                logging.debug(f"Got text: {data}")
-                input_matrix[part.name] = "text"
-                pass
-
-            if part.name == "file":
+            if Part(part.name) is Part.DATA_GRAPH_FILE:
                 # Process any files you uploaded
-                filename = part.filename
-                logging.debug(f"got filename: {filename}")
-                if part.headers[hdrs.CONTENT_TYPE]:
-                    content_type = part.headers[hdrs.CONTENT_TYPE]
-                    logging.debug(f"content_type of {content_type}")
+                logging.debug(f"Got input graph as file with filename: {part.filename}")
                 data = (await part.read()).decode()
-                logging.debug(f"content of {filename}:\n{data}")
-                input_matrix[part.name] = filename
-        # We need to check that user sendt one, and only one, input graph:
-        if len(input_matrix) != 1:
-            logging.debug(f"Ambigious user input: {input_matrix}")
-            raise web.HTTPBadRequest(reason="Multiple inputs for validation.")
+                logging.debug(f"Content of {part.filename}:\n{data}")
+                data_graph_matrix[part.name] = part.filename
+                pass
+
+            if Part(part.name) is Part.SHAPES_GRAPH_FILE:
+                # Process any files you uploaded
+                logging.debug(f"Got shacl from user with filename: {part.filename}")
+                shapes = (await part.read()).decode()
+                logging.debug(f"Content of {part.filename}:\n{shapes}")
+                pass
+
+        if len(data_graph_matrix) == 0:
+            raise web.HTTPBadRequest(reason="No data graph in input.")
+        elif len(data_graph_matrix) > 1:
+            logging.debug(f"Ambigious user input: {data_graph_matrix}")
+            raise web.HTTPBadRequest(reason="Multiple data graphs in input.")
 
         # We have got data, now validate:
         try:
-            service = ValidatorService(data, format=content_type, config=config)
+            # instantiate validator service:
+            service = ValidatorService(url=url, data=data, shapes=shapes, config=config)
+        except RequestException:
+            logging.debug(traceback.format_exc())
+            raise web.HTTPBadRequest(reason=f"Could not connect to {url}")
+        except SyntaxError:
+            logging.debug(traceback.format_exc())
+            raise web.HTTPBadRequest(reason="Bad syntax in input graph.")
+
+        try:
+            # validate:
             (
                 conforms,
                 data_graph,
@@ -79,22 +99,17 @@ class Validator(web.View):
             logging.debug(traceback.format_exc())
             raise web.HTTPBadRequest(reason=str(e))
 
-        except SyntaxError:
-            logging.debug(traceback.format_exc())
-            raise web.HTTPBadRequest(reason="Bad syntax in input graph.")
-
-        except PluginException:
-            logging.debug(traceback.format_exc())
-            raise web.HTTPUnsupportedMediaType(
-                reason=f"Input graph format not supported: {content_type}"
-            )
-
         # Try to content-negotiate:
-        format = "text/turtle"  # default
-        if "*/*" in accept_header:
+        logging.debug(
+            f"Got following accept-headers: {self.request.headers[hdrs.ACCEPT]}"
+        )
+        content_type = "text/turtle"  # default
+        if "*/*" in self.request.headers[hdrs.ACCEPT]:
             pass  # use default
-        elif accept_header:  # we try to serialize according to accept-header
-            format = accept_header
+        elif self.request.headers[
+            hdrs.ACCEPT
+        ]:  # we try to serialize according to accept-header
+            content_type = self.request.headers[hdrs.ACCEPT]
         response_graph = Graph()
         response_graph += results_graph
         response_graph += data_graph
@@ -102,58 +117,25 @@ class Validator(web.View):
             response_graph += ontology_graph
         try:
             return web.Response(
-                body=response_graph.serialize(format=format),
-                content_type=format,
+                body=response_graph.serialize(format=content_type),
+                content_type=content_type,
             )
         except PluginException:  # rdflib raises PluginException, in this context imples 406
             logging.debug(traceback.format_exc())
             raise web.HTTPNotAcceptable()  # 406
 
 
-async def get_graph_at_url(url: str) -> tuple:  # pragma: no cover
-    """Get a graph to be validated at given url."""
-    headers = MultiDict(
-        [
-            ("Accept", "text/turtle"),
-            ("Accept", "application/rdf+xml"),
-            ("Accept", "application/ld+json"),
-        ]
-    )
-    session = ClientSession()
-    try:
-        async with session.get(url, headers=headers) as resp:
-            graph = await resp.text()
-        await session.close()
-    except ClientConnectorError:
-        logging.debug(traceback.format_exc())
-        raise web.HTTPBadRequest(reason=f"Could not connect to url {url}")
-
-    if resp.status != 200:
-        raise web.HTTPBadRequest(
-            reason=f'Got unsuccesful status code when requesting "{url}": {resp.status}'
-        )
-
-    content_type = resp.headers[hdrs.CONTENT_TYPE]
-    logging.debug(
-        f"Got the following text from {url}/{resp.status}/{content_type}:\n {graph}"
-    )
-    # format is the first part of content_type:
-    format = content_type.split(";")[0]
-
-    return graph, format
-
-
 def _create_config(config: dict) -> Config:
     c = Config()
-    if "shapeId" in config:
-        c.shape_id = config["shapeId"]
+    if "shapesId" in config:
+        c.shapes_id = config["shapesId"]
     if "expand" in config:
-        if config["expand"] == "true":
+        if config["expand"]:
             c.expand = True
         else:
             c.expand = False
     if "includeExpandedTriples" in config:
-        if config["includeExpandedTriples"] == "true":
+        if config["includeExpandedTriples"]:
             c.include_expanded_triples = True
         else:
             c.include_expanded_triples = False
