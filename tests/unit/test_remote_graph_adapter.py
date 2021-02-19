@@ -41,7 +41,7 @@ async def test_fetch_graph_that_does_not_have_rdf_content_type(
 
 @pytest.mark.unit
 async def test_fetch_graph_that_is_not_parsable_as_rdf(mocker: MockFixture) -> None:
-    """Should return an empty graph."""
+    """Should return None."""
     # Set up the mock
     mocker.patch(
         "dcat_ap_no_validator_service.adapter.remote_graph_adapter.requests.get",
@@ -49,15 +49,14 @@ async def test_fetch_graph_that_is_not_parsable_as_rdf(mocker: MockFixture) -> N
     )
     url = "https://data.brreg.no/enhetsregisteret/api/enheter/961181399"
     o = fetch_graph(url)
-    assert type(o) == Graph
-    assert len(o) == 0
+    assert o is None
 
 
 @pytest.mark.unit
 async def test_fetch_graph_that_gives_unsuccessful_response(
     mocker: MockFixture,
 ) -> None:
-    """Should return an empty graph."""
+    """Should return None."""
     # Set up the mock
     mocker.patch(
         "dcat_ap_no_validator_service.adapter.remote_graph_adapter.requests.get",
@@ -65,8 +64,7 @@ async def test_fetch_graph_that_gives_unsuccessful_response(
     )
     url = "https://data.brreg.no/enhetsregisteret/api/enheter/961181399"
     o = fetch_graph(url)
-    assert type(o) == Graph
-    assert len(o) == 0
+    assert o is None
 
 
 # --- mocks

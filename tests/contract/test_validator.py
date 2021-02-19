@@ -13,12 +13,17 @@ from rdflib.compare import graph_diff, isomorphic
 async def test_validator_with_file(http_service: Any) -> None:
     """Should return OK and successful validation."""
     url = f"{http_service}/validator"
-    filename = "tests/files/valid_catalog.ttl"
+    data_graph_file = "tests/files/valid_catalog.ttl"
+    shapes_graph_file = "tests/files/mock_dcat-ap-no-shacl_shapes_2.00.ttl"
 
     with MultipartWriter("mixed") as mpwriter:
-        p = mpwriter.append(open(filename, "rb"))
+        p = mpwriter.append(open(data_graph_file, "rb"))
         p.set_content_disposition(
-            "attachment", name="data-graph-file", filename=filename
+            "attachment", name="data-graph-file", filename=data_graph_file
+        )
+        p = mpwriter.append(open(shapes_graph_file, "rb"))
+        p.set_content_disposition(
+            "attachment", name="shapes-graph-file", filename=shapes_graph_file
         )
 
     session = ClientSession()
@@ -58,13 +63,18 @@ async def test_validator_with_file(http_service: Any) -> None:
 async def test_validator_accept_json_ld(http_service: Any) -> None:
     """Should return OK and successful validation and content-type should be json-ld."""
     url = f"{http_service}/validator"
-    filename = "tests/files/valid_catalog.ttl"
+    data_graph_file = "tests/files/valid_catalog.ttl"
     headers = {"Accept": "application/ld+json"}
+    shapes_graph_file = "tests/files/mock_dcat-ap-no-shacl_shapes_2.00.ttl"
 
     with MultipartWriter("mixed") as mpwriter:
-        p = mpwriter.append(open(filename, "rb"))
+        p = mpwriter.append(open(data_graph_file, "rb"))
         p.set_content_disposition(
-            "attachment", name="data-graph-file", filename=filename
+            "attachment", name="data-graph-file", filename=data_graph_file
+        )
+        p = mpwriter.append(open(shapes_graph_file, "rb"))
+        p.set_content_disposition(
+            "attachment", name="shapes-graph-file", filename=shapes_graph_file
         )
 
     session = ClientSession()
@@ -94,7 +104,7 @@ async def test_validator_accept_json_ld(http_service: Any) -> None:
       }
     ]
     """
-    with open(filename, "r") as file:
+    with open(data_graph_file, "r") as file:
         text = file.read()
 
     g0 = Graph().parse(data=text, format="text/turtle")
@@ -113,14 +123,19 @@ async def test_validator_accept_json_ld(http_service: Any) -> None:
 async def test_validator_file_content_type_json_ld(http_service: Any) -> None:
     """Should return OK and successful validation."""
     url = f"{http_service}/validator"
-    filename = "tests/files/valid_catalog.json"
+    data_graph_file = "tests/files/valid_catalog.json"
+    shapes_graph_file = "tests/files/mock_dcat-ap-no-shacl_shapes_2.00.ttl"
 
     with MultipartWriter("mixed") as mpwriter:
         p = mpwriter.append(
-            open(filename, "rb"), {"CONTENT-TYPE": "application/ld+json"}
+            open(data_graph_file, "rb"), {"CONTENT-TYPE": "application/ld+json"}
         )
         p.set_content_disposition(
-            "attachment", name="data-graph-file", filename=filename
+            "attachment", name="data-graph-file", filename=data_graph_file
+        )
+        p = mpwriter.append(open(shapes_graph_file, "rb"))
+        p.set_content_disposition(
+            "attachment", name="shapes-graph-file", filename=shapes_graph_file
         )
 
     session = ClientSession()
@@ -140,7 +155,7 @@ async def test_validator_file_content_type_json_ld(http_service: Any) -> None:
          sh:conforms true
          .
     """
-    with open(filename, "r") as file:
+    with open(data_graph_file, "r") as file:
         text = file.read()
 
     g0 = Graph().parse(data=text, format="application/ld+json")
@@ -159,14 +174,19 @@ async def test_validator_file_content_type_json_ld(http_service: Any) -> None:
 async def test_validator_file_content_type_rdf_xml(http_service: Any) -> None:
     """Should return OK and successful validation."""
     url = f"{http_service}/validator"
-    filename = "tests/files/valid_catalog.xml"
+    data_graph_file = "tests/files/valid_catalog.xml"
+    shapes_graph_file = "tests/files/mock_dcat-ap-no-shacl_shapes_2.00.ttl"
 
     with MultipartWriter("mixed") as mpwriter:
         p = mpwriter.append(
-            open(filename, "rb"), {"CONTENT-TYPE": "application/rdf+xml"}
+            open(data_graph_file, "rb"), {"CONTENT-TYPE": "application/rdf+xml"}
         )
         p.set_content_disposition(
-            "attachment", name="data-graph-file", filename=filename
+            "attachment", name="data-graph-file", filename=data_graph_file
+        )
+        p = mpwriter.append(open(shapes_graph_file, "rb"))
+        p.set_content_disposition(
+            "attachment", name="shapes-graph-file", filename=shapes_graph_file
         )
 
     session = ClientSession()
@@ -186,7 +206,7 @@ async def test_validator_file_content_type_rdf_xml(http_service: Any) -> None:
          sh:conforms true
          .
     """
-    with open(filename, "r") as file:
+    with open(data_graph_file, "r") as file:
         text = file.read()
 
     g0 = Graph().parse(data=text, format="application/rdf+xml")
@@ -206,10 +226,16 @@ async def test_validator_url(http_service: Any) -> None:
     """Should return OK and successful validation."""
     url = f"{http_service}/validator"
 
-    url_to_graph = "https://raw.githubusercontent.com/Informasjonsforvaltning/dcat-ap-no-validator-service/main/tests/files/valid_catalog.ttl"  # noqa: B950
+    data_graph_url = "https://raw.githubusercontent.com/Informasjonsforvaltning/dcat-ap-no-validator-service/main/tests/files/valid_catalog.ttl"  # noqa: B950
+    shapes_graph_file = "tests/files/mock_dcat-ap-no-shacl_shapes_2.00.ttl"
+
     with MultipartWriter("mixed") as mpwriter:
-        p = mpwriter.append(url_to_graph)
+        p = mpwriter.append(data_graph_url)
         p.set_content_disposition("inline", name="data-graph-url")
+        p = mpwriter.append(open(shapes_graph_file, "rb"))
+        p.set_content_disposition(
+            "attachment", name="shapes-graph-file", filename=shapes_graph_file
+        )
 
     session = ClientSession()
     async with session.post(url, data=mpwriter) as resp:
@@ -229,7 +255,7 @@ async def test_validator_url(http_service: Any) -> None:
          .
     """
     session = ClientSession()
-    async with session.get(url_to_graph) as resp:
+    async with session.get(data_graph_url) as resp:
         text = await resp.text()
     await session.close()
 
@@ -249,14 +275,19 @@ async def test_validator_url(http_service: Any) -> None:
 async def test_validator_with_file_content_encoding(http_service: Any) -> None:
     """Should return OK and successful validation."""
     url = f"{http_service}/validator"
-    filename = "tests/files/valid_catalog.ttl"
+    data_graph_file = "tests/files/valid_catalog.ttl"
+    shapes_graph_file = "tests/files/mock_dcat-ap-no-shacl_shapes_2.00.ttl"
 
     with MultipartWriter("mixed") as mpwriter:
-        p = mpwriter.append(open(filename, "rb"))
+        p = mpwriter.append(open(data_graph_file, "rb"))
         p.set_content_disposition(
-            "attachment", name="data-graph-file", filename=filename
+            "attachment", name="data-graph-file", filename=data_graph_file
         )
         p.headers[hdrs.CONTENT_ENCODING] = "gzip"
+        p = mpwriter.append(open(shapes_graph_file, "rb"))
+        p.set_content_disposition(
+            "attachment", name="shapes-graph-file", filename=shapes_graph_file
+        )
 
     session = ClientSession()
     async with session.post(url, data=mpwriter) as resp:
@@ -275,7 +306,7 @@ async def test_validator_with_file_content_encoding(http_service: Any) -> None:
          sh:conforms true
          .
     """
-    with open(filename, "r") as file:
+    with open(data_graph_file, "r") as file:
         text = file.read()
 
     g0 = Graph().parse(data=text, format="text/turtle")
@@ -294,18 +325,23 @@ async def test_validator_with_file_content_encoding(http_service: Any) -> None:
 async def test_validator_with_default_config(http_service: Any) -> None:
     """Should return OK and successful validation."""
     url = f"{http_service}/validator"
-    filename = "tests/files/valid_catalog.ttl"
+    data_graph_file = "tests/files/valid_catalog.ttl"
+    shapes_graph_file = "tests/files/mock_dcat-ap-no-shacl_shapes_2.00.ttl"
 
-    config = {"shapesId": "2", "expand": True, "includeExpandedTriples": False}
+    config = {"expand": True, "includeExpandedTriples": False}
 
     with MultipartWriter("mixed") as mpwriter:
-        p = mpwriter.append(open(filename, "rb"))
+        p = mpwriter.append(open(data_graph_file, "rb"))
         p.set_content_disposition(
-            "attachment", name="data-graph-file", filename=filename
+            "attachment", name="data-graph-file", filename=data_graph_file
         )
         p.headers[hdrs.CONTENT_ENCODING] = "gzip"
         p = mpwriter.append(json.dumps(config))
         p.set_content_disposition("inline", name="config")
+        p = mpwriter.append(open(shapes_graph_file, "rb"))
+        p.set_content_disposition(
+            "attachment", name="shapes-graph-file", filename=shapes_graph_file
+        )
 
     session = ClientSession()
     async with session.post(url, data=mpwriter) as resp:
@@ -324,7 +360,7 @@ async def test_validator_with_default_config(http_service: Any) -> None:
          sh:conforms true
          .
     """
-    with open(filename, "r") as file:
+    with open(data_graph_file, "r") as file:
         text = file.read()
 
     g0 = Graph().parse(data=text, format="text/turtle")
@@ -340,18 +376,20 @@ async def test_validator_with_default_config(http_service: Any) -> None:
 
 @pytest.mark.contract
 @pytest.mark.asyncio
-async def test_validator_with_file_and_shacl(http_service: Any) -> None:
+async def test_validator_with_file_and_shapes_graph_file(http_service: Any) -> None:
     """Should return OK and successful validation."""
     url = f"{http_service}/validator"
-    graph = "tests/files/valid_catalog.ttl"
-    shacl = "dcat-ap-no-shacl_shapes_2.00.ttl"
+    data_graph_file = "tests/files/valid_catalog.ttl"
+    shapes_graph_file = "tests/files/mock_dcat-ap-no-shacl_shapes_2.00.ttl"
 
     with MultipartWriter("mixed") as mpwriter:
-        p = mpwriter.append(open(graph, "rb"))
-        p.set_content_disposition("attachment", name="data-graph-file", filename=graph)
-        p = mpwriter.append(open(shacl, "rb"))
+        p = mpwriter.append(open(data_graph_file, "rb"))
         p.set_content_disposition(
-            "attachment", name="shapes-graph-file", filename=shacl
+            "attachment", name="data-graph-file", filename=data_graph_file
+        )
+        p = mpwriter.append(open(shapes_graph_file, "rb"))
+        p.set_content_disposition(
+            "attachment", name="shapes-graph-file", filename=shapes_graph_file
         )
 
     session = ClientSession()
@@ -392,12 +430,17 @@ async def test_validator_with_file_and_shacl(http_service: Any) -> None:
 async def test_validator_with_not_valid_file(http_service: Any) -> None:
     """Should return OK and unsuccessful validation."""
     url = f"{http_service}/validator"
-    filename = "tests/files/invalid_catalog.ttl"
+    data_graph_file = "tests/files/invalid_catalog.ttl"
+    shapes_graph_file = "tests/files/mock_dcat-ap-no-shacl_shapes_2.00.ttl"
 
     with MultipartWriter("mixed") as mpwriter:
-        p = mpwriter.append(open(filename, "rb"))
+        p = mpwriter.append(open(data_graph_file, "rb"))
         p.set_content_disposition(
-            "attachment", name="data-graph-file", filename=filename
+            "attachment", name="data-graph-file", filename=data_graph_file
+        )
+        p = mpwriter.append(open(shapes_graph_file, "rb"))
+        p.set_content_disposition(
+            "attachment", name="shapes-graph-file", filename=shapes_graph_file
         )
 
     session = ClientSession()
@@ -436,7 +479,7 @@ async def test_validator_with_not_valid_file(http_service: Any) -> None:
                         sh:severity sh:Violation ] ]
     .
     """
-    with open(filename, "r") as file:
+    with open(data_graph_file, "r") as file:
         text = file.read()
 
     g0 = Graph().parse(data=text, format="text/turtle")
@@ -456,10 +499,16 @@ async def test_validator_notexisting_url(http_service: Any) -> None:
     """Should return 400."""
     url = f"{http_service}/validator"
 
-    url_to_graph = "https://raw.githubusercontent.com/Informasjonsforvaltning/dcat-ap-no-validator-service/main/tests/files/does_not_exist.ttl"  # noqa: B950
+    data_graph_url = "https://raw.githubusercontent.com/Informasjonsforvaltning/dcat-ap-no-validator-service/main/tests/files/does_not_exist.ttl"  # noqa: B950
+    shapes_graph_file = "tests/files/mock_dcat-ap-no-shacl_shapes_2.00.ttl"
+
     with MultipartWriter("mixed") as mpwriter:
-        p = mpwriter.append(url_to_graph)
+        p = mpwriter.append(data_graph_url)
         p.set_content_disposition("inline", name="data-graph-url")
+        p = mpwriter.append(open(shapes_graph_file, "rb"))
+        p.set_content_disposition(
+            "attachment", name="shapes-graph-file", filename=shapes_graph_file
+        )
 
     session = ClientSession()
     async with session.post(url, data=mpwriter) as resp:
@@ -475,10 +524,16 @@ async def test_validator_illformed_url(http_service: Any) -> None:
     """Should return 400."""
     url = f"{http_service}/validator"
 
-    url_to_graph = "http://slfkjasdf"  # noqa: B950
+    data_graph_url = "http://slfkjasdf"  # noqa: B950
+    shapes_graph_file = "tests/files/mock_dcat-ap-no-shacl_shapes_2.00.ttl"
+
     with MultipartWriter("mixed") as mpwriter:
-        p = mpwriter.append(url_to_graph)
+        p = mpwriter.append(data_graph_url)
         p.set_content_disposition("inline", name="data-graph-url")
+        p = mpwriter.append(open(shapes_graph_file, "rb"))
+        p.set_content_disposition(
+            "attachment", name="shapes-graph-file", filename=shapes_graph_file
+        )
 
     session = ClientSession()
     async with session.post(url, data=mpwriter) as resp:
@@ -494,10 +549,16 @@ async def test_validator_url_to_invalid_rdf(http_service: Any) -> None:
     """Should return 400."""
     url = f"{http_service}/validator"
 
-    url_to_graph = "https://raw.githubusercontent.com/Informasjonsforvaltning/dcat-ap-no-validator-service/main/tests/files/invalid_rdf.txt"  # noqa: B950
+    data_graph_url = "https://raw.githubusercontent.com/Informasjonsforvaltning/dcat-ap-no-validator-service/main/tests/files/invalid_rdf.txt"  # noqa: B950
+    shapes_graph_file = "tests/files/mock_dcat-ap-no-shacl_shapes_2.00.ttl"
+
     with MultipartWriter("mixed") as mpwriter:
-        p = mpwriter.append(url_to_graph)
+        p = mpwriter.append(data_graph_url)
         p.set_content_disposition("inline", name="data-graph-url")
+        p = mpwriter.append(open(shapes_graph_file, "rb"))
+        p.set_content_disposition(
+            "attachment", name="shapes-graph-file", filename=shapes_graph_file
+        )
 
     session = ClientSession()
     async with session.post(url, data=mpwriter) as resp:

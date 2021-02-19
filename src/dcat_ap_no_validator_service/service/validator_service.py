@@ -10,9 +10,7 @@ from requests.exceptions import RequestException
 
 
 from dcat_ap_no_validator_service.adapter import fetch_graph, parse_text
-from dcat_ap_no_validator_service.service import ShapesService
 
-DEFAULT_SHAPES_GRAPH = "2"
 SUPPORTED_FORMATS = set(["text/turtle", "application/ld+json", "application/rdf+xml"])
 
 
@@ -20,7 +18,6 @@ SUPPORTED_FORMATS = set(["text/turtle", "application/ld+json", "application/rdf+
 class Config:
     """Class for keeping track of config item."""
 
-    shapes_id: str = DEFAULT_SHAPES_GRAPH
     expand: bool = True
     include_expanded_triples: bool = False
 
@@ -29,42 +26,52 @@ class ValidatorService:
     """Class representing validator service."""
 
     __slots__ = (
-        "url",
-        "data",
-        "shapes",
+        "data_graph",
+        "data_graph_url",
+        "shapes_graph",
+        "shapes_graph_url",
         "config",
-        "ontology",
+        "ontology_graph",
     )
 
     def __init__(
         self,
-        url: Any,
-        data: Any,
-        shapes: Any,
+        data_graph_url: Any,
+        data_graph: Any,
+        shapes_graph: Any,
+        shapes_graph_url: Any,
         config: Config = None,
     ) -> None:
         """Initialize service instance."""
-        self.url = url
-        self.data = fetch_graph(url) if self.url else parse_text(data)
+        self.data_graph_url = data_graph_url
+        self.data_graph = (
+            fetch_graph(data_graph_url)
+            if self.data_graph_url
+            else parse_text(data_graph)
+        )
+        self.shapes_graph_url = shapes_graph_url
+        self.shapes_graph = (
+            fetch_graph(shapes_graph_url)
+            if self.shapes_graph_url
+            else parse_text(shapes_graph)
+        )
         if config is None:
             self.config = Config()
         else:
             self.config = config
-        self.ontology = Graph()
-        self.shapes = shapes
-        if self.shapes is not None:
-            self.shapes = parse_text(shapes)
+        self.ontology_graph = Graph()
 
     async def validate(self) -> Tuple[bool, Graph, Graph, Graph]:
         """Validate function."""
         # Do some sanity checks on preconditions:
-        if len(self.data) == 0:  # No need to validate empty graph
-            raise ValueError("Input graph cannot be empty.")
+        # No need to validate when empty data graph:
+        if self.data_graph is None or len(self.data_graph) == 0:
+            raise ValueError("Data graph cannot be empty.")
+        # No need to validate when empty shapes graph:
+        if self.shapes_graph is None or len(self.shapes_graph) == 0:
+            raise ValueError("Shapes graph cannot be empty.")
+
         logging.debug(f"Validating with following config: {self.config}")
-        if not self.shapes:
-            self.shapes = await ShapesService().get_shapes_by_id(self.config.shapes_id)
-        if len(self.shapes) == 0:  # No need to validate when empty shapes shapes
-            raise ValueError("SHACL graph cannot be empty.")
         # Add triples from remote predicates if user has asked for that:
         if self.config.expand is True:
             self._expand_objects_triples()
@@ -73,29 +80,31 @@ class ValidatorService:
         # Validate!
         # `inference` should be set to one of the followoing {"none", "rdfs", "owlrl", "both"}
         conforms, results_graph, _ = validate(
-            data_graph=self.data,
-            ont_graph=self.ontology,
-            shacl_graph=self.shapes,
+            data_graph=self.data_graph,
+            ont_graph=self.ontology_graph,
+            shacl_graph=self.shapes_graph,
             inference="rdfs",
             inplace=False,
             meta_shacl=False,
             debug=False,
         )
-        return (conforms, self.data, self.ontology, results_graph)
+        return (conforms, self.data_graph, self.ontology_graph, results_graph)
 
     def _expand_objects_triples(self) -> None:
         """Get triples of objects and add to ontology graph."""
         # TODO: this loop should be parallellized
-        for p, o in self.data.predicate_objects(subject=None):
+        for p, o in self.data_graph.predicate_objects(subject=None):
             # logging.debug(f"{p} a {type(p)}, {o} a {type(o)}")
             if p == RDF.type:
                 pass
             elif type(o) is URIRef:
-                if (o, None, None) not in self.data:
-                    if (o, None, None) not in self.ontology:
+                if (o, None, None) not in self.data_graph:
+                    if (o, None, None) not in self.ontology_graph:
                         logging.debug(f"Trying to fetch remote triples about {o}")
                         try:
-                            self.ontology += fetch_graph(o)
+                            g = fetch_graph(o)
+                            if g:
+                                self.ontology_graph += g
                         except RequestException:
                             logging.debug(traceback.format_exc())
                             pass
@@ -107,10 +116,12 @@ class ValidatorService:
         # TODO: cover with proper tests
         ontologies = ["https://www.w3.org/ns/regorg", "https://www.w3.org/ns/org"]
         for o in ontologies:
-            if (o, None, None) not in self.ontology:
+            if (o, None, None) not in self.ontology_graph:
                 logging.debug(f"Trying to add remote ontology {o}")
                 try:
-                    self.ontology += fetch_graph(o)
+                    g = fetch_graph(o)
+                    if g:
+                        self.ontology_graph += g
                 except RequestException:
                     logging.debug(traceback.format_exc())
                     pass

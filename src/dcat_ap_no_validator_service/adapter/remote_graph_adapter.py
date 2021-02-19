@@ -12,17 +12,16 @@ def fetch_graph(url: str) -> Graph:
     """Fetch remote graph at url and return as Graph."""
     logging.debug(f"Trying to fetch remote graph {url}")
     resp = requests.get(url, headers={hdrs.ACCEPT: "text/turtle"})
+    logging.debug(f"Got status_code {resp.status_code}")
     if resp.status_code == 200:
         try:
             g = parse_text(input_graph=resp.text)
-            logging.debug(
-                f"Got valid remote graph from parse_text\n{g.serialize().decode()}"
-            )
+            logging.debug(f"Got valid remote graph from {url}")
             return g
         except SyntaxError:
-            return Graph()
+            return None
     else:
-        return Graph()
+        return None
 
 
 def parse_text(input_graph: str) -> Graph:

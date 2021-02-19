@@ -10,17 +10,33 @@ from rdflib.compare import graph_diff  # , isomorphic
 @pytest.mark.contract
 @pytest.mark.asyncio
 async def test_get_all_shapes(http_service: Any) -> None:
-    """Should return OK and a graph with a list of shapes."""
+    """Should return 200 and a list of shapes."""
     url = f"{http_service}/shapes"
 
     session = ClientSession()
     async with session.get(url) as resp:
-        body = await resp.text()
+        body = await resp.json()
     await session.close()
 
     assert resp.status == 200
-    assert resp.headers[hdrs.CONTENT_TYPE] == "text/turtle"
-    print(f"body: {body}")
+    assert "application/json" in resp.headers[hdrs.CONTENT_TYPE]
+    assert type(body) is list
+    assert len(body) > 0
+    for s in body:
+        assert "id" in s, "No id property in shapes graph object"
+        assert "name" in s, "No name property in shapes graph object"
+        assert "description" in s, "No description property in shapes graph object"
+        assert "version" in s, "No version property in shapes graph object"
+        assert "url" in s, "No url property in shapes graph object"
+        assert (
+            "specificationName" in s
+        ), "No specificationName property in shapes graph object"
+        assert (
+            "specificationVersion" in s
+        ), "No specificationVersion property in shapes graph object"
+        assert (
+            "specificationUrl" in s
+        ), "No specificationUrl property in shapes graph object"
 
 
 # ---------------------------------------------------------------------- #
