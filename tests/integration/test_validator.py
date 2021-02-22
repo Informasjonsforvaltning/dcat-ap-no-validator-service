@@ -14,7 +14,7 @@ from requests.exceptions import RequestException
 
 from dcat_ap_no_validator_service.service import ShapesService
 
-_MOCK_SHAPES_DB: Dict[str, Dict] = dict(
+_MOCK_SHAPES_STORE: Dict[str, Dict] = dict(
     {
         "1": {"id": "1", "name": "DCAT-AP-NO", "version": "1.1"},
         "2": {"id": "2", "name": "DCAT-AP-NO", "version": "2.0"},
@@ -30,7 +30,7 @@ def mocks(mocker: MockFixture) -> Any:
         "dcat_ap_no_validator_service.adapter.remote_graph_adapter.requests.get",
         side_effect=_mock_response,
     )
-    mocker.patch.object(ShapesService, "_SHAPES_DB", _MOCK_SHAPES_DB)
+    mocker.patch.object(ShapesService, "_SHAPES_STORE", _MOCK_SHAPES_STORE)
 
 
 @pytest.mark.integration
@@ -594,20 +594,6 @@ async def test_validator_no_data_graph(client: _TestClient, mocks: Any) -> None:
 
 
 @pytest.mark.integration
-async def test_validator_empty_multipart(client: _TestClient, mocks: Any) -> None:
-    r"""Should return status 400 and message \"No input.\"."""
-    with MultipartWriter("mixed") as mpwriter:
-        pass
-
-    resp = await client.post("/validator", data=mpwriter)
-    assert resp.status == 400, "Wrong status code."
-    assert "application/json" in resp.headers[hdrs.CONTENT_TYPE], "Wrong content-type."
-
-    body = await resp.json()
-    assert "No input." in body["detail"], "Wrong message."
-
-
-@pytest.mark.integration
 async def test_validator_no_input(client: _TestClient, mocks: Any) -> None:
     r"""Should return status 415 and message \"multipart/* content type expected, got Content-Type\"."""
     resp = await client.post("/validator")
@@ -754,7 +740,7 @@ async def test_validator_data_graph_empty(client: _TestClient, mocks: Any) -> No
 async def test_validator_connection_error_caused_by_bad_url(
     client: _TestClient, mocks: Any
 ) -> None:
-    r"""Should return status 400 and message \"Could not connect to http://slfkjasdf\"."""
+    r"""Should return status 400 and message \"Could not fetch remote graph from http://slfkjasdf\"."""
     data_graph_url = "http://slfkjasdf"
     shapes_graph_file = "tests/files/mock_dcat-ap-no-shacl_shapes_2.00.ttl"
 
@@ -771,7 +757,9 @@ async def test_validator_connection_error_caused_by_bad_url(
     assert "application/json" in resp.headers[hdrs.CONTENT_TYPE], "Wrong content-type."
 
     body = await resp.json()
-    assert "Could not connect to http://slfkjasdf" in body["detail"], "Wrong message."
+    assert (
+        "Could not fetch remote graph from http://slfkjasdf" in body["detail"]
+    ), "Wrong message."
 
 
 @pytest.mark.integration

@@ -6,8 +6,8 @@ import traceback
 from aiohttp import hdrs, web
 from rdflib import Graph
 from rdflib.plugin import PluginException
-from requests.exceptions import RequestException
 
+from dcat_ap_no_validator_service.adapter import FetchError
 from dcat_ap_no_validator_service.service import Config, ValidatorService
 
 
@@ -84,8 +84,6 @@ class Validator(web.View):
                 pass
 
         # check if we got any input:
-        if len(data_graph_matrix) + len(shapes_graph_matrix) == 0:
-            raise web.HTTPBadRequest(reason="No input.")
         # validate data-graph input:
         if len(data_graph_matrix) == 0:
             raise web.HTTPBadRequest(reason="No data graph in input.")
@@ -109,9 +107,9 @@ class Validator(web.View):
                 shapes_graph=shapes_graph,
                 config=config,
             )
-        except RequestException:
+        except FetchError as e:
             logging.debug(traceback.format_exc())
-            raise web.HTTPBadRequest(reason=f"Could not connect to {data_graph_url}")
+            raise web.HTTPBadRequest(reason=str(e))
         except SyntaxError:
             logging.debug(traceback.format_exc())
             raise web.HTTPBadRequest(reason="Bad syntax in input graph.")

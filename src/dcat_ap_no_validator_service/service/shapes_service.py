@@ -5,7 +5,7 @@ from typing import Any, Dict
 class ShapesService:
     """Class representing shapes service."""
 
-    _SHAPES_DB: Dict[str, Dict] = dict(
+    _SHAPES_STORE: Dict[str, Dict] = dict(
         {
             "1": {
                 "id": "1",
@@ -19,7 +19,7 @@ class ShapesService:
             },
             "2": {
                 "id": "2",
-                "name": "DCAT-AP-NO",
+                "name": "The constraints of DCAT-AP-NO",
                 "description": "This document specifies the constraints on properties and classes expressed by DCAT-AP-NO in SHACL.",  # noqa
                 "version": "0.1",
                 "url": "https://raw.githubusercontent.com/Informasjonsforvaltning/dcat-ap-no/v2/shacl/DCAT-AP-NO-shacl_shapes_2.00.ttl",  # noqa
@@ -32,10 +32,10 @@ class ShapesService:
 
     async def get_all_shapes(self) -> list:
         """Get all shapes graphs function."""
-        return list(ShapesService._SHAPES_DB.values())
+        return list(ShapesService._SHAPES_STORE.values())
 
     async def get_shapes_by_id(self, id: str) -> Any:
         """Get unique shapes graph function."""
-        if id in self._SHAPES_DB:
-            return ShapesService._SHAPES_DB[id]
+        if id in self._SHAPES_STORE:
+            return ShapesService._SHAPES_STORE[id]
         return None

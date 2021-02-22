@@ -9,7 +9,7 @@ from pytest_mock import MockFixture
 from dcat_ap_no_validator_service.service import ShapesService
 
 
-_MOCK_SHAPES_DB: Dict[str, Dict] = dict(
+_MOCK_SHAPES_STORE: Dict[str, Dict] = dict(
     {
         "1": {"id": "1", "name": "DCAT-AP-NO", "version": "1.1"},
         "2": {"id": "2", "name": "DCAT-AP-NO", "version": "2.0"},
@@ -21,7 +21,7 @@ _MOCK_SHAPES_DB: Dict[str, Dict] = dict(
 def mocked_response(mocker: MockFixture) -> Any:
     """Patch the in memory shapes db."""
     # Set up the mock
-    mocker.patch.object(ShapesService, "_SHAPES_DB", _MOCK_SHAPES_DB)
+    mocker.patch.object(ShapesService, "_SHAPES_STORE", _MOCK_SHAPES_STORE)
 
 
 @pytest.mark.integration

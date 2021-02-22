@@ -6,10 +6,9 @@ from typing import Any, Tuple
 
 from pyshacl import validate
 from rdflib import Graph, RDF, URIRef
-from requests.exceptions import RequestException
 
 
-from dcat_ap_no_validator_service.adapter import fetch_graph, parse_text
+from dcat_ap_no_validator_service.adapter import fetch_graph, FetchError, parse_text
 
 SUPPORTED_FORMATS = set(["text/turtle", "application/ld+json", "application/rdf+xml"])
 
@@ -105,7 +104,7 @@ class ValidatorService:
                             g = fetch_graph(o)
                             if g:
                                 self.ontology_graph += g
-                        except RequestException:
+                        except FetchError:
                             logging.debug(traceback.format_exc())
                             pass
 
@@ -122,6 +121,6 @@ class ValidatorService:
                     g = fetch_graph(o)
                     if g:
                         self.ontology_graph += g
-                except RequestException:
+                except FetchError:
                     logging.debug(traceback.format_exc())
                     pass
