@@ -30,9 +30,11 @@ class ShapesService:
         }
     )
 
-    async def get_all_shapes(self) -> list:
+    async def get_all_shapes(self) -> dict:
         """Get all shapes graphs function."""
-        return list(ShapesService._SHAPES_STORE.values())
+        collection = dict()
+        collection["shapes"] = list(ShapesService._SHAPES_STORE.values())
+        return collection
 
     async def get_shapes_by_id(self, id: str) -> Any:
         """Get unique shapes graph function."""

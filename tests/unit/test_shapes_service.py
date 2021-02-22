@@ -19,9 +19,11 @@ async def test_get_shapes(mocker: MockFixture) -> None:
     """Should return a non-empyt graph."""
     mocker.patch.object(ShapesService, "_SHAPES_STORE", _MOCK_SHAPES_STORE)
     shapes_collection = await ShapesService().get_all_shapes()
-    assert type(shapes_collection) == list
-    assert len(shapes_collection) == 2
-    for s in shapes_collection:
+    assert type(shapes_collection) == dict
+    assert "shapes" in shapes_collection
+    assert type(shapes_collection["shapes"]) == list
+    assert len(shapes_collection["shapes"]) == 2
+    for s in shapes_collection["shapes"]:
         assert s == _MOCK_SHAPES_STORE[s["id"]]
 
 
