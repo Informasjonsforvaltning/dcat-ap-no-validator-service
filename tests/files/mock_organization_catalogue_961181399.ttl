@@ -1,9 +1,10 @@
-@prefix br:    <https://github.com/Informasjonsforvaltning/organization-catalogue/blob/develop/src/main/resources/ontology/organization-catalogue.owl#> .
+@prefix br:    <https://raw.githubusercontent.com/Informasjonsforvaltning/organization-catalogue/master/src/main/resources/ontology/organization-catalogue.owl#> .
 @prefix dct:   <http://purl.org/dc/terms/> .
 @prefix adms:  <http://www.w3.org/ns/adms#> .
 @prefix org:   <http://www.w3.org/ns/org#> .
 @prefix rov:   <http://www.w3.org/ns/regorg#> .
 @prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
+@prefix brskos: <https://raw.githubusercontent.com/Informasjonsforvaltning/organization-catalogue/master/src/main/resources/ontology/org-status.ttl#> .
 @prefix foaf:  <http://xmlns.com/foaf/0.1/> .
 
 <https://organization-catalogue.fellesdatakatalog.digdir.no/organizations/961181399>
@@ -11,6 +12,7 @@
         dct:identifier         "961181399" ;
         org:subOrganizationOf  <https://organization-catalogue.fellesdatakatalog.digdir.no/organizations/972417866> ;
         rov:legalName          "ARKIVVERKET" ;
+        rov:orgStatus          brskos:NormalAktivitet ;
         rov:orgType            [ a               skos:Concept ;
                                  skos:prefLabel  "ORGL"
                                ] ;

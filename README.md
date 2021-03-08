@@ -21,7 +21,7 @@ Response will be a RDF graph consisting of
  -H "Accept: text/turtle" \
  -H "Content-Type: multipart/form-data" \
  -F "data-graph-file=@tests/files/valid_catalog.ttl;type=text/turtle" \
- -F "shapes-graph-file=@dcat-ap-no-shacl_shapes_2.00.ttl" \
+ -F "shapes-graph-file=@tests/files/mock_dcat-ap-no-shacl_shapes_2.00.ttl" \
  -X POST http://localhost:8000/validator
 ```
 ### Validate endpoint(url)
@@ -30,7 +30,7 @@ Response will be a RDF graph consisting of
  -H "Accept: text/turtle" \
  -H "Content-Type: multipart/form-data" \
  -F "data-graph-url=https://example.com/mygraph" \
- -F "shapes-graph-file=@dcat-ap-no-shacl_shapes_2.00.ttl" \
+ -F "shapes-graph-file=@tests/files/mock_dcat-ap-no-shacl_shapes_2.00.ttl" \
  -X POST http://localhost:8000/validator
 ```
 ### With config parameters:
@@ -39,7 +39,7 @@ Response will be a RDF graph consisting of
  -H "Accept: text/turtle" \
  -H "Content-Type: multipart/form-data" \
  -F "data-graph-file=@tests/files/valid_catalog.ttl;type=text/turtle" \
- -F "shapes-graph-file=@dcat-ap-no-shacl_shapes_2.00.ttl" \
+ -F "shapes-graph-file=@tests/files/mock_dcat-ap-no-shacl_shapes_2.00.ttl" \
  -F "config=@tests/files/config.json;type=application/json" \
 -X POST http://localhost:8000/validator
 ```

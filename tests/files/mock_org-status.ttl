@@ -1,0 +1,10 @@
+@prefix brskos:     <https://raw.githubusercontent.com/Informasjonsforvaltning/organization-catalogue/master/src/main/resources/ontology/org-status.ttl#> .
+@prefix skos:       <http://www.w3.org/2004/02/skos/core#> .
+
+brskos:NormalAktivitet
+    a               skos:Concept ;
+    skos:prefLabel  "Normal aktivitet"@nb , "Normal aktivitet"@nn , "Normal activity"@en .
+
+brskos:Avviklet
+    a               skos:Concept ;
+    skos:prefLabel  "Avviklet"@nb , "Avvikla"@nn , "Liquidated"@en .

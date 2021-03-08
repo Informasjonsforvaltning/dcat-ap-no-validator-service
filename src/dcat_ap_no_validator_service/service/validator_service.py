@@ -113,7 +113,11 @@ class ValidatorService:
         # TODO: this loop should be parallellized
         # TODO: discover relevant ontologies dynamically, should be cached
         # TODO: cover with proper tests
-        ontologies = ["https://www.w3.org/ns/regorg", "https://www.w3.org/ns/org"]
+        ontologies = [
+            "https://www.w3.org/ns/regorg",
+            "https://www.w3.org/ns/org",
+            "https://raw.githubusercontent.com/Informasjonsforvaltning/organization-catalogue/master/src/main/resources/ontology/org-status.ttl",  # noqa
+        ]
         for o in ontologies:
             if (o, None, None) not in self.ontology_graph:
                 logging.debug(f"Trying to add remote ontology {o}")

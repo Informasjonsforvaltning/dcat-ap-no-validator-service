@@ -1,7 +1,5 @@
 """Integration test cases for the ready route."""
-from collections import namedtuple
 import json
-import logging
 from typing import Any, Dict
 
 from aiohttp import hdrs, MultipartWriter
@@ -23,13 +21,84 @@ _MOCK_SHAPES_STORE: Dict[str, Dict] = dict(
 
 
 @pytest.fixture(scope="function")
-def mocks(mocker: MockFixture) -> Any:
+def mocks(requests_mock: Any, mocker: MockFixture) -> Any:
     """Patch the call to requests.get."""
     # Set up the mocks
-    mocker.patch(
-        "dcat_ap_no_validator_service.adapter.remote_graph_adapter.requests.get",
-        side_effect=_mock_response,
+    with open("tests/files/mock_organization_catalogue_961181399.ttl", "r") as file:
+        org_961181399 = file.read()
+    requests_mock.get(
+        "https://organization-catalogue.fellesdatakatalog.digdir.no/organizations/961181399",
+        text=org_961181399,
     )
+    with open("tests/files/mock_los_tema_barnehage.xml", "r") as file:
+        los = file.read()
+    requests_mock.get(
+        "https://psi.norge.no/los/tema/barnehage",
+        text=los,
+    )
+    with open("tests/files/mock_data_theme_GOVE.xml", "r") as file:
+        theme = file.read()
+    requests_mock.get(
+        "http://publications.europa.eu/resource/authority/data-theme/GOVE",
+        text=theme,
+    )
+    with open("tests/files/mock_organization_catalogue_991825827.ttl", "r") as file:
+        org_991825827 = file.read()
+    requests_mock.get(
+        "https://organization-catalogue.fellesdatakatalog.digdir.no/organizations/991825827",
+        text=org_991825827,
+    )
+    with open("tests/files/mock_regorg.ttl", "r") as file:
+        regorg = file.read()
+    requests_mock.get(
+        "https://www.w3.org/ns/regorg",
+        text=regorg,
+    )
+    with open("tests/files/mock_org.ttl", "r") as file:
+        org = file.read()
+    requests_mock.get(
+        "https://www.w3.org/ns/org",
+        text=org,
+    )
+    requests_mock.get(
+        "https://example.com/graphs/not_found_graph",
+        status_code=404,
+    )
+    requests_mock.get(
+        "http://slfkjasdf",
+        exc=RequestException("Failure in name resolution for http://slfkjasdf"),
+    )
+    requests_mock.get(
+        "https://example.com/nograph",
+        exc=RequestException(
+            "Failure in name resolution for https://example.com/nograph"
+        ),
+    )
+    with open("tests/files/invalid_rdf.txt", "r") as file:
+        invalid_rdf = file.read()
+    requests_mock.get(
+        "https://example.com/non_parsable_graph",
+        text=invalid_rdf,
+    )
+    with open("tests/files/valid_catalog.json", "r") as file:
+        valid_catalog_json = file.read()
+    requests_mock.get(
+        "https://example.com/datagraphs/valid_catalog.json",
+        text=valid_catalog_json,
+    )
+    with open("tests/files/valid_catalog.ttl", "r") as file:
+        valid_catalog = file.read()
+    requests_mock.get(
+        "https://example.com/datagraphs/valid_catalog.ttl",
+        text=valid_catalog,
+    )
+    with open("tests/files/mock_org-status.ttl", "r") as file:
+        valid_catalog = file.read()
+    requests_mock.get(
+        "https://raw.githubusercontent.com/Informasjonsforvaltning/organization-catalogue/master/src/main/resources/ontology/org-status.ttl",  # noqa
+        text=valid_catalog,
+    )
+    # Patch the Shapes graph store:
     mocker.patch.object(ShapesService, "_SHAPES_STORE", _MOCK_SHAPES_STORE)
 
 
@@ -835,83 +904,6 @@ async def _assess_response_body_unsuccessful(
         _dump_diff(g1, g2)
         pass
     assert not _isomorphic, "result_graph is not correct"
-
-
-# ------------------ #
-# Mocks
-
-
-def _mock_response(url: str, headers: dict) -> tuple:
-    """Return mocked response depending on input url."""
-    t = namedtuple("t", ("text", "status_code", "headers"))
-    text = ""
-    status_code = 200
-    content_type = "text/plain"
-    # breakpoint()
-    logging.debug(f"Got request for url {url}")
-    if (
-        str(url)
-        == "https://organization-catalogue.fellesdatakatalog.digdir.no/organizations/961181399"
-    ):
-        with open("tests/files/mock_organization_catalogue_961181399.ttl", "r") as file:
-            text = file.read()
-        content_type = "text/turtle"
-    elif (
-        str(url)
-        == "https://organization-catalogue.fellesdatakatalog.digdir.no/organizations/991825827"
-    ):
-        with open("tests/files/mock_organization_catalogue_991825827.ttl", "r") as file:
-            text = file.read()
-        content_type = "text/turtle"
-    elif str(url) == "http://publications.europa.eu/resource/authority/data-theme/GOVE":
-        with open("tests/files/mock_data_theme_GOVE.xml", "r") as file:
-            text = file.read()
-        content_type = "application/rdf+xml"
-    elif str(url) == "https://psi.norge.no/los/tema/barnehage":
-        with open("tests/files/mock_los_tema_barnehage.xml", "r") as file:
-            text = file.read()
-        content_type = "application/rdf+xml"
-    elif str(url) == "https://www.w3.org/ns/regorg":
-        with open("tests/files/mock_regorg.ttl", "r") as file:
-            text = file.read()
-        content_type = "text/turtle"
-    elif str(url) == "https://www.w3.org/ns/org":
-        with open("tests/files/mock_org.ttl", "r") as file:
-            text = file.read()
-        content_type = "text/turtle"
-    elif str(url) == "https://data.brreg.no/enhetsregisteret/api/enheter/961181399":
-        with open("tests/files/mock_enhetsregisteret_961181399.json", "r") as file:
-            text = file.read()
-        content_type = "application/json"
-    elif str(url) == "https://data.brreg.no/enhetsregisteret/api/enheter/991825827":
-        with open("tests/files/mock_enhetsregisteret_991825827.json", "r") as file:
-            text = file.read()
-        content_type = "application/json"
-    elif str(url) == "https://example.com/nograph":
-        raise RequestException(f"Failure in name resolution for {url}")
-    elif str(url) == "https://example.com/graphs/not_found_graph":
-        status_code = 404
-        content_type = "text/plain"
-    elif str(url) == "https://example.com/non_parsable_graph":
-        with open("tests/files/invalid_rdf.txt", "r") as file:
-            text = file.read()
-        status_code = 200
-        content_type = "text/plain"
-    elif str(url) == "https://example.com/datagraphs/valid_catalog.ttl":
-        with open("tests/files/valid_catalog.ttl", "r") as file:
-            text = file.read()
-        status_code = 200
-        content_type = "text/turtle"
-    elif str(url) == "https://example.com/datagraphs/valid_catalog.json":
-        with open("tests/files/valid_catalog.json", "r") as file:
-            text = file.read()
-        status_code = 200
-        content_type = "application/ld+json"
-    elif str(url) == "http://slfkjasdf":
-        raise RequestException(f"Failure in name resolution for {url}")
-    else:
-        raise Exception(f"Not able to return mock response for url {url}")
-    return t(text=text, status_code=status_code, headers={"content-type": content_type})
 
 
 # ---------------------------------------------------------------------- #

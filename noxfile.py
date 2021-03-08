@@ -25,6 +25,7 @@ def unit_tests(session: Session) -> None:
         "pytest",
         "pytest-mock",
         "pytest-aiohttp",
+        "pytest-profiling",
     )
     session.run(
         "pytest",
@@ -46,6 +47,8 @@ def integration_tests(session: Session) -> None:
         "pytest-cov",
         "pytest-mock",
         "pytest-aiohttp",
+        "pytest-profiling",
+        "requests-mock",
     )
     session.run(
         "pytest",

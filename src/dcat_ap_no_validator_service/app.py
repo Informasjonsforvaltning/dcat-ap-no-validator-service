@@ -36,4 +36,6 @@ async def create_app() -> web.Application:
         datefmt="%H:%M:%S",
         level=LOGGING_LEVEL,
     )
+    logging.getLogger("chardet.charsetprober").setLevel(logging.INFO)
+
     return app
