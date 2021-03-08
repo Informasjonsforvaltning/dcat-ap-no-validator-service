@@ -61,7 +61,10 @@ class Validator(web.View):
             if Part(part.name) is Part.DATA_GRAPH_FILE:
                 # Process any files you uploaded
                 logging.debug(f"Got input data graph with filename: {part.filename}")
-                data_graph = (await part.read()).decode()
+                try:
+                    data_graph = (await part.read()).decode()
+                except ValueError:
+                    raise web.HTTPBadRequest(reason="Data graph file is not readable.")
                 # logging.debug(f"Content of {part.filename}:\n{data_graph}")
                 data_graph_matrix[part.name] = part.filename
                 pass
@@ -78,7 +81,12 @@ class Validator(web.View):
             if Part(part.name) is Part.SHAPES_GRAPH_FILE:
                 # Process any files you uploaded
                 logging.debug(f"Got input shapes graph with filename: {part.filename}")
-                shapes_graph = (await part.read()).decode()
+                try:
+                    shapes_graph = (await part.read()).decode()
+                except ValueError:
+                    raise web.HTTPBadRequest(
+                        reason="Shapes graph file is not readable."
+                    )
                 # logging.debug(f"Content of {part.filename}:\n{shapes_graph}")
                 shapes_graph_matrix[part.name] = part.filename
                 pass

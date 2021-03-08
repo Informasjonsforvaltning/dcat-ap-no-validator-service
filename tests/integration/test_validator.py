@@ -764,12 +764,6 @@ async def test_validator_file_bad_syntax(client: _TestClient, mocks: Any) -> Non
         p.set_content_disposition(
             "attachment", name="data-graph-file", filename=data_graph_file
         )
-
-    with MultipartWriter("mixed") as mpwriter:
-        p = mpwriter.append(open(data_graph_file, "rb"))
-        p.set_content_disposition(
-            "attachment", name="data-graph-file", filename=data_graph_file
-        )
         p = mpwriter.append(open(shapes_graph_file, "rb"))
         p.set_content_disposition(
             "attachment", name="shapes-graph-file", filename=shapes_graph_file
@@ -853,6 +847,58 @@ async def test_validator_data_graph_url_references_not_found_url(
 
     body = await resp.json()
     assert "Data graph cannot be empty." in body["detail"], "Wrong message."
+
+
+@pytest.mark.integration
+async def test_validator_data_graph_file_file_not_readable(
+    client: _TestClient, mocks: Any
+) -> None:
+    r"""Should return status 400 and message \"Data graph file is not readable.\"."""
+    data_graph_file = "tests/files/not_readable_file.pdf"
+    shapes_graph_file = "tests/files/mock_dcat-ap-no-shacl_shapes_2.00.ttl"
+
+    with MultipartWriter("mixed") as mpwriter:
+        p = mpwriter.append(open(data_graph_file, "rb"))
+        p.set_content_disposition(
+            "attachment", name="data-graph-file", filename=data_graph_file
+        )
+        p = mpwriter.append(open(shapes_graph_file, "rb"))
+        p.set_content_disposition(
+            "attachment", name="shapes-graph-file", filename=shapes_graph_file
+        )
+
+    resp = await client.post("/validator", data=mpwriter)
+    assert resp.status == 400, "Wrong status code."
+    assert "application/json" in resp.headers[hdrs.CONTENT_TYPE], "Wrong content-type."
+
+    body = await resp.json()
+    assert "Data graph file is not readable." in body["detail"], "Wrong message."
+
+
+@pytest.mark.integration
+async def test_validator_shapes_graph_file_file_not_readable(
+    client: _TestClient, mocks: Any
+) -> None:
+    r"""Should return status 400 and message \"Shapes graph file is not readable.\"."""
+    data_graph_file = "tests/files/valid_catalog.ttl"
+    shapes_graph_file = "tests/files/not_readable_file.pdf"
+
+    with MultipartWriter("mixed") as mpwriter:
+        p = mpwriter.append(open(data_graph_file, "rb"))
+        p.set_content_disposition(
+            "attachment", name="data-graph-file", filename=data_graph_file
+        )
+        p = mpwriter.append(open(shapes_graph_file, "rb"))
+        p.set_content_disposition(
+            "attachment", name="shapes-graph-file", filename=shapes_graph_file
+        )
+
+    resp = await client.post("/validator", data=mpwriter)
+    assert resp.status == 400, "Wrong status code."
+    assert "application/json" in resp.headers[hdrs.CONTENT_TYPE], "Wrong content-type."
+
+    body = await resp.json()
+    assert "Shapes graph file is not readable." in body["detail"], "Wrong message."
 
 
 # -- Helper methods
