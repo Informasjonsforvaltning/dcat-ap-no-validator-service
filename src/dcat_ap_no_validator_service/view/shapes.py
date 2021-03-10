@@ -1,61 +1,27 @@
 """Resource module for liveness resources."""
-import logging
 
-from aiohttp import hdrs, web
-from rdflib.plugin import PluginException
+from aiohttp import web
 
 from dcat_ap_no_validator_service.service import ShapesService
 
 
-class Shapes(web.View):
+class ShapesCollection(web.View):
     """Class representing a collecion of shapes resource."""
 
     async def get(self) -> web.Response:
         """Shapes route function."""
-        try:
-            shapes = await ShapesService().get_all_shapes()
-        except Exception as e:
-            logging.error(f"Exception: {e}")
-            raise web.HTTPInternalServerError
-
-        logging.debug(f"accept header: {self.request.headers[hdrs.ACCEPT]}")
-        accept_header = self.request.headers[hdrs.ACCEPT]
-        # If no accept-header or if accept-header contains */*, we default to turtle:
-        if hdrs.ACCEPT not in self.request.headers or "*/*" in accept_header:
-            accept_header = "text/turtle"
-
-        try:
-            return web.Response(
-                body=shapes.serialize(format=accept_header), content_type=accept_header
-            )
-        except PluginException:
-            raise web.HTTPNotAcceptable
+        shapes = await ShapesService().get_all_shapes()
+        return web.json_response(shapes)
 
 
-class Shape(web.View):
-    """Class representing a single shape resource."""
+class Shapes(web.View):
+    """Class representing a single shapes resource."""
 
     async def get(self) -> web.Response:
         """Shape route function."""
         id = self.request.match_info["id"]
-        try:
-            shape = await ShapesService().get_shapes_by_id(id)
-        except Exception as e:
-            logging.error(f"Exception: {e}")
-            raise web.HTTPInternalServerError
+        shape = await ShapesService().get_shapes_by_id(id)
 
-        if len(shape) == 0:
-            raise web.HTTPNotFound
-
-        logging.debug(f"accept header: {self.request.headers[hdrs.ACCEPT]}")
-        accept_header = self.request.headers[hdrs.ACCEPT]
-        # If no accept-header or if accept-header contains */*, we default to turtle:
-        if hdrs.ACCEPT not in self.request.headers or "*/*" in accept_header:
-            accept_header = "text/turtle"
-
-        try:
-            return web.Response(
-                body=shape.serialize(format=accept_header), content_type=accept_header
-            )
-        except PluginException:
-            raise web.HTTPNotAcceptable
+        if shape:
+            return web.json_response(shape)
+        raise web.HTTPNotFound

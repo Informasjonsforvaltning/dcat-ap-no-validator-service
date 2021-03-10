@@ -6,8 +6,8 @@ import traceback
 from aiohttp import hdrs, web
 from rdflib import Graph
 from rdflib.plugin import PluginException
-from requests.exceptions import RequestException
 
+from dcat_ap_no_validator_service.adapter import FetchError
 from dcat_ap_no_validator_service.service import Config, ValidatorService
 
 
@@ -18,6 +18,7 @@ class Part(str, Enum):
     DATA_GRAPH_URL = "data-graph-url"
     DATA_GRAPH_FILE = "data-graph-file"
     SHAPES_GRAPH_FILE = "shapes-graph-file"
+    SHAPES_GRAPH_URL = "shapes-graph-url"
 
 
 class Validator(web.View):
@@ -32,12 +33,15 @@ class Validator(web.View):
             raise web.HTTPUnsupportedMediaType(
                 reason=f"multipart/* content type expected, got {hdrs.CONTENT_TYPE}"
             )
+
         # Iterate through each part of MultipartReader
-        url = None
-        data = None
-        shapes = None
+        data_graph_url = None
+        data_graph = None
+        shapes_graph = None
+        shapes_graph_url = None
         config = None
         data_graph_matrix = dict()
+        shapes_graph_matrix = dict()
         async for part in (await self.request.multipart()):
             logging.debug(f"part.name {part.name}")
             if Part(part.name) is Part.CONFIG:
@@ -49,39 +53,71 @@ class Validator(web.View):
 
             if Part(part.name) is Part.DATA_GRAPH_URL:
                 # Get data graph from url:
-                url = (await part.read()).decode()
-                logging.debug(f"Got reference to data graph with url: {url}")
-                data_graph_matrix[part.name] = url
+                data_graph_url = (await part.read()).decode()
+                logging.debug(f"Got reference to data graph with url: {data_graph_url}")
+                data_graph_matrix[part.name] = data_graph_url
                 pass
 
             if Part(part.name) is Part.DATA_GRAPH_FILE:
                 # Process any files you uploaded
-                logging.debug(f"Got input graph as file with filename: {part.filename}")
-                data = (await part.read()).decode()
-                logging.debug(f"Content of {part.filename}:\n{data}")
+                logging.debug(f"Got input data graph with filename: {part.filename}")
+                try:
+                    data_graph = (await part.read()).decode()
+                except ValueError:
+                    raise web.HTTPBadRequest(reason="Data graph file is not readable.")
+                # logging.debug(f"Content of {part.filename}:\n{data_graph}")
                 data_graph_matrix[part.name] = part.filename
+                pass
+
+            if Part(part.name) is Part.SHAPES_GRAPH_URL:
+                # Get data graph from url:
+                shapes_graph_url = (await part.read()).decode()
+                logging.debug(
+                    f"Got reference to shapes graph with url: {shapes_graph_url}"
+                )
+                shapes_graph_matrix[part.name] = shapes_graph_url
                 pass
 
             if Part(part.name) is Part.SHAPES_GRAPH_FILE:
                 # Process any files you uploaded
-                logging.debug(f"Got shacl from user with filename: {part.filename}")
-                shapes = (await part.read()).decode()
-                logging.debug(f"Content of {part.filename}:\n{shapes}")
+                logging.debug(f"Got input shapes graph with filename: {part.filename}")
+                try:
+                    shapes_graph = (await part.read()).decode()
+                except ValueError:
+                    raise web.HTTPBadRequest(
+                        reason="Shapes graph file is not readable."
+                    )
+                # logging.debug(f"Content of {part.filename}:\n{shapes_graph}")
+                shapes_graph_matrix[part.name] = part.filename
                 pass
 
+        # check if we got any input:
+        # validate data-graph input:
         if len(data_graph_matrix) == 0:
             raise web.HTTPBadRequest(reason="No data graph in input.")
         elif len(data_graph_matrix) > 1:
             logging.debug(f"Ambigious user input: {data_graph_matrix}")
             raise web.HTTPBadRequest(reason="Multiple data graphs in input.")
+        # validate shape-graph input:
+        if len(shapes_graph_matrix) == 0:
+            raise web.HTTPBadRequest(reason="No shapes graph in input.")
+        elif len(shapes_graph_matrix) > 1:
+            logging.debug(f"Ambigious user input: {shapes_graph_matrix}")
+            raise web.HTTPBadRequest(reason="Multiple shapes graphs in input.")
 
         # We have got data, now validate:
         try:
             # instantiate validator service:
-            service = ValidatorService(url=url, data=data, shapes=shapes, config=config)
-        except RequestException:
+            service = ValidatorService(
+                data_graph_url=data_graph_url,
+                data_graph=data_graph,
+                shapes_graph_url=shapes_graph_url,
+                shapes_graph=shapes_graph,
+                config=config,
+            )
+        except FetchError as e:
             logging.debug(traceback.format_exc())
-            raise web.HTTPBadRequest(reason=f"Could not connect to {url}")
+            raise web.HTTPBadRequest(reason=str(e))
         except SyntaxError:
             logging.debug(traceback.format_exc())
             raise web.HTTPBadRequest(reason="Bad syntax in input graph.")
@@ -127,8 +163,6 @@ class Validator(web.View):
 
 def _create_config(config: dict) -> Config:
     c = Config()
-    if "shapesId" in config:
-        c.shapes_id = config["shapesId"]
     if "expand" in config:
         if config["expand"]:
             c.expand = True

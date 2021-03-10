@@ -4,25 +4,38 @@ import logging
 from aiohttp import hdrs
 from rdflib import Graph
 import requests
+from requests.exceptions import RequestException
+
 
 SUPPORTED_FORMATS = set(["text/turtle", "application/ld+json", "application/rdf+xml"])
+
+
+class FetchError(Exception):
+    """Class representing custom exception for fetch method."""
+
+    def __init__(self, message: str) -> None:
+        """Initialize the error."""
+        # Call the base class constructor with the parameters it needs
+        super().__init__(message)
 
 
 def fetch_graph(url: str) -> Graph:
     """Fetch remote graph at url and return as Graph."""
     logging.debug(f"Trying to fetch remote graph {url}")
-    resp = requests.get(url, headers={hdrs.ACCEPT: "text/turtle"})
+    try:
+        resp = requests.get(url, headers={hdrs.ACCEPT: "text/turtle"})
+    except RequestException:
+        raise FetchError(f"Could not fetch remote graph from {url}")
+    logging.debug(f"Got status_code {resp.status_code}")
     if resp.status_code == 200:
         try:
             g = parse_text(input_graph=resp.text)
-            logging.debug(
-                f"Got valid remote graph from parse_text\n{g.serialize().decode()}"
-            )
+            logging.debug(f"Got valid remote graph from {url}")
             return g
         except SyntaxError:
-            return Graph()
+            return None
     else:
-        return Graph()
+        return None
 
 
 def parse_text(input_graph: str) -> Graph:

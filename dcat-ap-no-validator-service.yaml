@@ -36,6 +36,10 @@ paths:
                     type: string
                     format: binary
                     description: a file containing one or more [SHACL-shapes](https://www.w3.org/TR/shacl/#shapes-graph) the data graph should be validated against
+                  shapes-graph-url:
+                    type: string
+                    format: uri
+                    description: a url pointing to the [shapes graph](https://www.w3.org/TR/shacl/#shapes-graph) on the internet
             encoding:
               file:
                 contentType: text/turtle
@@ -54,17 +58,17 @@ paths:
                 type: string
   /shapes:
     get:
-      description: returns a list of shape graphs the validator can execute
+      description: returns a list of default shapes graphs the validator can execute
       responses:
         200:
           description: OK
           content:
-            text/turtle:
+            application/json:
               schema:
-                type: string
+               $ref: '#/components/schemas/ShapesGraphCollection'
   /shapes/{id}:
     get:
-      description: returns the content of a shape graph given by id
+      description: returns the content of a shapes graph given by id
       parameters:
       - name: id
         in: path
@@ -72,22 +76,19 @@ paths:
         required: true
         schema:
           type: string
+          format: uuid
       responses:
         200:
           description: OK
           content:
-            text/turtle:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/ShapesGraph'
 components:
   schemas:
     Config:
       type: object
       properties:
-        shapesId:
-          type: string
-          default: "2"
-          description: an identifier of the set of rules (shapes) to be validated against
         expand:
           type: boolean
           default: true
@@ -96,3 +97,40 @@ components:
           type: boolean
           default: false
           description: whether service should return remote triples referenced by input graph
+    ShapesGraphCollection:
+      type: object
+      properties:
+        shapes:
+          type: array
+          items:
+            $ref: '#/components/schemas/ShapesGraph'
+    ShapesGraph:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: generated unique id for the shapes graph
+        name:
+          type: string
+          description: The official name of the shapes graph
+        description:
+          type: string
+          description: A description of the shapes graph
+        version:
+          type: string
+          description: Version of the shapes graph
+        url:
+          type: string
+          format: uri
+          description: URL to where the shapes graph is published
+        specificationName:
+          type: string
+          description: Name of he specification the shapes graph enforces
+        specificationVersion:
+          type: string
+          description: Version of he specification the shapes graph enforces
+        specificationUrl:
+          type: string
+          format: uri
+          description: URL to the specification the shapes graph enforces

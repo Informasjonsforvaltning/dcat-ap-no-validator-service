@@ -6,7 +6,7 @@ from aiohttp import web
 from aiohttp_middlewares import cors_middleware, error_middleware
 from dotenv import load_dotenv
 
-from .view import Ping, Ready, Shape, Shapes, Validator
+from .view import Ping, Ready, Shapes, ShapesCollection, Validator
 
 load_dotenv()
 LOGGING_LEVEL = os.getenv("LOGGING_LEVEL", "INFO")
@@ -25,8 +25,8 @@ async def create_app() -> web.Application:
             web.view("/ping", Ping),
             web.view("/ready", Ready),
             web.view("/validator", Validator),
-            web.view("/shapes", Shapes),
-            web.view("/shapes/{id}", Shape),
+            web.view("/shapes", ShapesCollection),
+            web.view("/shapes/{id}", Shapes),
         ]
     )
 
@@ -36,4 +36,6 @@ async def create_app() -> web.Application:
         datefmt="%H:%M:%S",
         level=LOGGING_LEVEL,
     )
+    logging.getLogger("chardet.charsetprober").setLevel(logging.INFO)
+
     return app

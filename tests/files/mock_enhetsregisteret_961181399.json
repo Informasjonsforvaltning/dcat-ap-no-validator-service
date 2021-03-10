@@ -1,1 +1,63 @@
-{"organisasjonsnummer":"961181399","navn":"ARKIVVERKET","organisasjonsform":{"kode":"ORGL","beskrivelse":"Organisasjonsledd","_links":{"self":{"href":"https://data.brreg.no/enhetsregisteret/api/organisasjonsformer/ORGL"}}},"hjemmeside":"www.arkivverket.no/","postadresse":{"land":"Norge","landkode":"NO","postnummer":"0806","poststed":"OSLO","adresse":["Postboks 4013 Ullevål stadion"],"kommune":"OSLO","kommunenummer":"0301"},"registreringsdatoEnhetsregisteret":"1995-08-09","registrertIMvaregisteret":true,"naeringskode1":{"beskrivelse":"Drift av arkiver","kode":"91.013"},"antallAnsatte":320,"overordnetEnhet":"972417866","forretningsadresse":{"land":"Norge","landkode":"NO","postnummer":"0862","poststed":"OSLO","adresse":["Sognsveien 221"],"kommune":"OSLO","kommunenummer":"0301"},"institusjonellSektorkode":{"kode":"6100","beskrivelse":"Statsforvaltningen"},"registrertIForetaksregisteret":false,"registrertIStiftelsesregisteret":false,"registrertIFrivillighetsregisteret":false,"konkurs":false,"underAvvikling":false,"underTvangsavviklingEllerTvangsopplosning":false,"maalform":"Bokmål","_links":{"self":{"href":"https://data.brreg.no/enhetsregisteret/api/enheter/961181399"},"overordnetEnhet":{"href":"https://data.brreg.no/enhetsregisteret/api/enheter/972417866"}}}
+{
+  "organisasjonsnummer": "961181399",
+  "navn": "ARKIVVERKET",
+  "organisasjonsform": {
+    "kode": "ORGL",
+    "beskrivelse": "Organisasjonsledd",
+    "_links": {
+      "self": {
+        "href": "https://data.brreg.no/enhetsregisteret/api/organisasjonsformer/ORGL"
+      }
+    }
+  },
+  "hjemmeside": "www.arkivverket.no/",
+  "postadresse": {
+    "land": "Norge",
+    "landkode": "NO",
+    "postnummer": "0806",
+    "poststed": "OSLO",
+    "adresse": [
+      "Postboks 4013 Ullevål stadion"
+    ],
+    "kommune": "OSLO",
+    "kommunenummer": "0301"
+  },
+  "registreringsdatoEnhetsregisteret": "1995-08-09",
+  "registrertIMvaregisteret": true,
+  "naeringskode1": {
+    "beskrivelse": "Drift av arkiver",
+    "kode": "91.013"
+  },
+  "antallAnsatte": 320,
+  "overordnetEnhet": "972417866",
+  "forretningsadresse": {
+    "land": "Norge",
+    "landkode": "NO",
+    "postnummer": "0862",
+    "poststed": "OSLO",
+    "adresse": [
+      "Sognsveien 221"
+    ],
+    "kommune": "OSLO",
+    "kommunenummer": "0301"
+  },
+  "institusjonellSektorkode": {
+    "kode": "6100",
+    "beskrivelse": "Statsforvaltningen"
+  },
+  "registrertIForetaksregisteret": false,
+  "registrertIStiftelsesregisteret": false,
+  "registrertIFrivillighetsregisteret": false,
+  "konkurs": false,
+  "underAvvikling": false,
+  "underTvangsavviklingEllerTvangsopplosning": false,
+  "maalform": "Bokmål",
+  "_links": {
+    "self": {
+      "href": "https://data.brreg.no/enhetsregisteret/api/enheter/961181399"
+    },
+    "overordnetEnhet": {
+      "href": "https://data.brreg.no/enhetsregisteret/api/enheter/972417866"
+    }
+  }
+}
