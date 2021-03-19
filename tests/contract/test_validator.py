@@ -476,7 +476,18 @@ async def test_validator_with_not_valid_file(http_service: Any) -> None:
                 sh:sourceShape [ sh:minCount 1 ;
                         sh:nodeKind sh:Literal ;
                         sh:path <http://purl.org/dc/terms/description> ;
-                        sh:severity sh:Violation ] ]
+                        sh:severity sh:Violation ] ],
+            [ a sh:ValidationResult ;
+                sh:focusNode <http://dataset-publisher:8080/datasets/1> ;
+                sh:resultMessage "Data-themes fra EU skal brukes for dcat:theme"@nb ;
+                sh:resultPath <http://www.w3.org/ns/dcat#theme> ;
+                sh:resultSeverity sh:Warning ;
+                sh:sourceConstraintComponent sh:QualifiedMinCountConstraintComponent ;
+                sh:sourceShape [ sh:message "Data-themes fra EU skal brukes for dcat:theme"@nb ;
+                        sh:path <http://www.w3.org/ns/dcat#theme> ;
+                        sh:qualifiedMinCount 1 ;
+                        sh:qualifiedValueShape [ sh:node <https://data.norge.no/specification/dcat-ap-no/#DataThemeRestriction> ] ;
+                        sh:severity sh:Warning ] ]
     .
     """
     with open(data_graph_file, "r") as file:
