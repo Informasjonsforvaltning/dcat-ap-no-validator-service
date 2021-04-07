@@ -1,0 +1,27 @@
+@prefix dcat: <http://www.w3.org/ns/dcat#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcard: <http://www.w3.org/2006/vcard/ns#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix rov: <http://www.w3.org/ns/regorg#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
+
+<http://dataset-publisher:8080/datasets/1> a dcat:Dataset ;
+    dct:identifier "1" ;
+    dct:title "Test dataset"@en ;
+    dct:description "A valid test dataset"@en ;
+    dct:publisher <https://organization-catalogue.fellesdatakatalog.digdir.no/organizations/961181399> ;
+    dct:creator <https://organization-catalogue.fellesdatakatalog.digdir.no/organizations/991825827> ;
+    dcat:theme <http://publications.europa.eu/resource/authority/data-theme/GOVE>,
+               <https://psi.norge.no/los/tema/barnehage> ;
+    dcat:distribution [ a dcat:Distribution ;
+                        dcat:accessURL <http://example.com/accessURL> ;
+                        dct:license <http://publications.europa.eu/resource/authority/licence/CNRI_PYTHON> ;
+      ] ;
+    .
+
+<http://publications.europa.eu/resource/authority/licence/CNRI_PYTHON> a dct:LicenseDocument .

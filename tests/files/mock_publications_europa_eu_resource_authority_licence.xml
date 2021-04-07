@@ -1,0 +1,642 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<rdf:RDF
+	xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+	xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+	xmlns:owl="http://www.w3.org/2002/07/owl#"
+	xmlns:skos="http://www.w3.org/2004/02/skos/core#"
+	xmlns:ns4="http://purl.org/dc/terms/"
+	xmlns:ns5="http://www.w3.org/2008/05/skos-xl#"
+	xmlns:ns6="http://publications.europa.eu/ontology/authority/" >
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence">
+    <rdf:type rdf:resource="http://www.w3.org/2004/02/skos/core#ConceptScheme" />
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Ontology" />
+    <rdfs:label xml:lang="en">Licence</rdfs:label>
+    <owl:imports rdf:resource="http://publications.europa.eu/ontology/euvoc" />
+    <rdfs:comment rdf:datatype="http://www.w3.org/2000/01/rdf-schema#Literal">Licence</rdfs:comment>
+    <owl:versionInfo>20201216-0</owl:versionInfo>
+    <skos:prefLabel xml:lang="en">Licence</skos:prefLabel>
+    <ns4:identifier>http://publications.europa.eu/resource/authority/licence</ns4:identifier>
+    <ns5:prefLabel rdf:nodeID="b65313603" />
+    <ns6:prefLabel xml:lang="en">Licence</ns6:prefLabel>
+    <ns6:table.id>licence</ns6:table.id>
+    <ns6:table.version.number>20201216-0</ns6:table.version.number>
+    <owl:versionIRI rdf:resource="http://publications.europa.eu/resource/authority/licence/20201216-0" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/CC0">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/CC_BY">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/CC_BYNC">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/CC_BYNCND">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/CC_BYNCSA">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/CC_BYND">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/CC_BYSA">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/COM_REUSE">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/GNU_FDL">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/ISA_OML">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/ODC_BL">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/ODC_BY">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/ODC_PDDL">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/OP_DATPRO">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/CC_BYNCND_1_0">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/CC_BYNCND_2_0">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/CC_BYNCND_2_5">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/CC_BYNCSA_3_0">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/CC_BYNCSA_4_0">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/CC_BYNC_3_0">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/CC_BYNC_4_0">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/CC_BYND_1_0">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/CC_BYND_2_0">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/CC_BYND_2_5">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/CC_BYSA_3_0">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/CC_BY_1_0">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/CC_BY_2_0">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/CC_BY_2_5">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/EUPL_1_0">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/CC_BYNCND_3_0">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/CC_BYNCSA_1_0">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/CC_BYNCSA_2_0">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/CC_BYNC_1_0">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/CC_BYNC_2_0">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/CC_BYND_3_0">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/CC_BYSA_1_0">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/CC_BYSA_2_0">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/CC_BYSA_4_0">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/CC_BY_3_0">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/CC_BYNCND_4_0">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/CC_BYNCSA_2_5">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/CC_BYNC_2_5">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/CC_BYND_4_0">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/CC_BYSA_2_5">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/CC_BY_4_0">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/EUPL_1_1">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/EUPL_1_2">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/CDDL_1_0">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/DLDE_BY_1_0">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/DLDE_ZERO_2_0">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/ECL_1_0">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/ECL_2_0">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/LILIQ_P_1_1">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/LPPL_1_3C">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/OGTSL">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/OSL_1_0">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/OSL_3_0">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/PYTHON_2_0">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/RPL_1_1">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/RPL_1_5">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/UCL_1_0">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/ZPL_2_0">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/BSL_1_0">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/CC_BY_3_0_NL">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/CECILL_2_1">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/CPAL_1_0">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/CPL_1_0">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/EFL_1_0">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/EFL_2">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/EPL_1_0">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/EPL_2_0">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/FAIR">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/FRAMEWORX_1_0">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/GNU_FDL_1_1">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/GNU_FDL_1_2">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/GPL_3_0">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/LPL_1_0">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/LPL_1_02">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/MPL_1_0">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/MPL_1_1">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/MPL_2_0">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/NTP">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/OFL_1_1">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/OPL_2_1">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/OSL_2_1">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/SIMPL_2_0">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/WXWINDOWS">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/APACHE_1_1">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/APACHE_2_0">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/APSL_2_0">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/ARTISTIC_1_0">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/ARTISTIC_2_0">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/BSD_2_CLAUSE">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/CC_BYSA_3_0_NL">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/ECOS_2_0">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/ENTESSA">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/HPND">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/IODL_2_0">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/LGPL_3_0">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/MOTOSOTO">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/OGL_1_0">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/OGL_NC">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/QPL_1_0">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/SLEEPYCAT">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/XNET">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/0BSD">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/BSD_3_CLAUSE">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/BSD_PLUS_PATENT">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/ISC">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/NASA_1_3">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/NLOD_1_0">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/NPOSL_3_0">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/OGL_3_0">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/VSL_1_0">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/APL_1_0">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/BSD_3_CLAUSE_LBNL">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/CC_PDM_1_0">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/DLDE_BY_2_0">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/GPL_2_0">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/HROD">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/LILIQ_RPLUS_1_1">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/MS_PL">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/NAUMEN">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/W3C">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/WATCOM_1_0">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/IODL_1_0">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <ns4:references rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/IPA">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/LILIQ_R_1_1">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/MIROS">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/MIT">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/MULTICS">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/NCSA">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/NGPL">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/NOKIA">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/OCLC_2_0">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/OGL_ROU_1_0">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/POSTGRE_SQL">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/RPSL_1_0">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/RSCPL">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/UPL_1_0">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/ZLIB">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/CC_BY_3_0_AT">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/CNRI_PYTHON">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/DLDE_BYNC_1_0">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/EU_DATAGRID">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/IPL_1_0">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/LGPL_2_1">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/MS_RL">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/OGL_2_0">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/PSEUL">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/SPL_1_0">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/AGPL_3_0">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/CATOSL_1_1">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/licence/PHP_3_0">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/licence" />
+  </rdf:Description>
+</rdf:RDF>

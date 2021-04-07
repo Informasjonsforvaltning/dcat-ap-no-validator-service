@@ -98,6 +98,19 @@ def mocks(requests_mock: Any, mocker: MockFixture) -> Any:
         "https://raw.githubusercontent.com/Informasjonsforvaltning/organization-catalogue/master/src/main/resources/ontology/org-status.ttl",  # noqa
         text=valid_catalog,
     )
+    with open(
+        "tests/files/mock_publications_europa_eu_resource_authority_licence.xml", "r"
+    ) as file:
+        valid_catalog = file.read()
+    requests_mock.get(
+        "http://publications.europa.eu/resource/authority/licence",  # noqa
+        text=valid_catalog,
+    )
+    requests_mock.get(
+        "http://example.com/accessURL",
+        status_code=404,
+    )
+
     # Patch the Shapes graph store:
     mocker.patch.object(ShapesService, "_SHAPES_STORE", _MOCK_SHAPES_STORE)
 
@@ -206,7 +219,7 @@ async def test_validator_file_full_config_all_true(
     """Should return OK."""
     data_graph_file = "tests/files/valid_catalog.ttl"
     shapes_graph_file = "tests/files/mock_dcat-ap-no-shacl_shapes_2.00.ttl"
-    config: dict = {"expand": True, "includeExpandedTriples": False}
+    config: dict = {"expand": True, "includeExpandedTriples": True}
 
     with MultipartWriter("mixed") as mpwriter:
         p = mpwriter.append(open(data_graph_file, "rb"))
@@ -466,10 +479,6 @@ async def test_validator_graph_references_non_parsable_graph(
     """Should return OK and unsuccessful validation."""
     data_graph_file = "tests/files/valid_catalog_references_non_parsable_graph.ttl"
     shapes_graph_file = "tests/files/mock_dcat-ap-no-shacl_shapes_2.00.ttl"
-    config: dict = {
-        "expand": "true",
-        "includeExpandedTriples": "false",
-    }
 
     with MultipartWriter("mixed") as mpwriter:
         p = mpwriter.append(open(data_graph_file, "rb"))
@@ -480,8 +489,6 @@ async def test_validator_graph_references_non_parsable_graph(
         p.set_content_disposition(
             "attachment", name="shapes-graph-file", filename=shapes_graph_file
         )
-        p = mpwriter.append_json(config)
-        p.set_content_disposition("inline", name="config")
 
     resp = await client.post("/validator", data=mpwriter)
     assert resp.status == 200
@@ -503,10 +510,6 @@ async def test_validator_graph_references_no_response_graph(
     """Should return OK and unsuccessful validation."""
     data_graph_file = "tests/files/valid_catalog_references_no_graph.ttl"
     shapes_graph_file = "tests/files/mock_dcat-ap-no-shacl_shapes_2.00.ttl"
-    config: dict = {
-        "expand": "true",
-        "includeExpandedTriples": "false",
-    }
 
     with MultipartWriter("mixed") as mpwriter:
         p = mpwriter.append(open(data_graph_file, "rb"))
@@ -517,8 +520,6 @@ async def test_validator_graph_references_no_response_graph(
         p.set_content_disposition(
             "attachment", name="shapes-graph-file", filename=shapes_graph_file
         )
-        p = mpwriter.append_json(config)
-        p.set_content_disposition("inline", name="config")
 
     resp = await client.post("/validator", data=mpwriter)
     assert resp.status == 200
@@ -540,10 +541,6 @@ async def test_validator_graph_references_not_found_graph(
     """Should return OK and unsuccessful validation."""
     data_graph_file = "tests/files/valid_catalog_references_not_found_graph.ttl"
     shapes_graph_file = "tests/files/mock_dcat-ap-no-shacl_shapes_2.00.ttl"
-    config: dict = {
-        "expand": "true",
-        "includeExpandedTriples": "false",
-    }
 
     with MultipartWriter("mixed") as mpwriter:
         p = mpwriter.append(open(data_graph_file, "rb"))
@@ -554,8 +551,6 @@ async def test_validator_graph_references_not_found_graph(
         p.set_content_disposition(
             "attachment", name="shapes-graph-file", filename=shapes_graph_file
         )
-        p = mpwriter.append_json(config)
-        p.set_content_disposition("inline", name="config")
 
     resp = await client.post("/validator", data=mpwriter)
     assert resp.status == 200
@@ -566,6 +561,37 @@ async def test_validator_graph_references_not_found_graph(
     with open(data_graph_file, "r") as file:
         text = file.read()
     await _assess_response_body_unsuccessful(
+        data=text, format="text/turtle", body=body, content_type="text/turtle"
+    )
+
+
+@pytest.mark.integration
+async def test_validator_graph_contains_distribution_with_eu_licence(
+    client: _TestClient, mocks: Any
+) -> None:
+    """Should return OK and successful validation."""
+    data_graph_file = "tests/files/valid_catalog_with_distribution.ttl"
+    shapes_graph_file = "tests/files/mock_dcat-ap-no-shacl_shapes_2.00.ttl"
+
+    with MultipartWriter("mixed") as mpwriter:
+        p = mpwriter.append(open(data_graph_file, "rb"))
+        p.set_content_disposition(
+            "attachment", name="data-graph-file", filename=data_graph_file
+        )
+        p = mpwriter.append(open(shapes_graph_file, "rb"))
+        p.set_content_disposition(
+            "attachment", name="shapes-graph-file", filename=shapes_graph_file
+        )
+
+    resp = await client.post("/validator", data=mpwriter)
+    assert resp.status == 200
+    assert resp.headers[hdrs.CONTENT_TYPE] == "text/turtle"
+
+    body = await resp.text()
+
+    with open(data_graph_file, "r") as file:
+        text = file.read()
+    await _assess_response_body_successful(
         data=text, format="text/turtle", body=body, content_type="text/turtle"
     )
 
