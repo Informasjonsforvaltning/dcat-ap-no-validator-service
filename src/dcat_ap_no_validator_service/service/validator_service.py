@@ -73,8 +73,8 @@ class ValidatorService:
         logging.debug(f"Validating with following config: {self.config}")
         # Add triples from remote predicates if user has asked for that:
         if self.config.expand is True:
-            self._expand_objects_triples()
             self._load_ontologies()
+            self._expand_objects_triples()
 
         # Validate!
         # `inference` should be set to one of the followoing {"none", "rdfs", "owlrl", "both"}
@@ -117,6 +117,7 @@ class ValidatorService:
             "https://www.w3.org/ns/regorg",
             "https://www.w3.org/ns/org",
             "https://raw.githubusercontent.com/Informasjonsforvaltning/organization-catalogue/master/src/main/resources/ontology/org-status.ttl",  # noqa
+            "http://publications.europa.eu/resource/authority/licence",
         ]
         for o in ontologies:
             if (o, None, None) not in self.ontology_graph:
