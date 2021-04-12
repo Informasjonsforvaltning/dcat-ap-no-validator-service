@@ -5,7 +5,7 @@ import traceback
 from typing import Any, Tuple
 
 from pyshacl import validate
-from rdflib import Graph, RDF, URIRef
+from rdflib import Graph, OWL, RDF, URIRef
 
 
 from dcat_ap_no_validator_service.adapter import fetch_graph, FetchError, parse_text
@@ -29,8 +29,9 @@ class ValidatorService:
         "data_graph_url",
         "shapes_graph",
         "shapes_graph_url",
-        "config",
         "ontology_graph",
+        "ontology_graph_url",
+        "config",
     )
 
     def __init__(
@@ -39,26 +40,37 @@ class ValidatorService:
         data_graph: Any,
         shapes_graph: Any,
         shapes_graph_url: Any,
+        ontology_graph_url: Any,
+        ontology_graph: Any,
         config: Config = None,
     ) -> None:
         """Initialize service instance."""
+        # Process data graph:
         self.data_graph_url = data_graph_url
         self.data_graph = (
             fetch_graph(data_graph_url)
             if self.data_graph_url
             else parse_text(data_graph)
         )
+        # Process shapes graph:
         self.shapes_graph_url = shapes_graph_url
         self.shapes_graph = (
             fetch_graph(shapes_graph_url)
             if self.shapes_graph_url
             else parse_text(shapes_graph)
         )
+        # Process ontology graph if given:
+        if ontology_graph_url:
+            self.ontology_graph = fetch_graph(ontology_graph_url)
+        elif ontology_graph:
+            self.ontology_graph = parse_text(ontology_graph)
+        else:
+            self.ontology_graph = Graph()
+        # Config:
         if config is None:
             self.config = Config()
         else:
             self.config = config
-        self.ontology_graph = Graph()
 
     async def validate(self) -> Tuple[bool, Graph, Graph, Graph]:
         """Validate function."""
@@ -69,11 +81,13 @@ class ValidatorService:
         # No need to validate when empty shapes graph:
         if self.shapes_graph is None or len(self.shapes_graph) == 0:
             raise ValueError("Shapes graph cannot be empty.")
+        # If user has given an ontology graph, we check for and do imports:
+        if self.ontology_graph and len(self.ontology_graph) > 0:
+            self._import_ontologies()
 
         logging.debug(f"Validating with following config: {self.config}")
         # Add triples from remote predicates if user has asked for that:
         if self.config.expand is True:
-            self._load_ontologies()
             self._expand_objects_triples()
 
         # Validate!
@@ -86,6 +100,8 @@ class ValidatorService:
             inplace=False,
             meta_shacl=False,
             debug=False,
+            do_owl_imports=False,  # owl_imports in pyshacl represent performance penalty
+            advanced=False,
         )
         return (conforms, self.data_graph, self.ontology_graph, results_graph)
 
@@ -107,25 +123,39 @@ class ValidatorService:
                         except FetchError:
                             logging.debug(traceback.format_exc())
                             pass
+                        except SyntaxError:
+                            logging.debug(traceback.format_exc())
+                            pass
 
-    def _load_ontologies(self) -> None:  # pragma: no cover
-        """Load relevant ontologies into ontology graph."""
-        # TODO: this loop should be parallellized
-        # TODO: discover relevant ontologies dynamically, should be cached
-        # TODO: cover with proper tests
-        ontologies = [
-            "https://www.w3.org/ns/regorg",
-            "https://www.w3.org/ns/org",
-            "https://raw.githubusercontent.com/Informasjonsforvaltning/organization-catalogue/master/src/main/resources/ontology/org-status.ttl",  # noqa
-            "http://publications.europa.eu/resource/authority/licence",
-        ]
-        for o in ontologies:
-            if (o, None, None) not in self.ontology_graph:
-                logging.debug(f"Trying to add remote ontology {o}")
-                try:
-                    g = fetch_graph(o)
-                    if g:
-                        self.ontology_graph += g
-                except FetchError:
-                    logging.debug(traceback.format_exc())
-                    pass
+    def _import_ontologies(self) -> None:
+        """Import relevant ontologies into ontology graph.
+
+        Interpret the owl import statements. Essentially, recursively merge with all the objects in the owl import
+        statement, and remove the corresponding triples from the graph.
+
+        Based on https://owl-rl.readthedocs.io/en/latest/_modules/owlrl.html#interpret_owl_imports
+        """
+        while True:
+            # 1. collect the import statements:
+            all_imports = [
+                t for t in self.ontology_graph.triples((None, OWL.imports, None))
+            ]
+            if len(all_imports) == 0:
+                # no import statement whatsoever, we can go on...
+                return
+            # 2. remove all the import statements from the graph
+            for t in all_imports:
+                self.ontology_graph.remove(t)
+            # 3. get all the imported vocabularies and import them
+            for (_s, _p, uri) in all_imports:
+                if (uri, None, None) not in self.data_graph:
+                    if (uri, None, None) not in self.ontology_graph:
+                        logging.debug(f"Trying to fetch remote triples about {uri}")
+                        try:
+                            g = fetch_graph(uri)
+                            if g:
+                                self.ontology_graph += g
+                        except FetchError:
+                            logging.debug(traceback.format_exc())
+                            pass
+            # 4. start all over again to see if import statements have been imported

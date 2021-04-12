@@ -28,12 +28,8 @@ def fetch_graph(url: str) -> Graph:
         raise FetchError(f"Could not fetch remote graph from {url}")
     logging.debug(f"Got status_code {resp.status_code}")
     if resp.status_code == 200:
-        try:
-            g = parse_text(input_graph=resp.text)
-            logging.debug(f"Got valid remote graph from {url}")
-            return g
-        except SyntaxError:
-            return None
+        logging.debug(f"Got valid remote graph from {url}")
+        return parse_text(input_graph=resp.text)
     else:
         return None
 

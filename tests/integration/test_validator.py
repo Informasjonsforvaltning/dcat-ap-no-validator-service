@@ -110,7 +110,10 @@ def mocks(requests_mock: Any, mocker: MockFixture) -> Any:
         "http://example.com/accessURL",
         status_code=404,
     )
-
+    requests_mock.get(
+        "http://publications.europa.eu/ontology/euvoc",
+        status_code=404,
+    )
     # Patch the Shapes graph store:
     mocker.patch.object(ShapesService, "_SHAPES_STORE", _MOCK_SHAPES_STORE)
 
@@ -120,6 +123,7 @@ async def test_validator_file_no_config(client: _TestClient, mocks: Any) -> None
     """Should return OK."""
     data_graph_file = "tests/files/valid_catalog.ttl"
     shapes_graph_file = "tests/files/mock_dcat-ap-no-shacl_shapes_2.00.ttl"
+    ontology_graph_file = "tests/files/ontologies.ttl"
 
     with MultipartWriter("mixed") as mpwriter:
         p = mpwriter.append(open(data_graph_file, "rb"))
@@ -129,6 +133,10 @@ async def test_validator_file_no_config(client: _TestClient, mocks: Any) -> None
         p = mpwriter.append(open(shapes_graph_file, "rb"))
         p.set_content_disposition(
             "attachment", name="shapes-graph-file", filename=shapes_graph_file
+        )
+        p = mpwriter.append(open(ontology_graph_file, "rb"))
+        p.set_content_disposition(
+            "attachment", name="ontology-graph-file", filename=ontology_graph_file
         )
 
     resp = await client.post("/validator", data=mpwriter)
@@ -148,6 +156,7 @@ async def test_validator_file_empty_config(client: _TestClient, mocks: Any) -> N
     """Should return OK."""
     data_graph_file = "tests/files/valid_catalog.ttl"
     shapes_graph_file = "tests/files/mock_dcat-ap-no-shacl_shapes_2.00.ttl"
+    ontology_graph_file = "tests/files/ontologies.ttl"
     config: dict = {}
 
     with MultipartWriter("mixed") as mpwriter:
@@ -161,6 +170,10 @@ async def test_validator_file_empty_config(client: _TestClient, mocks: Any) -> N
         )
         p = mpwriter.append_json(config)
         p.set_content_disposition("inline", name="config")
+        p = mpwriter.append(open(ontology_graph_file, "rb"))
+        p.set_content_disposition(
+            "attachment", name="ontology-graph-file", filename=ontology_graph_file
+        )
 
     resp = await client.post("/validator", data=mpwriter)
     assert resp.status == 200
@@ -182,6 +195,7 @@ async def test_validator_file_full_config_with_default_values(
     """Should return OK."""
     data_graph_file = "tests/files/valid_catalog.ttl"
     shapes_graph_file = "tests/files/mock_dcat-ap-no-shacl_shapes_2.00.ttl"
+    ontology_graph_file = "tests/files/ontologies.ttl"
     config: dict = {
         "expand": True,
         "includeExpandedTriples": False,
@@ -198,6 +212,10 @@ async def test_validator_file_full_config_with_default_values(
         )
         p = mpwriter.append_json(config)
         p.set_content_disposition("inline", name="config")
+        p = mpwriter.append(open(ontology_graph_file, "rb"))
+        p.set_content_disposition(
+            "attachment", name="ontology-graph-file", filename=ontology_graph_file
+        )
 
     resp = await client.post("/validator", data=mpwriter)
     assert resp.status == 200
@@ -219,6 +237,7 @@ async def test_validator_file_full_config_all_true(
     """Should return OK."""
     data_graph_file = "tests/files/valid_catalog.ttl"
     shapes_graph_file = "tests/files/mock_dcat-ap-no-shacl_shapes_2.00.ttl"
+    ontology_graph_file = "tests/files/ontologies.ttl"
     config: dict = {"expand": True, "includeExpandedTriples": True}
 
     with MultipartWriter("mixed") as mpwriter:
@@ -232,6 +251,10 @@ async def test_validator_file_full_config_all_true(
         )
         p = mpwriter.append_json(config)
         p.set_content_disposition("inline", name="config")
+        p = mpwriter.append(open(ontology_graph_file, "rb"))
+        p.set_content_disposition(
+            "attachment", name="ontology-graph-file", filename=ontology_graph_file
+        )
 
     resp = await client.post("/validator", data=mpwriter)
     assert resp.status == 200
@@ -251,6 +274,7 @@ async def test_validator_file_full_config_all_false(
     """Should return OK and unsuccessful validation."""
     data_graph_file = "tests/files/valid_catalog.ttl"
     shapes_graph_file = "tests/files/mock_dcat-ap-no-shacl_shapes_2.00.ttl"
+    ontology_graph_file = "tests/files/ontologies.ttl"
     config: dict = {
         "expand": False,
         "includeExpandedTriples": False,
@@ -267,6 +291,10 @@ async def test_validator_file_full_config_all_false(
         )
         p = mpwriter.append_json(config)
         p.set_content_disposition("inline", name="config")
+        p = mpwriter.append(open(ontology_graph_file, "rb"))
+        p.set_content_disposition(
+            "attachment", name="ontology-graph-file", filename=ontology_graph_file
+        )
 
     resp = await client.post("/validator", data=mpwriter)
     assert resp.status == 200
@@ -288,6 +316,7 @@ async def test_validator_file_full_config_from_json_str(
     """Should return OK and successful validation."""
     data_graph_file = "tests/files/valid_catalog.ttl"
     shapes_graph_file = "tests/files/mock_dcat-ap-no-shacl_shapes_2.00.ttl"
+    ontology_graph_file = "tests/files/ontologies.ttl"
     config = """
     {
         "expand": true,
@@ -306,6 +335,10 @@ async def test_validator_file_full_config_from_json_str(
         )
         p = mpwriter.append_json(json.loads(config))
         p.set_content_disposition("inline", name="config")
+        p = mpwriter.append(open(ontology_graph_file, "rb"))
+        p.set_content_disposition(
+            "attachment", name="ontology-graph-file", filename=ontology_graph_file
+        )
 
     resp = await client.post("/validator", data=mpwriter)
     assert resp.status == 200
@@ -327,6 +360,7 @@ async def test_validator_file_content_negotiation_json_ld(
     """Should return OK."""
     data_graph_file = "tests/files/valid_catalog.ttl"
     shapes_graph_file = "tests/files/mock_dcat-ap-no-shacl_shapes_2.00.ttl"
+    ontology_graph_file = "tests/files/ontologies.ttl"
     accept = "application/ld+json"
     headers = {"Accept": accept}
 
@@ -338,6 +372,10 @@ async def test_validator_file_content_negotiation_json_ld(
         p = mpwriter.append(open(shapes_graph_file, "rb"))
         p.set_content_disposition(
             "attachment", name="shapes-graph-file", filename=shapes_graph_file
+        )
+        p = mpwriter.append(open(ontology_graph_file, "rb"))
+        p.set_content_disposition(
+            "attachment", name="ontology-graph-file", filename=ontology_graph_file
         )
 
     resp = await client.post("/validator", headers=headers, data=mpwriter)
@@ -360,6 +398,7 @@ async def test_validator_file_content_type_json_ld(
     """Should return OK and successful validation."""
     data_graph_file = "tests/files/valid_catalog.json"
     shapes_graph_file = "tests/files/mock_dcat-ap-no-shacl_shapes_2.00.ttl"
+    ontology_graph_file = "tests/files/ontologies.ttl"
 
     with MultipartWriter("mixed") as mpwriter:
         p = mpwriter.append(
@@ -371,6 +410,10 @@ async def test_validator_file_content_type_json_ld(
         p = mpwriter.append(open(shapes_graph_file, "rb"))
         p.set_content_disposition(
             "attachment", name="shapes-graph-file", filename=shapes_graph_file
+        )
+        p = mpwriter.append(open(ontology_graph_file, "rb"))
+        p.set_content_disposition(
+            "attachment", name="ontology-graph-file", filename=ontology_graph_file
         )
 
     resp = await client.post("/validator", data=mpwriter)
@@ -391,6 +434,7 @@ async def test_validator_file_content_encoding(client: _TestClient, mocks: Any) 
     """Should return OK."""
     data_graph_file = "tests/files/valid_catalog.ttl"
     shapes_graph_file = "tests/files/mock_dcat-ap-no-shacl_shapes_2.00.ttl"
+    ontology_graph_file = "tests/files/ontologies.ttl"
 
     with MultipartWriter("mixed") as mpwriter:
         p = mpwriter.append(open(data_graph_file, "rb"))
@@ -403,6 +447,10 @@ async def test_validator_file_content_encoding(client: _TestClient, mocks: Any) 
             "attachment", name="shapes-graph-file", filename=shapes_graph_file
         )
         p.headers[hdrs.CONTENT_ENCODING] = "gzip"
+        p = mpwriter.append(open(ontology_graph_file, "rb"))
+        p.set_content_disposition(
+            "attachment", name="ontology-graph-file", filename=ontology_graph_file
+        )
 
     resp = await client.post("/validator", data=mpwriter)
     assert resp.status == 200
@@ -423,12 +471,18 @@ async def test_validator_data_graph_url(client: _TestClient, mocks: Any) -> None
     data_graph_url = "https://example.com/datagraphs/valid_catalog.ttl"
     data_graph_file = "tests/files/valid_catalog.ttl"
     shapes_graph_file = "tests/files/mock_dcat-ap-no-shacl_shapes_2.00.ttl"
+    ontology_graph_file = "tests/files/ontologies.ttl"
+
     with MultipartWriter("mixed") as mpwriter:
         p = mpwriter.append(data_graph_url)
         p.set_content_disposition("inline", name="data-graph-url")
         p = mpwriter.append(open(shapes_graph_file, "rb"))
         p.set_content_disposition(
             "attachment", name="shapes-graph-file", filename=shapes_graph_file
+        )
+        p = mpwriter.append(open(ontology_graph_file, "rb"))
+        p.set_content_disposition(
+            "attachment", name="ontology-graph-file", filename=ontology_graph_file
         )
 
     resp = await client.post("/validator", data=mpwriter)
@@ -450,6 +504,7 @@ async def test_validator_url_to_json_ld_file(client: _TestClient, mocks: Any) ->
     data_graph_url = "https://example.com/datagraphs/valid_catalog.json"
     data_graph_file = "tests/files/valid_catalog.ttl"
     shapes_graph_file = "tests/files/mock_dcat-ap-no-shacl_shapes_2.00.ttl"
+    ontology_graph_file = "tests/files/ontologies.ttl"
 
     with MultipartWriter("mixed") as mpwriter:
         p = mpwriter.append(data_graph_url)
@@ -457,6 +512,10 @@ async def test_validator_url_to_json_ld_file(client: _TestClient, mocks: Any) ->
         p = mpwriter.append(open(shapes_graph_file, "rb"))
         p.set_content_disposition(
             "attachment", name="shapes-graph-file", filename=shapes_graph_file
+        )
+        p = mpwriter.append(open(ontology_graph_file, "rb"))
+        p.set_content_disposition(
+            "attachment", name="ontology-graph-file", filename=ontology_graph_file
         )
 
     resp = await client.post("/validator", data=mpwriter)
@@ -473,12 +532,13 @@ async def test_validator_url_to_json_ld_file(client: _TestClient, mocks: Any) ->
 
 
 @pytest.mark.integration
-async def test_validator_graph_references_non_parsable_graph(
+async def test_validator_data_graph_references_non_parsable_graph(
     client: _TestClient, mocks: Any
 ) -> None:
     """Should return OK and unsuccessful validation."""
     data_graph_file = "tests/files/valid_catalog_references_non_parsable_graph.ttl"
     shapes_graph_file = "tests/files/mock_dcat-ap-no-shacl_shapes_2.00.ttl"
+    ontology_graph_file = "tests/files/ontologies.ttl"
 
     with MultipartWriter("mixed") as mpwriter:
         p = mpwriter.append(open(data_graph_file, "rb"))
@@ -488,6 +548,10 @@ async def test_validator_graph_references_non_parsable_graph(
         p = mpwriter.append(open(shapes_graph_file, "rb"))
         p.set_content_disposition(
             "attachment", name="shapes-graph-file", filename=shapes_graph_file
+        )
+        p = mpwriter.append(open(ontology_graph_file, "rb"))
+        p.set_content_disposition(
+            "attachment", name="ontology-graph-file", filename=ontology_graph_file
         )
 
     resp = await client.post("/validator", data=mpwriter)
@@ -510,6 +574,7 @@ async def test_validator_graph_references_no_response_graph(
     """Should return OK and unsuccessful validation."""
     data_graph_file = "tests/files/valid_catalog_references_no_graph.ttl"
     shapes_graph_file = "tests/files/mock_dcat-ap-no-shacl_shapes_2.00.ttl"
+    ontology_graph_file = "tests/files/ontologies.ttl"
 
     with MultipartWriter("mixed") as mpwriter:
         p = mpwriter.append(open(data_graph_file, "rb"))
@@ -519,6 +584,10 @@ async def test_validator_graph_references_no_response_graph(
         p = mpwriter.append(open(shapes_graph_file, "rb"))
         p.set_content_disposition(
             "attachment", name="shapes-graph-file", filename=shapes_graph_file
+        )
+        p = mpwriter.append(open(ontology_graph_file, "rb"))
+        p.set_content_disposition(
+            "attachment", name="ontology-graph-file", filename=ontology_graph_file
         )
 
     resp = await client.post("/validator", data=mpwriter)
@@ -541,6 +610,7 @@ async def test_validator_graph_references_not_found_graph(
     """Should return OK and unsuccessful validation."""
     data_graph_file = "tests/files/valid_catalog_references_not_found_graph.ttl"
     shapes_graph_file = "tests/files/mock_dcat-ap-no-shacl_shapes_2.00.ttl"
+    ontology_graph_file = "tests/files/ontologies.ttl"
 
     with MultipartWriter("mixed") as mpwriter:
         p = mpwriter.append(open(data_graph_file, "rb"))
@@ -550,6 +620,10 @@ async def test_validator_graph_references_not_found_graph(
         p = mpwriter.append(open(shapes_graph_file, "rb"))
         p.set_content_disposition(
             "attachment", name="shapes-graph-file", filename=shapes_graph_file
+        )
+        p = mpwriter.append(open(ontology_graph_file, "rb"))
+        p.set_content_disposition(
+            "attachment", name="ontology-graph-file", filename=ontology_graph_file
         )
 
     resp = await client.post("/validator", data=mpwriter)
@@ -572,6 +646,7 @@ async def test_validator_graph_contains_distribution_with_eu_licence(
     """Should return OK and successful validation."""
     data_graph_file = "tests/files/valid_catalog_with_distribution.ttl"
     shapes_graph_file = "tests/files/mock_dcat-ap-no-shacl_shapes_2.00.ttl"
+    ontology_graph_file = "tests/files/ontologies.ttl"
 
     with MultipartWriter("mixed") as mpwriter:
         p = mpwriter.append(open(data_graph_file, "rb"))
@@ -581,6 +656,10 @@ async def test_validator_graph_contains_distribution_with_eu_licence(
         p = mpwriter.append(open(shapes_graph_file, "rb"))
         p.set_content_disposition(
             "attachment", name="shapes-graph-file", filename=shapes_graph_file
+        )
+        p = mpwriter.append(open(ontology_graph_file, "rb"))
+        p.set_content_disposition(
+            "attachment", name="ontology-graph-file", filename=ontology_graph_file
         )
 
     resp = await client.post("/validator", data=mpwriter)
@@ -592,6 +671,42 @@ async def test_validator_graph_contains_distribution_with_eu_licence(
     with open(data_graph_file, "r") as file:
         text = file.read()
     await _assess_response_body_successful(
+        data=text, format="text/turtle", body=body, content_type="text/turtle"
+    )
+
+
+@pytest.mark.integration
+async def test_validator_ontology_graph_imports_non_reachable_ontology(
+    client: _TestClient, mocks: Any
+) -> None:
+    """Should return OK and unsuccessful validation."""
+    data_graph_file = "tests/files/valid_catalog.ttl"
+    shapes_graph_file = "tests/files/mock_dcat-ap-no-shacl_shapes_2.00.ttl"
+    ontology_graph_file = "tests/files/ontology_imports_non_reachable_ontology.ttl"
+
+    with MultipartWriter("mixed") as mpwriter:
+        p = mpwriter.append(open(data_graph_file, "rb"))
+        p.set_content_disposition(
+            "attachment", name="data-graph-file", filename=data_graph_file
+        )
+        p = mpwriter.append(open(shapes_graph_file, "rb"))
+        p.set_content_disposition(
+            "attachment", name="shapes-graph-file", filename=shapes_graph_file
+        )
+        p = mpwriter.append(open(ontology_graph_file, "rb"))
+        p.set_content_disposition(
+            "attachment", name="ontology-graph-file", filename=ontology_graph_file
+        )
+
+    resp = await client.post("/validator", data=mpwriter)
+    assert resp.status == 200
+    assert resp.headers[hdrs.CONTENT_TYPE] == "text/turtle"
+
+    body = await resp.text()
+
+    with open(data_graph_file, "r") as file:
+        text = file.read()
+    await _assess_response_body_unsuccessful(
         data=text, format="text/turtle", body=body, content_type="text/turtle"
     )
 
@@ -804,6 +919,30 @@ async def test_validator_file_bad_syntax(client: _TestClient, mocks: Any) -> Non
 
 
 @pytest.mark.integration
+async def test_validator_data_graph_url_bad_syntax(
+    client: _TestClient, mocks: Any
+) -> None:
+    r"""Should return status 400 and message \"Bad syntax in input graph.\"."""
+    data_graph_url = "https://example.com/non_parsable_graph"
+    shapes_graph_file = "tests/files/mock_dcat-ap-no-shacl_shapes_2.00.ttl"
+
+    with MultipartWriter("mixed") as mpwriter:
+        p = mpwriter.append(data_graph_url)
+        p.set_content_disposition("inline", name="data-graph-url")
+        p = mpwriter.append(open(shapes_graph_file, "rb"))
+        p.set_content_disposition(
+            "attachment", name="shapes-graph-file", filename=shapes_graph_file
+        )
+
+    resp = await client.post("/validator", data=mpwriter)
+    assert resp.status == 400, "Wrong status code."
+    assert "application/json" in resp.headers[hdrs.CONTENT_TYPE], "Wrong content-type."
+
+    body = await resp.json()
+    assert "Bad syntax in input graph." in body["detail"], "Wrong message."
+
+
+@pytest.mark.integration
 async def test_validator_data_graph_empty(client: _TestClient, mocks: Any) -> None:
     r"""Should return status 400 and message \"Data graph cannot be empty.\"."""
     data = ""
@@ -925,6 +1064,97 @@ async def test_validator_shapes_graph_file_file_not_readable(
 
     body = await resp.json()
     assert "Shapes graph file is not readable." in body["detail"], "Wrong message."
+
+
+@pytest.mark.integration
+async def test_validator_ontology_graph_url_bad_syntax(
+    client: _TestClient, mocks: Any
+) -> None:
+    r"""Should return status 400 and message \"Bad syntax in input graph.\"."""
+    data_graph_file = "tests/files/valid_catalog.ttl"
+    shapes_graph_file = "tests/files/mock_dcat-ap-no-shacl_shapes_2.00.ttl"
+    ontology_graph_url = "https://example.com/non_parsable_graph"
+
+    with MultipartWriter("mixed") as mpwriter:
+        p = mpwriter.append(open(data_graph_file, "rb"))
+        p.set_content_disposition(
+            "attachment", name="data-graph-file", filename=data_graph_file
+        )
+        p = mpwriter.append(open(shapes_graph_file, "rb"))
+        p.set_content_disposition(
+            "attachment", name="shapes-graph-file", filename=shapes_graph_file
+        )
+        p = mpwriter.append(ontology_graph_url)
+        p.set_content_disposition("inline", name="ontology-graph-url")
+
+    resp = await client.post("/validator", data=mpwriter)
+    assert resp.status == 400, "Wrong status code."
+    assert "application/json" in resp.headers[hdrs.CONTENT_TYPE], "Wrong content-type."
+
+    body = await resp.json()
+    assert "Bad syntax in input graph." in body["detail"], "Wrong message."
+
+
+@pytest.mark.integration
+async def test_validator_ontology_graph_file_not_readable(
+    client: _TestClient, mocks: Any
+) -> None:
+    r"""Should return status 400 and message \"Ontology graph file is not readable.\"."""
+    data_graph_file = "tests/files/valid_catalog.ttl"
+    shapes_graph_file = "tests/files/mock_dcat-ap-no-shacl_shapes_2.00.ttl"
+    ontology_graph_file = "tests/files/not_readable_file.pdf"
+
+    with MultipartWriter("mixed") as mpwriter:
+        p = mpwriter.append(open(data_graph_file, "rb"))
+        p.set_content_disposition(
+            "attachment", name="data-graph-file", filename=data_graph_file
+        )
+        p = mpwriter.append(open(shapes_graph_file, "rb"))
+        p.set_content_disposition(
+            "attachment", name="shapes-graph-file", filename=shapes_graph_file
+        )
+        p = mpwriter.append(open(ontology_graph_file, "rb"))
+        p.set_content_disposition(
+            "attachment", name="ontology-graph-file", filename=ontology_graph_file
+        )
+
+    resp = await client.post("/validator", data=mpwriter)
+    assert resp.status == 400, "Wrong status code."
+    assert "application/json" in resp.headers[hdrs.CONTENT_TYPE], "Wrong content-type."
+
+    body = await resp.json()
+    assert "Ontology graph file is not readable." in body["detail"], "Wrong message."
+
+
+@pytest.mark.integration
+async def test_validator_ontology_graph_url_references_no_response_graph(
+    client: _TestClient, mocks: Any
+) -> None:
+    r"""Should return status 400 and message \"Could not fetch remote graph from http://slfkjasdf.\"."""
+    data_graph_file = "tests/files/valid_catalog.ttl"
+    shapes_graph_file = "tests/files/mock_dcat-ap-no-shacl_shapes_2.00.ttl"
+    ontology_graph_url = "http://slfkjasdf"
+
+    with MultipartWriter("mixed") as mpwriter:
+        p = mpwriter.append(open(data_graph_file, "rb"))
+        p.set_content_disposition(
+            "attachment", name="data-graph-file", filename=data_graph_file
+        )
+        p = mpwriter.append(open(shapes_graph_file, "rb"))
+        p.set_content_disposition(
+            "attachment", name="shapes-graph-file", filename=shapes_graph_file
+        )
+        p = mpwriter.append(ontology_graph_url)
+        p.set_content_disposition("inline", name="ontology-graph-url")
+
+    resp = await client.post("/validator", data=mpwriter)
+    assert resp.status == 400, "Wrong status code."
+    assert "application/json" in resp.headers[hdrs.CONTENT_TYPE], "Wrong content-type."
+
+    body = await resp.json()
+    assert (
+        "Could not fetch remote graph from http://slfkjasdf" in body["detail"]
+    ), "Wrong message."
 
 
 # -- Helper methods

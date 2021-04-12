@@ -19,6 +19,8 @@ class Part(str, Enum):
     DATA_GRAPH_FILE = "data-graph-file"
     SHAPES_GRAPH_FILE = "shapes-graph-file"
     SHAPES_GRAPH_URL = "shapes-graph-url"
+    ONTOLOGY_GRAPH_FILE = "ontology-graph-file"
+    ONTOLOGY_GRAPH_URL = "ontology-graph-url"
 
 
 class Validator(web.View):
@@ -39,6 +41,8 @@ class Validator(web.View):
         data_graph = None
         shapes_graph = None
         shapes_graph_url = None
+        ontology_graph = None
+        ontology_graph_url = None
         config = None
         data_graph_matrix = dict()
         shapes_graph_matrix = dict()
@@ -50,14 +54,14 @@ class Validator(web.View):
                 logging.debug(f"Got config: {config_json}")
                 config = _create_config(config_json)
                 pass
-
+            # Data graph, url:
             if Part(part.name) is Part.DATA_GRAPH_URL:
                 # Get data graph from url:
                 data_graph_url = (await part.read()).decode()
                 logging.debug(f"Got reference to data graph with url: {data_graph_url}")
                 data_graph_matrix[part.name] = data_graph_url
                 pass
-
+            # Data graph, file:
             if Part(part.name) is Part.DATA_GRAPH_FILE:
                 # Process any files you uploaded
                 logging.debug(f"Got input data graph with filename: {part.filename}")
@@ -68,16 +72,16 @@ class Validator(web.View):
                 # logging.debug(f"Content of {part.filename}:\n{data_graph}")
                 data_graph_matrix[part.name] = part.filename
                 pass
-
+            # Shapes graph, url:
             if Part(part.name) is Part.SHAPES_GRAPH_URL:
-                # Get data graph from url:
+                # Get shapes graph from url:
                 shapes_graph_url = (await part.read()).decode()
                 logging.debug(
                     f"Got reference to shapes graph with url: {shapes_graph_url}"
                 )
                 shapes_graph_matrix[part.name] = shapes_graph_url
                 pass
-
+            # Shapes graph, file:
             if Part(part.name) is Part.SHAPES_GRAPH_FILE:
                 # Process any files you uploaded
                 logging.debug(f"Got input shapes graph with filename: {part.filename}")
@@ -90,6 +94,26 @@ class Validator(web.View):
                 # logging.debug(f"Content of {part.filename}:\n{shapes_graph}")
                 shapes_graph_matrix[part.name] = part.filename
                 pass
+            # Ontology graph, url:
+            if Part(part.name) is Part.ONTOLOGY_GRAPH_URL:
+                # Get ontology graph from url:
+                ontology_graph_url = (await part.read()).decode()
+                logging.debug(
+                    f"Got reference to ontology graph with url: {ontology_graph_url}"
+                )
+                pass
+            # Ontology graph, file:
+            if Part(part.name) is Part.ONTOLOGY_GRAPH_FILE:
+                # Process any files you uploaded
+                logging.debug(
+                    f"Got input ontology graph with filename: {part.filename}"
+                )
+                try:
+                    ontology_graph = (await part.read()).decode()
+                except ValueError:
+                    raise web.HTTPBadRequest(
+                        reason="Ontology graph file is not readable."
+                    )
 
         # check if we got any input:
         # validate data-graph input:
@@ -113,6 +137,8 @@ class Validator(web.View):
                 data_graph=data_graph,
                 shapes_graph_url=shapes_graph_url,
                 shapes_graph=shapes_graph,
+                ontology_graph_url=ontology_graph_url,
+                ontology_graph=ontology_graph,
                 config=config,
             )
         except FetchError as e:
