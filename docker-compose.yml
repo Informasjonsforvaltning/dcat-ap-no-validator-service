@@ -4,4 +4,12 @@ services:
     build: .
     image: eu.gcr.io/digdir-fdk-infra/dcat-ap-no-validator-service:test
     ports:
-      - "8080:8080"
+      - "8000:8080"
+    environment:
+      - REDIS_HOST=redis
+    depends_on:
+      - "redis"
+  redis:
+    image: redis
+    ports:
+      - "6379:6379"

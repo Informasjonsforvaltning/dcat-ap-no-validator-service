@@ -1,11 +1,27 @@
 """Module for fetching remote graph."""
 import logging
+import os
 
 from aiohttp import hdrs
+from dotenv import load_dotenv
 from rdflib import Graph
+import redis
 import requests
 from requests.exceptions import RequestException
+import requests_cache
 
+
+# Setting up cache
+load_dotenv()
+# Enable cache in all other cases than test:
+CONFIG = os.getenv("CONFIG", "production")
+if CONFIG in {"test", "dev"}:
+    pass
+else:  # pragma: no cover
+    REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
+    REDIS_PORT = os.getenv("REDIS_HOST", 6379)
+    conn = redis.StrictRedis(host=REDIS_HOST, port=REDIS_PORT)
+    requests_cache.install_cache(backend="redis", namespace="my-cache", connection=conn)
 
 SUPPORTED_FORMATS = set(["text/turtle", "application/ld+json", "application/rdf+xml"])
 

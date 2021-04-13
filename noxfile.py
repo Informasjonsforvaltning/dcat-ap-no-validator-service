@@ -55,7 +55,7 @@ def integration_tests(session: Session) -> None:
         "-m integration",
         "-rfE",
         *args,
-        env={},
+        env={"CONFIG": "test"},
     )
 
 

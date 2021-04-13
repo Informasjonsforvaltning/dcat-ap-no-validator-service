@@ -61,12 +61,7 @@ Where `config.json` file may have the following properties, ref [the openAPI spe
   "includeExpandedTriples": "true"
 }
 ```
-### List all available shacl shapes
-```
-% curl -i \
- -H "Accept: application/json" \
- -X GET http://localhost:8000/shapes
- ```
+
 ## Develop and run locally
 ### Requirements
 - [pyenv](https://github.com/pyenv/pyenv) (recommended)
@@ -85,21 +80,20 @@ Where `config.json` file may have the following properties, ref [the openAPI spe
 % pipx inject nox nox-poetry
 % poetry install
 ```
-### Running the API locally
+## Running the API locally
 Start the server locally:
 ```
 % poetry run adev runserver src/dcat_ap_no_validator_service
 ```
- TBD
 ## Running the API in a wsgi-server (gunicorn)
 ```
-% poetry run gunicorn dcat_ap_no_validator_service:create_app --bind localhost:8080 --worker-class aiohttp.GunicornWebWorker
+% poetry run gunicorn dcat_ap_no_validator_service:create_app --bind localhost:8000 --worker-class aiohttp.GunicornWebWorker
 ```
 ## Running the wsgi-server in Docker
 To build and run the api in a Docker container:
 ```
 % docker build -t digdir/dcat-ap-no-validator-service:latest .
-% docker run --env-file .env -p 8080:8080 -d digdir/dcat-ap-no-validator-service:latest
+% docker run --env-file .env -p 8000:8080 -d digdir/dcat-ap-no-validator-service:latest
 ```
 The easier way would be with docker-compose:
 ```
@@ -115,4 +109,18 @@ To run linters, checkers and tests:
 To run tests with logging, do:
 ```
 % nox -s integration_tests -- --log-cli-level=DEBUG
+```
+## Environment variables
+### `LOGGING_LEVEL`
+One of the supporte levels found [here](https://docs.python.org/3/library/logging.html#levels), given as string, eg.`DEBUG`
+### `CONFIG`
+One of
+- `dev`: will not use cache backend
+- `test`: will not use cache backend
+- `production`: will require and use a redis backend, cf docker-compose.yml
+
+An example .env file:
+```
+LOGGING_LEVEL=DEBUG
+CONFIG=dev
 ```
