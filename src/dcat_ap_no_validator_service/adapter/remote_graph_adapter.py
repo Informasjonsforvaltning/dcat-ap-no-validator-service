@@ -31,7 +31,7 @@ def fetch_graph(url: str) -> Graph:
         logging.debug(f"Got valid remote graph from {url}")
         return parse_text(input_graph=resp.text)
     else:
-        return None
+        raise FetchError(f"Could not fetch remote graph from {url}")
 
 
 def parse_text(input_graph: str) -> Graph:

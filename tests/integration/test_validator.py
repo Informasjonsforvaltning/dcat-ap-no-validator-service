@@ -850,7 +850,7 @@ async def test_validator_file_accept_header_not_valid(
 async def test_validator_data_graph_url_does_not_exist(
     client: _TestClient, mocks: Any
 ) -> None:
-    r"""Should return status 400 and message \"Data graph cannot be empty.\"."""
+    r"""Should return status 400 and message \"Could not fetch remote graph from {url}\"."""
     data_graph_url = "https://example.com/graphs/not_found_graph"
     shapes_graph_file = "tests/files/mock_dcat-ap-no-shacl_shapes_2.00.ttl"
 
@@ -867,14 +867,16 @@ async def test_validator_data_graph_url_does_not_exist(
     assert "application/json" in resp.headers[hdrs.CONTENT_TYPE], "Wrong content-type."
 
     body = await resp.json()
-    assert "Data graph cannot be empty." in body["detail"], "Wrong message."
+    assert (
+        f"Could not fetch remote graph from {data_graph_url}" in body["detail"]
+    ), "Wrong message."
 
 
 @pytest.mark.integration
 async def test_validator_shapes_graph_url_does_not_exist(
     client: _TestClient, mocks: Any
 ) -> None:
-    r"""Should return status 400 and message \"Shapes graph cannot be empty.\"."""
+    r"""Should return status 400 and message \"Could not fetch remote graph from {url}.\"."""
     data_graph_file = "tests/files/valid_catalog.ttl"
     shapes_graph_url = "https://example.com/graphs/not_found_graph"
 
@@ -891,7 +893,9 @@ async def test_validator_shapes_graph_url_does_not_exist(
     assert "application/json" in resp.headers[hdrs.CONTENT_TYPE], "Wrong content-type."
 
     body = await resp.json()
-    assert "Shapes graph cannot be empty." in body["detail"], "Wrong message."
+    assert (
+        f"Could not fetch remote graph from {shapes_graph_url}" in body["detail"]
+    ), "Wrong message."
 
 
 @pytest.mark.integration
@@ -965,6 +969,28 @@ async def test_validator_data_graph_empty(client: _TestClient, mocks: Any) -> No
 
 
 @pytest.mark.integration
+async def test_validator_shapes_graph_empty(client: _TestClient, mocks: Any) -> None:
+    r"""Should return status 400 and message \"Shapes graph cannot be empty.\"."""
+    data_graph_file = "tests/files/valid_catalog.ttl"
+    shapes_graph = ""
+
+    with MultipartWriter("mixed") as mpwriter:
+        p = mpwriter.append(open(data_graph_file, "rb"))
+        p.set_content_disposition(
+            "attachment", name="data-graph-file", filename=data_graph_file
+        )
+        p = mpwriter.append(shapes_graph, {"CONTENT-TYPE": "text/turtle"})
+        p.set_content_disposition("attachment", name="shapes-graph-file")
+
+    resp = await client.post("/validator", data=mpwriter)
+    assert resp.status == 400, "Wrong status code."
+    assert "application/json" in resp.headers[hdrs.CONTENT_TYPE], "Wrong content-type."
+
+    body = await resp.json()
+    assert "Shapes graph cannot be empty." in body["detail"], "Wrong message."
+
+
+@pytest.mark.integration
 async def test_validator_connection_error_caused_by_bad_url(
     client: _TestClient, mocks: Any
 ) -> None:
@@ -986,32 +1012,8 @@ async def test_validator_connection_error_caused_by_bad_url(
 
     body = await resp.json()
     assert (
-        "Could not fetch remote graph from http://slfkjasdf" in body["detail"]
+        f"Could not fetch remote graph from {data_graph_url}" in body["detail"]
     ), "Wrong message."
-
-
-@pytest.mark.integration
-async def test_validator_data_graph_url_references_not_found_url(
-    client: _TestClient, mocks: Any
-) -> None:
-    r"""Should return status 400 and message \"Data graph cannot be empty.\"."""
-    data_graph_url = "https://example.com/graphs/not_found_graph"
-    shapes_graph_file = "tests/files/mock_dcat-ap-no-shacl_shapes_2.00.ttl"
-
-    with MultipartWriter("mixed") as mpwriter:
-        p = mpwriter.append(data_graph_url)
-        p.set_content_disposition("inline", name="data-graph-url")
-        p = mpwriter.append(open(shapes_graph_file, "rb"))
-        p.set_content_disposition(
-            "attachment", name="shapes-graph-file", filename=shapes_graph_file
-        )
-
-    resp = await client.post("/validator", data=mpwriter)
-    assert resp.status == 400, "Wrong status code."
-    assert "application/json" in resp.headers[hdrs.CONTENT_TYPE], "Wrong content-type."
-
-    body = await resp.json()
-    assert "Data graph cannot be empty." in body["detail"], "Wrong message."
 
 
 @pytest.mark.integration
