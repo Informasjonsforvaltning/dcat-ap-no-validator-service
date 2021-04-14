@@ -152,9 +152,9 @@ class ValidatorService:
                     if (uri, None, None) not in self.ontology_graph:
                         logging.debug(f"Trying to fetch remote triples about {uri}")
                         try:
-                            g = fetch_graph(uri)
-                            if g:
-                                self.ontology_graph += g
+                            _g = fetch_graph(uri)
+                            if _g:
+                                self.ontology_graph += _g
                         except FetchError:
                             logging.debug(traceback.format_exc())
                             pass
