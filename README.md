@@ -128,6 +128,9 @@ Default: localhost
 ### `REDIS_PORT`
 Port where the remote redis is reachable.
 Default: `6379`
+### `REDIS_PASS`
+Password to the remote redis is reachable.
+Default: `6379`
 ### `LOGGING_LEVEL`
 One of the supported levels found [here](https://docs.python.org/3/library/logging.html#levels).
 Default: `INFO`

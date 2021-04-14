@@ -20,7 +20,8 @@ if CONFIG in {"test", "dev"}:
 else:  # pragma: no cover
     REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
     REDIS_PORT = int(os.getenv("REDIS_PORT", 6379))
-    conn = redis.StrictRedis(host=REDIS_HOST, port=REDIS_PORT)
+    REDIS_PASS = os.getenv("REDIS_PASS")
+    conn = redis.StrictRedis(host=REDIS_HOST, port=REDIS_PORT, password=REDIS_PASS)
     requests_cache.install_cache(
         backend="redis", namespace="dcat-ap-no-validator-service", connection=conn
     )
