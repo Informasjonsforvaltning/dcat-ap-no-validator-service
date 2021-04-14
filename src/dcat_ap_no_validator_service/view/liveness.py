@@ -17,8 +17,9 @@ class Ready(web.View):
             pass
         else:  # pragma: no cover
             redis_host = os.getenv("REDIS_HOST", "localhost")
+            redis_password = os.getenv("REDIS_PASSWORD")
             r = Redis(
-                redis_host, socket_connect_timeout=1
+                redis_host, socket_connect_timeout=1, password=redis_password
             )  # short timeout for the test
             try:
                 r.ping()

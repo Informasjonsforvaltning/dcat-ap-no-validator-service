@@ -7,9 +7,12 @@ services:
       - "8000:8080"
     environment:
       - REDIS_HOST=redis
+      - REDIS_PASSWORD=secret
+      - CONFIG=production
     depends_on:
       - "redis"
   redis:
     image: redis
     ports:
       - "6379:6379"
+    command: redis-server --requirepass secret
