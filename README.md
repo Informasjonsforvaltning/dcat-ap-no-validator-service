@@ -128,7 +128,7 @@ Default: localhost
 ### `REDIS_PORT`
 Port where the remote redis is reachable.
 Default: `6379`
-### `REDIS_PASS`
+### `REDIS_PASSWORD`
 Password to the remote redis is reachable.
 Default: `6379`
 ### `LOGGING_LEVEL`
