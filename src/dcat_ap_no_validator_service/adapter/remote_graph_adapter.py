@@ -38,11 +38,15 @@ class FetchError(Exception):
         super().__init__(message)
 
 
-def fetch_graph(url: str) -> Graph:
+def fetch_graph(url: str, use_cache: bool = True) -> Graph:
     """Fetch remote graph at url and return as Graph."""
     logging.debug(f"Trying to fetch remote graph {url}")
     try:
-        resp = requests.get(url, headers={hdrs.ACCEPT: "text/turtle"})
+        if not use_cache:
+            with requests_cache.disabled():
+                resp = requests.get(url, headers={hdrs.ACCEPT: "text/turtle"})
+        else:
+            resp = requests.get(url, headers={hdrs.ACCEPT: "text/turtle"})
     except RequestException:
         raise FetchError(f"Could not fetch remote graph from {url}")
     logging.debug(f"Got status_code {resp.status_code}")

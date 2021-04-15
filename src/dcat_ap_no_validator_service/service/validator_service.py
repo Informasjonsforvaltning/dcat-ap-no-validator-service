@@ -48,20 +48,20 @@ class ValidatorService:
         # Process data graph:
         self.data_graph_url = data_graph_url
         self.data_graph = (
-            fetch_graph(data_graph_url)
+            fetch_graph(data_graph_url, use_cache=False)
             if self.data_graph_url
             else parse_text(data_graph)
         )
         # Process shapes graph:
         self.shapes_graph_url = shapes_graph_url
         self.shapes_graph = (
-            fetch_graph(shapes_graph_url)
+            fetch_graph(shapes_graph_url, use_cache=False)
             if self.shapes_graph_url
             else parse_text(shapes_graph)
         )
         # Process ontology graph if given:
         if ontology_graph_url:
-            self.ontology_graph = fetch_graph(ontology_graph_url)
+            self.ontology_graph = fetch_graph(ontology_graph_url, use_cache=False)
         elif ontology_graph:
             self.ontology_graph = parse_text(ontology_graph)
         else:
