@@ -868,7 +868,7 @@ async def test_validator_data_graph_url_does_not_exist(
 
     body = await resp.json()
     assert (
-        f"Could not fetch remote graph from {data_graph_url}" in body["detail"]
+        f"Could not fetch remote graph from {data_graph_url}." in body["detail"]
     ), "Wrong message."
 
 
@@ -894,7 +894,7 @@ async def test_validator_shapes_graph_url_does_not_exist(
 
     body = await resp.json()
     assert (
-        f"Could not fetch remote graph from {shapes_graph_url}" in body["detail"]
+        f"Could not fetch remote graph from {shapes_graph_url}." in body["detail"]
     ), "Wrong message."
 
 
@@ -926,7 +926,7 @@ async def test_validator_file_bad_syntax(client: _TestClient, mocks: Any) -> Non
 async def test_validator_data_graph_url_bad_syntax(
     client: _TestClient, mocks: Any
 ) -> None:
-    r"""Should return status 400 and message \"Bad syntax in input graph.\"."""
+    r"""Should return status 400 and message \"Bad syntax in graph {url}.\"."""
     data_graph_url = "https://example.com/non_parsable_graph"
     shapes_graph_file = "tests/files/mock_dcat-ap-no-shacl_shapes_2.00.ttl"
 
@@ -943,7 +943,7 @@ async def test_validator_data_graph_url_bad_syntax(
     assert "application/json" in resp.headers[hdrs.CONTENT_TYPE], "Wrong content-type."
 
     body = await resp.json()
-    assert "Bad syntax in input graph." in body["detail"], "Wrong message."
+    assert f"Bad syntax in graph {data_graph_url}." in body["detail"], "Wrong message."
 
 
 @pytest.mark.integration
@@ -1012,7 +1012,7 @@ async def test_validator_connection_error_caused_by_bad_url(
 
     body = await resp.json()
     assert (
-        f"Could not fetch remote graph from {data_graph_url}" in body["detail"]
+        f"Could not fetch remote graph from {data_graph_url}." in body["detail"]
     ), "Wrong message."
 
 
@@ -1072,7 +1072,7 @@ async def test_validator_shapes_graph_file_file_not_readable(
 async def test_validator_ontology_graph_url_bad_syntax(
     client: _TestClient, mocks: Any
 ) -> None:
-    r"""Should return status 400 and message \"Bad syntax in input graph.\"."""
+    r"""Should return status 400 and message \"Bad syntax in graph {url}.\"."""
     data_graph_file = "tests/files/valid_catalog.ttl"
     shapes_graph_file = "tests/files/mock_dcat-ap-no-shacl_shapes_2.00.ttl"
     ontology_graph_url = "https://example.com/non_parsable_graph"
@@ -1094,7 +1094,9 @@ async def test_validator_ontology_graph_url_bad_syntax(
     assert "application/json" in resp.headers[hdrs.CONTENT_TYPE], "Wrong content-type."
 
     body = await resp.json()
-    assert "Bad syntax in input graph." in body["detail"], "Wrong message."
+    assert (
+        f"Bad syntax in graph {ontology_graph_url}." in body["detail"]
+    ), "Wrong message."
 
 
 @pytest.mark.integration
@@ -1132,7 +1134,7 @@ async def test_validator_ontology_graph_file_not_readable(
 async def test_validator_ontology_graph_url_references_no_response_graph(
     client: _TestClient, mocks: Any
 ) -> None:
-    r"""Should return status 400 and message \"Could not fetch remote graph from http://slfkjasdf.\"."""
+    r"""Should return status 400 and message \"Could not fetch remote graph from {url}.\"."""
     data_graph_file = "tests/files/valid_catalog.ttl"
     shapes_graph_file = "tests/files/mock_dcat-ap-no-shacl_shapes_2.00.ttl"
     ontology_graph_url = "http://slfkjasdf"
@@ -1155,7 +1157,7 @@ async def test_validator_ontology_graph_url_references_no_response_graph(
 
     body = await resp.json()
     assert (
-        "Could not fetch remote graph from http://slfkjasdf" in body["detail"]
+        f"Could not fetch remote graph from {ontology_graph_url}." in body["detail"]
     ), "Wrong message."
 
 

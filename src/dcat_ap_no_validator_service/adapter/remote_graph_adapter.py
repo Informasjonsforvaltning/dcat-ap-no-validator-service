@@ -40,7 +40,7 @@ class FetchError(Exception):
 
 def fetch_graph(url: str, use_cache: bool = True) -> Graph:
     """Fetch remote graph at url and return as Graph."""
-    logging.debug(f"Trying to fetch remote graph {url}")
+    logging.debug(f"Trying to fetch remote graph {url}.")
     try:
         if not use_cache:
             with requests_cache.disabled():
@@ -48,13 +48,16 @@ def fetch_graph(url: str, use_cache: bool = True) -> Graph:
         else:
             resp = requests.get(url, headers={hdrs.ACCEPT: "text/turtle"})
     except RequestException:
-        raise FetchError(f"Could not fetch remote graph from {url}")
-    logging.debug(f"Got status_code {resp.status_code}")
+        raise FetchError(f"Could not fetch remote graph from {url}.")
+    logging.debug(f"Got status_code {resp.status_code}.")
     if resp.status_code == 200:
         logging.debug(f"Got valid remote graph from {url}")
-        return parse_text(input_graph=resp.text)
+        try:
+            return parse_text(input_graph=resp.text)
+        except SyntaxError as e:
+            raise SyntaxError(f"Bad syntax in graph {url}.") from e
     else:
-        raise FetchError(f"Could not fetch remote graph from {url}")
+        raise FetchError(f"Could not fetch remote graph from {url}.")
 
 
 def parse_text(input_graph: str) -> Graph:
@@ -68,4 +71,4 @@ def parse_text(input_graph: str) -> Graph:
         except Exception:
             pass
     # If we reached this point, we were unable to parse.
-    raise SyntaxError()
+    raise SyntaxError("Bad syntax in input graph.")

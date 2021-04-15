@@ -85,7 +85,7 @@ class ValidatorService:
         if self.ontology_graph and len(self.ontology_graph) > 0:
             self._import_ontologies()
 
-        logging.debug(f"Validating with following config: {self.config}")
+        logging.debug(f"Validating with following config: {self.config}.")
         # Add triples from remote predicates if user has asked for that:
         if self.config.expand is True:
             self._expand_objects_triples()
@@ -109,13 +109,13 @@ class ValidatorService:
         """Get triples of objects and add to ontology graph."""
         # TODO: this loop should be parallellized
         for p, o in self.data_graph.predicate_objects(subject=None):
-            # logging.debug(f"{p} a {type(p)}, {o} a {type(o)}")
+            # logging.debug(f"{p} a {type(p)}, {o} a {type(o)}.")
             if p == RDF.type:
                 pass
             elif type(o) is URIRef:
                 if (o, None, None) not in self.data_graph:
                     if (o, None, None) not in self.ontology_graph:
-                        logging.debug(f"Trying to fetch remote triples about {o}")
+                        logging.debug(f"Trying to fetch remote triples about {o}.")
                         try:
                             g = fetch_graph(o)
                             if g:
@@ -150,7 +150,7 @@ class ValidatorService:
             for (_s, _p, uri) in all_imports:
                 if (uri, None, None) not in self.data_graph:
                     if (uri, None, None) not in self.ontology_graph:
-                        logging.debug(f"Trying to fetch remote triples about {uri}")
+                        logging.debug(f"Trying to fetch remote triples about {uri}.")
                         try:
                             _g = fetch_graph(uri)
                             if _g:
