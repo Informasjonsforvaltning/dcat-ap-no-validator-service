@@ -6,7 +6,7 @@ from pytest_mock import MockFixture
 from rdflib import Graph
 from rdflib.compare import graph_diff
 
-from dcat_ap_no_validator_service.adapter import fetch_graph
+from dcat_ap_no_validator_service.adapter import fetch_graph, FetchError
 
 
 @pytest.mark.unit
@@ -45,11 +45,11 @@ async def test_fetch_graph_that_is_not_parsable_as_rdf(mocker: MockFixture) -> N
     # Set up the mock
     mocker.patch(
         "dcat_ap_no_validator_service.adapter.remote_graph_adapter.requests.get",
-        return_value=_mock_no_response(),
+        return_value=_mock_non_parsable_response(),
     )
     url = "https://data.brreg.no/enhetsregisteret/api/enheter/961181399"
-    o = fetch_graph(url)
-    assert o is None
+    with pytest.raises(SyntaxError):
+        _ = fetch_graph(url)
 
 
 @pytest.mark.unit
@@ -60,11 +60,11 @@ async def test_fetch_graph_that_gives_unsuccessful_response(
     # Set up the mock
     mocker.patch(
         "dcat_ap_no_validator_service.adapter.remote_graph_adapter.requests.get",
-        return_value=_mock_non_parsable_response(),
+        return_value=_mock_no_response(),
     )
     url = "https://data.brreg.no/enhetsregisteret/api/enheter/961181399"
-    o = fetch_graph(url)
-    assert o is None
+    with pytest.raises(FetchError):
+        _ = fetch_graph(url)
 
 
 # --- mocks

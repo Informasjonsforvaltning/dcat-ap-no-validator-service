@@ -1,0 +1,15 @@
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+#
+# This file provides the imports that are implicitly the result of reusing them in the DCAT-AP application profile.
+# The imports point to the URL of the RDF serializations (mostly the turtle serializations) as not all ontology URIs have content negotation implemented.
+# The RDF format is required for the ISA testbed validator.
+
+
+<http://data.norge.no/r5r>
+  rdf:type owl:Ontology ;
+  owl:imports <http://slfkjasdf> ;
+  .

@@ -1,18 +1,26 @@
 # dcat-ap-no-validator-service
 A shacl based validator backend service for validating catalogs against dcat-ap-no specification
 
-Input should be one of the following
- - a file containing your graph as turtle, or
- - a url pointing to resource on the internet containing your graph as turtle, or
- - a string containing your graph as turtle
+The validator need the following input graphs:
+## A data graph
+The RDF graph containing the data to be validated
 
- In addition you can input what version of dcat-ap-no you want your graph to be validated against.
- Today we support the following versions:
- - dcat-ap-no v1.1: 1.1
- - dcat-ap-no v2: 2
+## A shapes graph
+The RDF graph containing the [SHACL shapes](https://www.w3.org/TR/shacl/) to validate with
+
+## An ontology graph (optional)
+The RDF graph containing extra ontological information. The validator will try to import
+ontologies referenced in [owl:imports](https://www.w3.org/TR/owl-ref/#imports-def) statements
+
+Input graphs should be supplied in of the following ways:
+ - a file containing your graph, or
+ - a url pointing to a resource on the internet containing your graph, or
 
 Response will be a RDF graph consisting of
+ - the input data graph
  - the report as a graph according to a SHACL [validation report](https://www.w3.org/TR/shacl/#validation-report)
+ - the additional triples added to the data graph (if `includeExpandedTriples` is True)
+ - the ontology graph (if `includeExpandedTriples` is True)
 
 ## Usage by curl examples
 ### Validate file
@@ -22,6 +30,7 @@ Response will be a RDF graph consisting of
  -H "Content-Type: multipart/form-data" \
  -F "data-graph-file=@tests/files/valid_catalog.ttl;type=text/turtle" \
  -F "shapes-graph-file=@tests/files/mock_dcat-ap-no-shacl_shapes_2.00.ttl" \
+ -F "ontology-graph-file=@tests/files/ontologies.ttl" \
  -X POST http://localhost:8000/validator
 ```
 ### Validate endpoint(url)
@@ -31,6 +40,7 @@ Response will be a RDF graph consisting of
  -H "Content-Type: multipart/form-data" \
  -F "data-graph-url=https://example.com/mygraph" \
  -F "shapes-graph-file=@tests/files/mock_dcat-ap-no-shacl_shapes_2.00.ttl" \
+ -F "ontology-graph-file=@tests/files/ontologies.ttl" \
  -X POST http://localhost:8000/validator
 ```
 ### With config parameters:
@@ -40,6 +50,7 @@ Response will be a RDF graph consisting of
  -H "Content-Type: multipart/form-data" \
  -F "data-graph-file=@tests/files/valid_catalog.ttl;type=text/turtle" \
  -F "shapes-graph-file=@tests/files/mock_dcat-ap-no-shacl_shapes_2.00.ttl" \
+ -F "ontology-graph-file=@tests/files/ontologies.ttl" \
  -F "config=@tests/files/config.json;type=application/json" \
 -X POST http://localhost:8000/validator
 ```
@@ -56,6 +67,12 @@ Where `config.json` file may have the following properties, ref [the openAPI spe
  -H "Accept: application/json" \
  -X GET http://localhost:8000/shapes
  ```
+### Get details about given shacl shapes
+ ```
+ % curl -i \
+  -H "Accept: application/json" \
+  -X GET http://localhost:8000/shapes/1
+  ```
 ## Develop and run locally
 ### Requirements
 - [pyenv](https://github.com/pyenv/pyenv) (recommended)
@@ -74,21 +91,20 @@ Where `config.json` file may have the following properties, ref [the openAPI spe
 % pipx inject nox nox-poetry
 % poetry install
 ```
-### Running the API locally
+## Running the API locally
 Start the server locally:
 ```
 % poetry run adev runserver src/dcat_ap_no_validator_service
 ```
- TBD
 ## Running the API in a wsgi-server (gunicorn)
 ```
-% poetry run gunicorn dcat_ap_no_validator_service:create_app --bind localhost:8080 --worker-class aiohttp.GunicornWebWorker
+% poetry run gunicorn dcat_ap_no_validator_service:create_app --bind localhost:8000 --worker-class aiohttp.GunicornWebWorker
 ```
 ## Running the wsgi-server in Docker
 To build and run the api in a Docker container:
 ```
 % docker build -t digdir/dcat-ap-no-validator-service:latest .
-% docker run --env-file .env -p 8080:8080 -d digdir/dcat-ap-no-validator-service:latest
+% docker run --env-file .env -p 8000:8080 -d digdir/dcat-ap-no-validator-service:latest
 ```
 The easier way would be with docker-compose:
 ```
@@ -104,4 +120,29 @@ To run linters, checkers and tests:
 To run tests with logging, do:
 ```
 % nox -s integration_tests -- --log-cli-level=DEBUG
+```
+## Environment variables
+### `REDIS_HOST`
+Hostname where the remote redis is reachable on default port (6379).
+Default: localhost
+### `REDIS_PORT`
+Port where the remote redis is reachable.
+Default: `6379`
+### `REDIS_PASSWORD`
+Password to the remote redis is reachable.
+Default: `6379`
+### `LOGGING_LEVEL`
+One of the supported levels found [here](https://docs.python.org/3/library/logging.html#levels).
+Default: `INFO`
+### `CONFIG`
+One of
+- `dev`: will not use cache backend
+- `test`: will not use cache backend
+- `production`: will require and use a redis backend, cf docker-compose.yml
+Default: `production`
+
+An example .env file for local development without use of redis cache:
+```
+LOGGING_LEVEL=DEBUG
+CONFIG=dev
 ```

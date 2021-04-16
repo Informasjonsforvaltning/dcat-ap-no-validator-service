@@ -40,6 +40,14 @@ paths:
                     type: string
                     format: uri
                     description: a url pointing to the [shapes graph](https://www.w3.org/TR/shacl/#shapes-graph) on the internet
+                  ontology-graph-file:
+                    type: string
+                    format: binary
+                    description: a file containing extra ontological information. Supports owl:imports 
+                  ontology-graph-url:
+                    type: string
+                    format: uri
+                    description: a url pointing to a graph containing extra ontological information
             encoding:
               file:
                 contentType: text/turtle

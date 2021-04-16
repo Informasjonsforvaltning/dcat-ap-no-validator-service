@@ -55,7 +55,7 @@ def integration_tests(session: Session) -> None:
         "-m integration",
         "-rfE",
         *args,
-        env={},
+        env={"CONFIG": "test"},
     )
 
 
@@ -75,7 +75,7 @@ def contract_tests(session: Session) -> None:
         "-m contract",
         "-rfE",
         *args,
-        env={},
+        env={"REDIS_PASSWORD": "secret"},
     )
 
 

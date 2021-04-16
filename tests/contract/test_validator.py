@@ -15,6 +15,7 @@ async def test_validator_with_file(http_service: Any) -> None:
     url = f"{http_service}/validator"
     data_graph_file = "tests/files/valid_catalog.ttl"
     shapes_graph_file = "tests/files/mock_dcat-ap-no-shacl_shapes_2.00.ttl"
+    ontology_graph_file = "tests/files/ontologies.ttl"
 
     with MultipartWriter("mixed") as mpwriter:
         p = mpwriter.append(open(data_graph_file, "rb"))
@@ -24,6 +25,10 @@ async def test_validator_with_file(http_service: Any) -> None:
         p = mpwriter.append(open(shapes_graph_file, "rb"))
         p.set_content_disposition(
             "attachment", name="shapes-graph-file", filename=shapes_graph_file
+        )
+        p = mpwriter.append(open(ontology_graph_file, "rb"))
+        p.set_content_disposition(
+            "attachment", name="ontology-graph-file", filename=ontology_graph_file
         )
 
     session = ClientSession()
@@ -66,6 +71,7 @@ async def test_validator_accept_json_ld(http_service: Any) -> None:
     data_graph_file = "tests/files/valid_catalog.ttl"
     headers = {"Accept": "application/ld+json"}
     shapes_graph_file = "tests/files/mock_dcat-ap-no-shacl_shapes_2.00.ttl"
+    ontology_graph_file = "tests/files/ontologies.ttl"
 
     with MultipartWriter("mixed") as mpwriter:
         p = mpwriter.append(open(data_graph_file, "rb"))
@@ -75,6 +81,10 @@ async def test_validator_accept_json_ld(http_service: Any) -> None:
         p = mpwriter.append(open(shapes_graph_file, "rb"))
         p.set_content_disposition(
             "attachment", name="shapes-graph-file", filename=shapes_graph_file
+        )
+        p = mpwriter.append(open(ontology_graph_file, "rb"))
+        p.set_content_disposition(
+            "attachment", name="ontology-graph-file", filename=ontology_graph_file
         )
 
     session = ClientSession()
@@ -125,6 +135,7 @@ async def test_validator_file_content_type_json_ld(http_service: Any) -> None:
     url = f"{http_service}/validator"
     data_graph_file = "tests/files/valid_catalog.json"
     shapes_graph_file = "tests/files/mock_dcat-ap-no-shacl_shapes_2.00.ttl"
+    ontology_graph_file = "tests/files/ontologies.ttl"
 
     with MultipartWriter("mixed") as mpwriter:
         p = mpwriter.append(
@@ -136,6 +147,10 @@ async def test_validator_file_content_type_json_ld(http_service: Any) -> None:
         p = mpwriter.append(open(shapes_graph_file, "rb"))
         p.set_content_disposition(
             "attachment", name="shapes-graph-file", filename=shapes_graph_file
+        )
+        p = mpwriter.append(open(ontology_graph_file, "rb"))
+        p.set_content_disposition(
+            "attachment", name="ontology-graph-file", filename=ontology_graph_file
         )
 
     session = ClientSession()
@@ -176,6 +191,7 @@ async def test_validator_file_content_type_rdf_xml(http_service: Any) -> None:
     url = f"{http_service}/validator"
     data_graph_file = "tests/files/valid_catalog.xml"
     shapes_graph_file = "tests/files/mock_dcat-ap-no-shacl_shapes_2.00.ttl"
+    ontology_graph_file = "tests/files/ontologies.ttl"
 
     with MultipartWriter("mixed") as mpwriter:
         p = mpwriter.append(
@@ -187,6 +203,10 @@ async def test_validator_file_content_type_rdf_xml(http_service: Any) -> None:
         p = mpwriter.append(open(shapes_graph_file, "rb"))
         p.set_content_disposition(
             "attachment", name="shapes-graph-file", filename=shapes_graph_file
+        )
+        p = mpwriter.append(open(ontology_graph_file, "rb"))
+        p.set_content_disposition(
+            "attachment", name="ontology-graph-file", filename=ontology_graph_file
         )
 
     session = ClientSession()
@@ -228,6 +248,7 @@ async def test_validator_url(http_service: Any) -> None:
 
     data_graph_url = "https://raw.githubusercontent.com/Informasjonsforvaltning/dcat-ap-no-validator-service/main/tests/files/valid_catalog.ttl"  # noqa: B950
     shapes_graph_file = "tests/files/mock_dcat-ap-no-shacl_shapes_2.00.ttl"
+    ontology_graph_file = "tests/files/ontologies.ttl"
 
     with MultipartWriter("mixed") as mpwriter:
         p = mpwriter.append(data_graph_url)
@@ -235,6 +256,10 @@ async def test_validator_url(http_service: Any) -> None:
         p = mpwriter.append(open(shapes_graph_file, "rb"))
         p.set_content_disposition(
             "attachment", name="shapes-graph-file", filename=shapes_graph_file
+        )
+        p = mpwriter.append(open(ontology_graph_file, "rb"))
+        p.set_content_disposition(
+            "attachment", name="ontology-graph-file", filename=ontology_graph_file
         )
 
     session = ClientSession()
@@ -277,6 +302,7 @@ async def test_validator_with_file_content_encoding(http_service: Any) -> None:
     url = f"{http_service}/validator"
     data_graph_file = "tests/files/valid_catalog.ttl"
     shapes_graph_file = "tests/files/mock_dcat-ap-no-shacl_shapes_2.00.ttl"
+    ontology_graph_file = "tests/files/ontologies.ttl"
 
     with MultipartWriter("mixed") as mpwriter:
         p = mpwriter.append(open(data_graph_file, "rb"))
@@ -287,6 +313,10 @@ async def test_validator_with_file_content_encoding(http_service: Any) -> None:
         p = mpwriter.append(open(shapes_graph_file, "rb"))
         p.set_content_disposition(
             "attachment", name="shapes-graph-file", filename=shapes_graph_file
+        )
+        p = mpwriter.append(open(ontology_graph_file, "rb"))
+        p.set_content_disposition(
+            "attachment", name="ontology-graph-file", filename=ontology_graph_file
         )
 
     session = ClientSession()
@@ -327,6 +357,7 @@ async def test_validator_with_default_config(http_service: Any) -> None:
     url = f"{http_service}/validator"
     data_graph_file = "tests/files/valid_catalog.ttl"
     shapes_graph_file = "tests/files/mock_dcat-ap-no-shacl_shapes_2.00.ttl"
+    ontology_graph_file = "tests/files/ontologies.ttl"
 
     config = {"expand": True, "includeExpandedTriples": False}
 
@@ -341,6 +372,10 @@ async def test_validator_with_default_config(http_service: Any) -> None:
         p = mpwriter.append(open(shapes_graph_file, "rb"))
         p.set_content_disposition(
             "attachment", name="shapes-graph-file", filename=shapes_graph_file
+        )
+        p = mpwriter.append(open(ontology_graph_file, "rb"))
+        p.set_content_disposition(
+            "attachment", name="ontology-graph-file", filename=ontology_graph_file
         )
 
     session = ClientSession()
@@ -381,6 +416,7 @@ async def test_validator_with_file_and_shapes_graph_file(http_service: Any) -> N
     url = f"{http_service}/validator"
     data_graph_file = "tests/files/valid_catalog.ttl"
     shapes_graph_file = "tests/files/mock_dcat-ap-no-shacl_shapes_2.00.ttl"
+    ontology_graph_file = "tests/files/ontologies.ttl"
 
     with MultipartWriter("mixed") as mpwriter:
         p = mpwriter.append(open(data_graph_file, "rb"))
@@ -390,6 +426,10 @@ async def test_validator_with_file_and_shapes_graph_file(http_service: Any) -> N
         p = mpwriter.append(open(shapes_graph_file, "rb"))
         p.set_content_disposition(
             "attachment", name="shapes-graph-file", filename=shapes_graph_file
+        )
+        p = mpwriter.append(open(ontology_graph_file, "rb"))
+        p.set_content_disposition(
+            "attachment", name="ontology-graph-file", filename=ontology_graph_file
         )
 
     session = ClientSession()
@@ -432,6 +472,7 @@ async def test_validator_with_not_valid_file(http_service: Any) -> None:
     url = f"{http_service}/validator"
     data_graph_file = "tests/files/invalid_catalog.ttl"
     shapes_graph_file = "tests/files/mock_dcat-ap-no-shacl_shapes_2.00.ttl"
+    ontology_graph_file = "tests/files/ontologies.ttl"
 
     with MultipartWriter("mixed") as mpwriter:
         p = mpwriter.append(open(data_graph_file, "rb"))
@@ -441,6 +482,10 @@ async def test_validator_with_not_valid_file(http_service: Any) -> None:
         p = mpwriter.append(open(shapes_graph_file, "rb"))
         p.set_content_disposition(
             "attachment", name="shapes-graph-file", filename=shapes_graph_file
+        )
+        p = mpwriter.append(open(ontology_graph_file, "rb"))
+        p.set_content_disposition(
+            "attachment", name="ontology-graph-file", filename=ontology_graph_file
         )
 
     session = ClientSession()
