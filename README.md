@@ -125,9 +125,6 @@ To run tests with logging, do:
 ### `REDIS_HOST`
 Hostname where the remote redis is reachable on default port (6379).
 Default: localhost
-### `REDIS_PORT`
-Port where the remote redis is reachable.
-Default: `6379`
 ### `REDIS_PASSWORD`
 Password to the remote redis is reachable.
 Default: `6379`

@@ -1,4 +1,7 @@
 """Module for validator service."""
+from __future__ import annotations
+
+
 from dataclasses import dataclass
 import logging
 import traceback
@@ -21,7 +24,7 @@ class Config:
     include_expanded_triples: bool = False
 
 
-class ValidatorService:
+class ValidatorService(object):
     """Class representing validator service."""
 
     __slots__ = (
@@ -34,8 +37,18 @@ class ValidatorService:
         "config",
     )
 
-    def __init__(
-        self,
+    # Instance variables:
+    data_graph: Any
+    data_graph_url: str
+    shapes_graph: Any
+    shapes_graph_url: str
+    ontology_graph: Any
+    ontology_graph_url: str
+    config: Config
+
+    @classmethod
+    async def create(
+        cls: Any,
         data_graph_url: Any,
         data_graph: Any,
         shapes_graph: Any,
@@ -43,25 +56,26 @@ class ValidatorService:
         ontology_graph_url: Any,
         ontology_graph: Any,
         config: Config = None,
-    ) -> None:
+    ) -> ValidatorService:
         """Initialize service instance."""
+        self = ValidatorService()
         # Process data graph:
         self.data_graph_url = data_graph_url
         self.data_graph = (
-            fetch_graph(data_graph_url, use_cache=False)
+            await fetch_graph(data_graph_url, use_cache=False)
             if self.data_graph_url
             else parse_text(data_graph)
         )
         # Process shapes graph:
         self.shapes_graph_url = shapes_graph_url
         self.shapes_graph = (
-            fetch_graph(shapes_graph_url, use_cache=False)
+            await fetch_graph(shapes_graph_url, use_cache=False)
             if self.shapes_graph_url
             else parse_text(shapes_graph)
         )
         # Process ontology graph if given:
         if ontology_graph_url:
-            self.ontology_graph = fetch_graph(ontology_graph_url, use_cache=False)
+            self.ontology_graph = await fetch_graph(ontology_graph_url, use_cache=False)
         elif ontology_graph:
             self.ontology_graph = parse_text(ontology_graph)
         else:
@@ -71,6 +85,7 @@ class ValidatorService:
             self.config = Config()
         else:
             self.config = config
+        return self
 
     async def validate(self) -> Tuple[bool, Graph, Graph, Graph]:
         """Validate function."""
@@ -83,12 +98,12 @@ class ValidatorService:
             raise ValueError("Shapes graph cannot be empty.")
         # If user has given an ontology graph, we check for and do imports:
         if self.ontology_graph and len(self.ontology_graph) > 0:
-            self._import_ontologies()
+            await self._import_ontologies()
 
         logging.debug(f"Validating with following config: {self.config}.")
         # Add triples from remote predicates if user has asked for that:
         if self.config.expand is True:
-            self._expand_objects_triples()
+            await self._expand_objects_triples()
 
         # Validate!
         # `inference` should be set to one of the followoing {"none", "rdfs", "owlrl", "both"}
@@ -105,7 +120,7 @@ class ValidatorService:
         )
         return (conforms, self.data_graph, self.ontology_graph, results_graph)
 
-    def _expand_objects_triples(self) -> None:
+    async def _expand_objects_triples(self) -> None:
         """Get triples of objects and add to ontology graph."""
         # TODO: this loop should be parallellized
         for p, o in self.data_graph.predicate_objects(subject=None):
@@ -117,7 +132,7 @@ class ValidatorService:
                     if (o, None, None) not in self.ontology_graph:
                         logging.debug(f"Trying to fetch remote triples about {o}.")
                         try:
-                            g = fetch_graph(o)
+                            g = await fetch_graph(o)
                             if g:
                                 self.ontology_graph += g
                         except FetchError:
@@ -127,7 +142,7 @@ class ValidatorService:
                             logging.debug(traceback.format_exc())
                             pass
 
-    def _import_ontologies(self) -> None:
+    async def _import_ontologies(self) -> None:
         """Import relevant ontologies into ontology graph.
 
         Interpret the owl import statements. Essentially, recursively merge with all the objects in the owl import
@@ -152,7 +167,7 @@ class ValidatorService:
                     if (uri, None, None) not in self.ontology_graph:
                         logging.debug(f"Trying to fetch remote triples about {uri}.")
                         try:
-                            _g = fetch_graph(uri)
+                            _g = await fetch_graph(uri)
                             if _g:
                                 self.ontology_graph += _g
                         except FetchError:

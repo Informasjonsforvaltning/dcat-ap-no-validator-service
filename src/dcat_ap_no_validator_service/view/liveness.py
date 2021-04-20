@@ -2,7 +2,7 @@
 import os
 
 from aiohttp import web
-from redis import Redis, RedisError
+from aioredis import create_redis_pool, Redis
 
 CONFIG = os.getenv("CONFIG", "production")
 
@@ -18,12 +18,13 @@ class Ready(web.View):
         else:  # pragma: no cover
             redis_host = os.getenv("REDIS_HOST", "localhost")
             redis_password = os.getenv("REDIS_PASSWORD")
-            r = Redis(
-                redis_host, socket_connect_timeout=1, password=redis_password
-            )  # short timeout for the test
+            pool = await create_redis_pool(
+                f"redis://{redis_host}", password=redis_password
+            )
+            r = Redis(pool)
             try:
-                r.ping()
-            except RedisError as e:
+                await r.ping()
+            except OSError as e:
                 raise e
 
         return web.Response(text="OK")

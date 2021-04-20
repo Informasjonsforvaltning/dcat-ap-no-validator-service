@@ -2,13 +2,14 @@
 import json
 from typing import Any, Dict
 
-from aiohttp import hdrs, MultipartWriter
+
+from aiohttp import ClientError, hdrs, MultipartWriter
 from aiohttp.test_utils import TestClient as _TestClient
+from aioresponses import aioresponses
 import pytest
 from pytest_mock import MockFixture
 from rdflib import Graph
 from rdflib.compare import graph_diff, isomorphic
-from requests.exceptions import RequestException
 
 from dcat_ap_no_validator_service.service import ShapesService
 
@@ -20,99 +21,106 @@ _MOCK_SHAPES_STORE: Dict[str, Dict] = dict(
 )
 
 
+@pytest.fixture
+def mock_aioresponse() -> Any:
+    """Set up aioresponses as fixture."""
+    with aioresponses(passthrough=["http://127.0.0.1"]) as m:
+        yield m
+
+
 @pytest.fixture(scope="function")
-def mocks(requests_mock: Any, mocker: MockFixture) -> Any:
-    """Patch the call to requests.get."""
+def mocks(mock_aioresponse: Any, mocker: MockFixture) -> Any:
+    """Patch the calls to aiohttp.Client.get."""
     # Set up the mocks
     with open("tests/files/mock_organization_catalogue_961181399.ttl", "r") as file:
         org_961181399 = file.read()
-    requests_mock.get(
+    mock_aioresponse.get(
         "https://organization-catalogue.fellesdatakatalog.digdir.no/organizations/961181399",
-        text=org_961181399,
+        body=org_961181399,
     )
     with open("tests/files/mock_los_tema_barnehage.xml", "r") as file:
         los = file.read()
-    requests_mock.get(
+    mock_aioresponse.get(
         "https://psi.norge.no/los/tema/barnehage",
-        text=los,
+        body=los,
     )
     with open("tests/files/mock_data_theme_GOVE.xml", "r") as file:
         theme = file.read()
-    requests_mock.get(
+    mock_aioresponse.get(
         "http://publications.europa.eu/resource/authority/data-theme/GOVE",
-        text=theme,
+        body=theme,
     )
     with open("tests/files/mock_organization_catalogue_991825827.ttl", "r") as file:
         org_991825827 = file.read()
-    requests_mock.get(
+    mock_aioresponse.get(
         "https://organization-catalogue.fellesdatakatalog.digdir.no/organizations/991825827",
-        text=org_991825827,
+        body=org_991825827,
     )
     with open("tests/files/mock_regorg.ttl", "r") as file:
         regorg = file.read()
-    requests_mock.get(
+    mock_aioresponse.get(
         "https://www.w3.org/ns/regorg",
-        text=regorg,
+        body=regorg,
     )
     with open("tests/files/mock_org.ttl", "r") as file:
         org = file.read()
-    requests_mock.get(
+    mock_aioresponse.get(
         "https://www.w3.org/ns/org",
-        text=org,
+        body=org,
     )
-    requests_mock.get(
+    mock_aioresponse.get(
         "https://example.com/graphs/not_found_graph",
-        status_code=404,
+        status=404,
     )
-    requests_mock.get(
+    mock_aioresponse.get(
         "http://slfkjasdf",
-        exc=RequestException("Failure in name resolution for http://slfkjasdf"),
+        exception=ClientError("Failure in name resolution for http://slfkjasdf"),
     )
-    requests_mock.get(
+    mock_aioresponse.get(
         "https://example.com/nograph",
-        exc=RequestException(
+        exception=ClientError(
             "Failure in name resolution for https://example.com/nograph"
         ),
     )
     with open("tests/files/invalid_rdf.txt", "r") as file:
         invalid_rdf = file.read()
-    requests_mock.get(
+    mock_aioresponse.get(
         "https://example.com/non_parsable_graph",
-        text=invalid_rdf,
+        body=invalid_rdf,
     )
     with open("tests/files/valid_catalog.json", "r") as file:
         valid_catalog_json = file.read()
-    requests_mock.get(
+    mock_aioresponse.get(
         "https://example.com/datagraphs/valid_catalog.json",
-        text=valid_catalog_json,
+        body=valid_catalog_json,
     )
     with open("tests/files/valid_catalog.ttl", "r") as file:
         valid_catalog = file.read()
-    requests_mock.get(
+    mock_aioresponse.get(
         "https://example.com/datagraphs/valid_catalog.ttl",
-        text=valid_catalog,
+        body=valid_catalog,
     )
     with open("tests/files/mock_org-status.ttl", "r") as file:
         valid_catalog = file.read()
-    requests_mock.get(
+    mock_aioresponse.get(
         "https://raw.githubusercontent.com/Informasjonsforvaltning/organization-catalogue/master/src/main/resources/ontology/org-status.ttl",  # noqa
-        text=valid_catalog,
+        body=valid_catalog,
     )
     with open(
         "tests/files/mock_publications_europa_eu_resource_authority_licence.xml", "r"
     ) as file:
         valid_catalog = file.read()
-    requests_mock.get(
+    mock_aioresponse.get(
         "http://publications.europa.eu/resource/authority/licence",  # noqa
-        text=valid_catalog,
+        body=valid_catalog,
     )
-    requests_mock.get(
+    mock_aioresponse.get(
         "http://example.com/accessURL",
-        status_code=404,
+        status=404,
     )
-    requests_mock.get(
+    mock_aioresponse.get(
         "http://publications.europa.eu/ontology/euvoc",
-        status_code=404,
+        status=404,
     )
     # Patch the Shapes graph store:
     mocker.patch.object(ShapesService, "_SHAPES_STORE", _MOCK_SHAPES_STORE)

@@ -22,17 +22,19 @@ def unit_tests(session: Session) -> None:
     args = session.posargs
     session.install(".")
     session.install(
+        "requests",
         "pytest",
         "pytest-mock",
         "pytest-aiohttp",
         "pytest-profiling",
+        "aioresponses",
     )
     session.run(
         "pytest",
         "-m unit",
         "-rfE",
         *args,
-        env={},
+        env={"CONFIG": "test"},
     )
 
 
@@ -43,12 +45,13 @@ def integration_tests(session: Session) -> None:
     session.install(".")
     session.install(
         "coverage[toml]",
+        "requests",
         "pytest",
         "pytest-cov",
         "pytest-mock",
         "pytest-aiohttp",
         "pytest-profiling",
-        "requests-mock",
+        "aioresponses",
     )
     session.run(
         "pytest",
@@ -65,10 +68,12 @@ def contract_tests(session: Session) -> None:
     args = session.posargs
     session.install(".")
     session.install(
+        "requests",
         "pytest",
         "pytest-docker",
         "pytest_mock",
         "pytest-asyncio",
+        "aioresponses",
     )
     session.run(
         "pytest",

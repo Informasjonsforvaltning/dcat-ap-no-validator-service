@@ -134,7 +134,7 @@ class Validator(web.View):
         # We have got data, now validate:
         try:
             # instantiate validator service:
-            service = ValidatorService(
+            service = await ValidatorService.create(
                 data_graph_url=data_graph_url,
                 data_graph=data_graph,
                 shapes_graph_url=shapes_graph_url,
