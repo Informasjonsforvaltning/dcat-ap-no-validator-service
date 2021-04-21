@@ -1057,6 +1057,14 @@ docs = ["sphinx (>=1.7.4)", "docutils", "requests", "sphinx-paramlinks"]
 testing = ["coverage", "mypy", "pylint", "pytest"]
 
 [[package]]
+name = "python-json-logger"
+version = "2.0.1"
+description = "A python library adding a json log formatter"
+category = "main"
+optional = false
+python-versions = ">=3.4"
+
+[[package]]
 name = "pywin32"
 version = "227"
 description = "Python for Window Extensions"
@@ -1286,7 +1294,7 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "5f2e222482489966ed4f1fc9247e9ec11f71b98458cd9ee778ca5906b4458de6"
+content-hash = "71112e6f384325a1b8cd87cb6e48a5b42a31e7cc1d50c7fdf2bac5221992fbfa"
 
 [metadata.files]
 aioboto3 = [
@@ -1928,6 +1936,9 @@ python-dotenv = [
 ]
 python-forge = [
     {file = "python_forge-18.6.0-py35-none-any.whl", hash = "sha256:bf91f9a42150d569c2e9a0d90ab60a8cbed378bdf185e5120532a3481067395c"},
+]
+python-json-logger = [
+    {file = "python-json-logger-2.0.1.tar.gz", hash = "sha256:f26eea7898db40609563bed0a7ca11af12e2a79858632706d835a0f961b7d398"},
 ]
 pywin32 = [
     {file = "pywin32-227-cp27-cp27m-win32.whl", hash = "sha256:371fcc39416d736401f0274dd64c2302728c9e034808e37381b5e1b22be4a6b0"},
