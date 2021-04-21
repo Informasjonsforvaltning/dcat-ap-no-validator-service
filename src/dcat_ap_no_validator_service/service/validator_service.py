@@ -1,12 +1,15 @@
 """Module for validator service."""
 from __future__ import annotations
 
-
 from dataclasses import dataclass
 import logging
+import os
 import traceback
 from typing import Any, Tuple
 
+from aiohttp_client_cache import CachedSession
+from aiohttp_client_cache.backends.redis import RedisBackend
+from dotenv import load_dotenv
 from pyshacl import validate
 from rdflib import Graph, OWL, RDF, URIRef
 
@@ -14,6 +17,22 @@ from rdflib import Graph, OWL, RDF, URIRef
 from dcat_ap_no_validator_service.adapter import fetch_graph, FetchError, parse_text
 
 SUPPORTED_FORMATS = set(["text/turtle", "application/ld+json", "application/rdf+xml"])
+
+
+# Setting up cache
+load_dotenv()
+# Enable cache in all other cases than test:
+CONFIG = os.getenv("CONFIG", "production")
+if CONFIG in {"test", "dev"}:
+    cache = None
+else:  # pragma: no cover
+    REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
+    REDIS_PASSWORD = os.getenv("REDIS_PASSWORD")
+    cache = RedisBackend(
+        "aiohttp-cache",
+        address=f"redis://{REDIS_HOST}",
+        password=REDIS_PASSWORD,
+    )
 
 
 @dataclass
@@ -35,6 +54,7 @@ class ValidatorService(object):
         "ontology_graph",
         "ontology_graph_url",
         "config",
+        "session",
     )
 
     # Instance variables:
@@ -45,6 +65,7 @@ class ValidatorService(object):
     ontology_graph: Any
     ontology_graph_url: str
     config: Config
+    session: CachedSession
 
     @classmethod
     async def create(
@@ -59,68 +80,73 @@ class ValidatorService(object):
     ) -> ValidatorService:
         """Initialize service instance."""
         self = ValidatorService()
-        # Process data graph:
-        self.data_graph_url = data_graph_url
-        self.data_graph = (
-            await fetch_graph(data_graph_url, use_cache=False)
-            if self.data_graph_url
-            else parse_text(data_graph)
-        )
-        # Process shapes graph:
-        self.shapes_graph_url = shapes_graph_url
-        self.shapes_graph = (
-            await fetch_graph(shapes_graph_url, use_cache=False)
-            if self.shapes_graph_url
-            else parse_text(shapes_graph)
-        )
-        # Process ontology graph if given:
-        if ontology_graph_url:
-            self.ontology_graph = await fetch_graph(ontology_graph_url, use_cache=False)
-        elif ontology_graph:
-            self.ontology_graph = parse_text(ontology_graph)
-        else:
-            self.ontology_graph = Graph()
-        # Config:
-        if config is None:
-            self.config = Config()
-        else:
-            self.config = config
-        return self
+        async with CachedSession(cache=cache) as session:
+            # Process data graph:
+            self.data_graph_url = data_graph_url
+            self.data_graph = (
+                await fetch_graph(session, data_graph_url, use_cache=False)
+                if self.data_graph_url
+                else parse_text(data_graph)
+            )
+            # Process shapes graph:
+            self.shapes_graph_url = shapes_graph_url
+            self.shapes_graph = (
+                await fetch_graph(session, shapes_graph_url, use_cache=False)
+                if self.shapes_graph_url
+                else parse_text(shapes_graph)
+            )
+            # Process ontology graph if given:
+            if ontology_graph_url:
+                self.ontology_graph = await fetch_graph(
+                    session, ontology_graph_url, use_cache=False
+                )
+            elif ontology_graph:
+                self.ontology_graph = parse_text(ontology_graph)
+            else:
+                self.ontology_graph = Graph()
+            # Config:
+            if config is None:
+                self.config = Config()
+            else:
+                self.config = config
+            return self
 
     async def validate(self) -> Tuple[bool, Graph, Graph, Graph]:
         """Validate function."""
-        # Do some sanity checks on preconditions:
-        # No need to validate when empty data graph:
-        if self.data_graph is None or len(self.data_graph) == 0:
-            raise ValueError("Data graph cannot be empty.")
-        # No need to validate when empty shapes graph:
-        if self.shapes_graph is None or len(self.shapes_graph) == 0:
-            raise ValueError("Shapes graph cannot be empty.")
-        # If user has given an ontology graph, we check for and do imports:
-        if self.ontology_graph and len(self.ontology_graph) > 0:
-            await self._import_ontologies()
+        async with CachedSession(cache=cache) as session:
 
-        logging.debug(f"Validating with following config: {self.config}.")
-        # Add triples from remote predicates if user has asked for that:
-        if self.config.expand is True:
-            await self._expand_objects_triples()
+            # Do some sanity checks on preconditions:
+            # No need to validate when empty data graph:
+            if self.data_graph is None or len(self.data_graph) == 0:
+                raise ValueError("Data graph cannot be empty.")
+            # No need to validate when empty shapes graph:
+            if self.shapes_graph is None or len(self.shapes_graph) == 0:
+                raise ValueError("Shapes graph cannot be empty.")
+            # If user has given an ontology graph, we check for and do imports:
+            if self.ontology_graph and len(self.ontology_graph) > 0:
+                await self._import_ontologies(session)
 
-        # Validate!
-        # `inference` should be set to one of the followoing {"none", "rdfs", "owlrl", "both"}
-        conforms, results_graph, _ = validate(
-            data_graph=self.data_graph,
-            ont_graph=self.ontology_graph,
-            shacl_graph=self.shapes_graph,
-            inference="rdfs",
-            inplace=False,
-            meta_shacl=False,
-            debug=False,
-            do_owl_imports=False,  # owl_imports in pyshacl represent performance penalty
-            advanced=False,
-        )
-        return (conforms, self.data_graph, self.ontology_graph, results_graph)
+            logging.debug(f"Validating with following config: {self.config}.")
+            # Add triples from remote predicates if user has asked for that:
+            if self.config.expand is True:
+                await self._expand_objects_triples(session)
 
-    async def _expand_objects_triples(self) -> None:
+            # Validate!
+            # `inference` should be set to one of the followoing {"none", "rdfs", "owlrl", "both"}
+            conforms, results_graph, _ = validate(
+                data_graph=self.data_graph,
+                ont_graph=self.ontology_graph,
+                shacl_graph=self.shapes_graph,
+                inference="rdfs",
+                inplace=False,
+                meta_shacl=False,
+                debug=False,
+                do_owl_imports=False,  # owl_imports in pyshacl represent performance penalty
+                advanced=False,
+            )
+            return (conforms, self.data_graph, self.ontology_graph, results_graph)
+
+    async def _expand_objects_triples(self, session: CachedSession) -> None:
         """Get triples of objects and add to ontology graph."""
         # TODO: this loop should be parallellized
         for p, o in self.data_graph.predicate_objects(subject=None):
@@ -132,7 +158,7 @@ class ValidatorService(object):
                     if (o, None, None) not in self.ontology_graph:
                         logging.debug(f"Trying to fetch remote triples about {o}.")
                         try:
-                            g = await fetch_graph(o)
+                            g = await fetch_graph(session, o)
                             if g:
                                 self.ontology_graph += g
                         except FetchError:
@@ -142,7 +168,7 @@ class ValidatorService(object):
                             logging.debug(traceback.format_exc())
                             pass
 
-    async def _import_ontologies(self) -> None:
+    async def _import_ontologies(self, session: CachedSession) -> None:
         """Import relevant ontologies into ontology graph.
 
         Interpret the owl import statements. Essentially, recursively merge with all the objects in the owl import
@@ -167,7 +193,7 @@ class ValidatorService(object):
                     if (uri, None, None) not in self.ontology_graph:
                         logging.debug(f"Trying to fetch remote triples about {uri}.")
                         try:
-                            _g = await fetch_graph(uri)
+                            _g = await fetch_graph(session, uri)
                             if _g:
                                 self.ontology_graph += _g
                         except FetchError:

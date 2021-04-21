@@ -1,6 +1,7 @@
 """Integration test cases for the graph_adapter."""
 from typing import Any
 
+from aiohttp_client_cache import CachedSession
 from aioresponses import aioresponses
 import pytest
 from rdflib import Graph
@@ -24,9 +25,10 @@ async def test_fetch_graph_that_has_rdf_content_type(mock_aioresponse: Any) -> N
     # Set up the mock
     mock_aioresponse.get(url, status=200, body=_mock_rdf_response())
 
-    o = await fetch_graph(url)
-    assert type(o) == Graph
-    assert len(o) > 0
+    async with CachedSession(cache=None) as session:
+        o = await fetch_graph(session, url)
+        assert type(o) == Graph
+        assert len(o) > 0
 
 
 @pytest.mark.asyncio
@@ -41,9 +43,10 @@ async def test_fetch_graph_that_does_not_have_rdf_content_type(
         url, status=200, body=_mock_rdf_with_non_standard_content_type_response()
     )
 
-    o = await fetch_graph(url)
-    assert type(o) == Graph
-    assert len(o) > 0
+    async with CachedSession(cache=None) as session:
+        o = await fetch_graph(session, url)
+        assert type(o) == Graph
+        assert len(o) > 0
 
 
 @pytest.mark.asyncio
@@ -53,8 +56,10 @@ async def test_fetch_graph_that_is_not_parsable_as_rdf(mock_aioresponse: Any) ->
     url = "https://data.brreg.no/enhetsregisteret/api/enheter/961181399"
     # Set up the mock
     mock_aioresponse.get(url, status=200, body=_mock_non_parsable_response())
-    with pytest.raises(SyntaxError):
-        _ = await fetch_graph(url)
+
+    async with CachedSession(cache=None) as session:
+        with pytest.raises(SyntaxError):
+            _ = await fetch_graph(session, url)
 
 
 @pytest.mark.asyncio
@@ -66,8 +71,10 @@ async def test_fetch_graph_that_gives_unsuccessful_response(
     url = "https://data.brreg.no/enhetsregisteret/api/enheter/961181399"
     # Set up the mock
     mock_aioresponse.get(url, status=406)
-    with pytest.raises(FetchError):
-        _ = await fetch_graph(url)
+
+    async with CachedSession(cache=None) as session:
+        with pytest.raises(FetchError):
+            _ = await fetch_graph(session, url)
 
 
 # --- mocks

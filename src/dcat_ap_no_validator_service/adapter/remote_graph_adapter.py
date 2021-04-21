@@ -1,28 +1,10 @@
 """Module for fetching remote graph."""
 import logging
-import os
 
 from aiohttp import ClientError, hdrs
 from aiohttp_client_cache import CachedSession
-from aiohttp_client_cache.backends.redis import RedisBackend
-from dotenv import load_dotenv
 from rdflib import Graph
 
-
-# Setting up cache
-load_dotenv()
-# Enable cache in all other cases than test:
-CONFIG = os.getenv("CONFIG", "production")
-if CONFIG in {"test", "dev"}:
-    cache = None
-else:  # pragma: no cover
-    REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
-    REDIS_PASSWORD = os.getenv("REDIS_PASSWORD")
-    cache = RedisBackend(
-        "aiohttp-cache",
-        address=f"redis://{REDIS_HOST}",
-        password=REDIS_PASSWORD,
-    )
 
 SUPPORTED_FORMATS = set(["text/turtle", "application/ld+json", "application/rdf+xml"])
 
@@ -36,21 +18,19 @@ class FetchError(Exception):
         super().__init__(message)
 
 
-async def fetch_graph(url: str, use_cache: bool = True) -> Graph:
+async def fetch_graph(
+    session: CachedSession, url: str, use_cache: bool = True
+) -> Graph:
     """Fetch remote graph at url and return as Graph."""
     logging.debug(f"Trying to fetch remote graph {url}.")
     try:
         if use_cache:
-            async with CachedSession(cache=cache) as session:
+            response = await session.get(url, headers={hdrs.ACCEPT: "text/turtle"})
+            body = await response.text()
+        else:
+            async with session.disabled():
                 response = await session.get(url, headers={hdrs.ACCEPT: "text/turtle"})
                 body = await response.text()
-        else:
-            async with CachedSession(cache=cache) as session:
-                async with session.disabled():
-                    response = await session.get(
-                        url, headers={hdrs.ACCEPT: "text/turtle"}
-                    )
-                    body = await response.text()
     except ClientError:
         raise FetchError(f"Could not fetch remote graph from {url}.")
     logging.debug(f"Got status_code {response.status}.")
