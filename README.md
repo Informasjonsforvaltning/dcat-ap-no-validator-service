@@ -16,11 +16,14 @@ Input graphs should be supplied in of the following ways:
  - a file containing your graph, or
  - a url pointing to a resource on the internet containing your graph, or
 
-Response will be a RDF graph consisting of
- - the input data graph
- - the report as a graph according to a SHACL [validation report](https://www.w3.org/TR/shacl/#validation-report)
- - the additional triples added to the data graph (if `includeExpandedTriples` is True)
- - the ontology graph (if `includeExpandedTriples` is True)
+The response will be a RDF graph consisting of
+ - the input data graph, and
+ - the report as a graph according to a SHACL [validation report](https://www.w3.org/TR/shacl/#validation-report).
+
+
+ If `includeExpandedTriples` is `True`, the response will aslo include:
+ - the additional triples added to the data graph, and
+ - the ontology graph
 
 ## Usage by curl examples
 ### Validate file
