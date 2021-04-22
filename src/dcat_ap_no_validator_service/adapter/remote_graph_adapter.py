@@ -1,30 +1,10 @@
 """Module for fetching remote graph."""
 import logging
-import os
 
-from aiohttp import hdrs
-from dotenv import load_dotenv
+from aiohttp import ClientError, hdrs
+from aiohttp_client_cache import CachedSession
 from rdflib import Graph
-import redis
-import requests
-from requests.exceptions import RequestException
-import requests_cache
 
-
-# Setting up cache
-load_dotenv()
-# Enable cache in all other cases than test:
-CONFIG = os.getenv("CONFIG", "production")
-if CONFIG in {"test", "dev"}:
-    pass
-else:  # pragma: no cover
-    REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
-    REDIS_PORT = int(os.getenv("REDIS_PORT", 6379))
-    REDIS_PASSWORD = os.getenv("REDIS_PASSWORD")
-    conn = redis.StrictRedis(host=REDIS_HOST, port=REDIS_PORT, password=REDIS_PASSWORD)
-    requests_cache.install_cache(
-        backend="redis", namespace="dcat-ap-no-validator-service", connection=conn
-    )
 
 SUPPORTED_FORMATS = set(["text/turtle", "application/ld+json", "application/rdf+xml"])
 
@@ -38,22 +18,26 @@ class FetchError(Exception):
         super().__init__(message)
 
 
-def fetch_graph(url: str, use_cache: bool = True) -> Graph:
+async def fetch_graph(
+    session: CachedSession, url: str, use_cache: bool = True
+) -> Graph:
     """Fetch remote graph at url and return as Graph."""
     logging.debug(f"Trying to fetch remote graph {url}.")
     try:
-        if not use_cache:
-            with requests_cache.disabled():
-                resp = requests.get(url, headers={hdrs.ACCEPT: "text/turtle"})
+        if use_cache:
+            response = await session.get(url, headers={hdrs.ACCEPT: "text/turtle"})
+            body = await response.text()
         else:
-            resp = requests.get(url, headers={hdrs.ACCEPT: "text/turtle"})
-    except RequestException:
+            async with session.disabled():
+                response = await session.get(url, headers={hdrs.ACCEPT: "text/turtle"})
+                body = await response.text()
+    except ClientError:
         raise FetchError(f"Could not fetch remote graph from {url}.")
-    logging.debug(f"Got status_code {resp.status_code}.")
-    if resp.status_code == 200:
+    logging.debug(f"Got status_code {response.status}.")
+    if response.status == 200:
         logging.debug(f"Got valid remote graph from {url}")
         try:
-            return parse_text(input_graph=resp.text)
+            return parse_text(input_graph=body)
         except SyntaxError as e:
             raise SyntaxError(f"Bad syntax in graph {url}.") from e
     else:

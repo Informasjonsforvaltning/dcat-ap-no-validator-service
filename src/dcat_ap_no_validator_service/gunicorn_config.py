@@ -2,16 +2,18 @@
 import logging
 import multiprocessing
 from os import environ as env
+import sys
 from typing import Any
 
 from dotenv import load_dotenv
 from gunicorn import glogging
+from pythonjsonlogger import jsonlogger
 
 load_dotenv()
 
 HOST_PORT = env.get("HOST_PORT", "8080")
 DEBUG_MODE = env.get("DEBUG_MODE", False)
-LOG_LEVEL = env.get("LOG_LEVEL", "info")
+LOG_LEVEL = env.get("LOG_LEVEL", "INFO")
 
 # Gunicorn config
 bind = ":" + HOST_PORT
@@ -20,9 +22,23 @@ threads = 2 * multiprocessing.cpu_count()
 loglevel = str(LOG_LEVEL)
 accesslog = "-"
 
-# Need to override the logger to remove healthcheck (ping) form accesslog
+
+class StackdriverJsonFormatter(jsonlogger.JsonFormatter, object):
+    """json log formatter."""
+
+    def __init__(
+        self, fmt="%(levelname) %(message)", style="%", *args, **kwargs  # noqa
+    ):  # noqa
+        """Instantiate the logger."""
+        jsonlogger.JsonFormatter.__init__(self, fmt=fmt, *args, **kwargs)
+
+    def process_log_record(self, log_record):  # noqa
+        log_record["severity"] = log_record["levelname"]
+        del log_record["levelname"]
+        return super(StackdriverJsonFormatter, self).process_log_record(log_record)
 
 
+# Override the logger to remove healthcheck (ping) from the access log and format logs as json
 class CustomGunicornLogger(glogging.Logger):
     """Custom Gunicorn Logger class."""
 
@@ -30,10 +46,30 @@ class CustomGunicornLogger(glogging.Logger):
         """Set up function."""
         super().setup(cfg)
 
-        # Add filters to Gunicorn logger
-        logger = logging.getLogger("gunicorn.access")
-        logger.addFilter(PingFilter())
-        logger.addFilter(ReadyFilter())
+        access_logger = logging.getLogger("gunicorn.access")
+        access_logger.addFilter(PingFilter())
+        access_logger.addFilter(ReadyFilter())
+
+        root_logger = logging.getLogger()
+        root_logger.setLevel(loglevel)
+
+        other_loggers = [
+            "gunicorn",
+            "gunicorn.error",
+            "gunicorn.http",
+            "gunicorn.http.wsgi",
+        ]
+        loggers = [logging.getLogger(name) for name in other_loggers]
+        loggers.append(root_logger)
+        loggers.append(access_logger)
+
+        json_handler = logging.StreamHandler(sys.stdout)
+        json_handler.setFormatter(StackdriverJsonFormatter())
+
+        for logger in loggers:
+            for handler in logger.handlers:
+                logger.removeHandler(handler)
+            logger.addHandler(json_handler)
 
 
 class PingFilter(logging.Filter):
