@@ -1,6 +1,7 @@
 """Module for validator service."""
 from __future__ import annotations
 
+import asyncio
 from dataclasses import dataclass
 import logging
 import os
@@ -148,25 +149,21 @@ class ValidatorService(object):
 
     async def _expand_objects_triples(self, session: CachedSession) -> None:
         """Get triples of objects and add to ontology graph."""
-        # TODO: this loop should be parallellized
+        all_remote_triples = []
+        # 1. Collect all relevant remote triples:
         for p, o in self.data_graph.predicate_objects(subject=None):
-            # logging.debug(f"{p} a {type(p)}, {o} a {type(o)}.")
             if p == RDF.type:
                 pass
             elif type(o) is URIRef:
                 if (o, None, None) not in self.data_graph:
-                    if (o, None, None) not in self.ontology_graph:
-                        logging.debug(f"Trying to fetch remote triples about {o}.")
-                        try:
-                            g = await fetch_graph(session, o)
-                            if g:
-                                self.ontology_graph += g
-                        except FetchError:
-                            logging.debug(traceback.format_exc())
-                            pass
-                        except SyntaxError:
-                            logging.debug(traceback.format_exc())
-                            pass
+                    all_remote_triples.append(o)
+        if len(all_remote_triples) == 0:
+            # no remote_triples whatsoever, we can go on...
+            return
+        # 2.Get all remote triples:
+        await asyncio.gather(
+            *[self.fetch_triples(uri, session) for uri in all_remote_triples]
+        )
 
     async def _import_ontologies(self, session: CachedSession) -> None:
         """Import relevant ontologies into ontology graph.
@@ -188,15 +185,23 @@ class ValidatorService(object):
             for t in all_imports:
                 self.ontology_graph.remove(t)
             # 3. get all the imported vocabularies and import them
-            for (_s, _p, uri) in all_imports:
-                if (uri, None, None) not in self.data_graph:
-                    if (uri, None, None) not in self.ontology_graph:
-                        logging.debug(f"Trying to fetch remote triples about {uri}.")
-                        try:
-                            _g = await fetch_graph(session, uri)
-                            if _g:
-                                self.ontology_graph += _g
-                        except FetchError:
-                            logging.debug(traceback.format_exc())
-                            pass
+            await asyncio.gather(
+                *[self.fetch_triples(uri, session) for (_s, _p, uri) in all_imports]
+            )
             # 4. start all over again to see if import statements have been imported
+
+    async def fetch_triples(self, uri: str, session: CachedSession) -> None:
+        """Fetch remote triples."""
+        if (uri, None, None) not in self.data_graph:
+            if (uri, None, None) not in self.ontology_graph:
+                logging.debug(f"Trying to fetch remote triples {uri}.")
+                try:
+                    _g = await fetch_graph(session, uri)
+                    if _g:
+                        self.ontology_graph += _g
+                except FetchError:
+                    logging.debug(traceback.format_exc())
+                    pass
+                except SyntaxError:
+                    logging.debug(traceback.format_exc())
+                    pass

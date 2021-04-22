@@ -719,6 +719,41 @@ async def test_validator_ontology_graph_imports_non_reachable_ontology(
     )
 
 
+@pytest.mark.integration
+async def test_validator_file_no_remote_triples(
+    client: _TestClient, mocks: Any
+) -> None:
+    """Should return OK and an unsuccessful validation."""
+    data_graph_file = "tests/files/valid_catalog_no_remote_triples.ttl"
+    shapes_graph_file = "tests/files/mock_dcat-ap-no-shacl_shapes_2.00.ttl"
+    ontology_graph_file = "tests/files/ontologies.ttl"
+
+    with MultipartWriter("mixed") as mpwriter:
+        p = mpwriter.append(open(data_graph_file, "rb"))
+        p.set_content_disposition(
+            "attachment", name="data-graph-file", filename=data_graph_file
+        )
+        p = mpwriter.append(open(shapes_graph_file, "rb"))
+        p.set_content_disposition(
+            "attachment", name="shapes-graph-file", filename=shapes_graph_file
+        )
+        p = mpwriter.append(open(ontology_graph_file, "rb"))
+        p.set_content_disposition(
+            "attachment", name="ontology-graph-file", filename=ontology_graph_file
+        )
+
+    resp = await client.post("/validator", data=mpwriter)
+    assert resp.status == 200
+    assert resp.headers[hdrs.CONTENT_TYPE] == "text/turtle"
+
+    body = await resp.text()
+    with open(data_graph_file, "r") as file:
+        text = file.read()
+    await _assess_response_body_unsuccessful(
+        data=text, format="text/turtle", body=body, content_type="text/turtle"
+    )
+
+
 # -- Bad cases
 @pytest.mark.integration
 async def test_validator_data_graph_url_and_file(
