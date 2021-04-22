@@ -1,14 +1,15 @@
 # dcat-ap-no-validator-service
 A shacl based validator backend service for validating catalogs against dcat-ap-no specification
 
+## Input
 The validator need the following input graphs:
-## A data graph
+### A data graph
 The RDF graph containing the data to be validated
 
-## A shapes graph
+### A shapes graph
 The RDF graph containing the [SHACL shapes](https://www.w3.org/TR/shacl/) to validate with
 
-## An ontology graph (optional)
+### An ontology graph (optional)
 The RDF graph containing extra ontological information. The validator will try to import
 ontologies referenced in [owl:imports](https://www.w3.org/TR/owl-ref/#imports-def) statements
 
@@ -16,6 +17,20 @@ Input graphs should be supplied in of the following ways:
  - a file containing your graph, or
  - a url pointing to a resource on the internet containing your graph, or
 
+### Config
+The input may also contain a configuration record containing two options:
+- `expand` (boolean: `true`/`false`): if set to `true`, the validator will try to fetch remote triples referenced to in the data-graph.
+- `includeExpandedTriples` (boolean: true/false): if set to `true`, the validator will include the remote triples and the ontologies in the response.
+
+Ref [the openAPI specification](./dcat_ap_no_validator_service.yaml). An example config record:
+```
+{
+  "expand": "true",
+  "includeExpandedTriples": "true"
+}
+```
+
+## Response
 The response will be a RDF graph consisting of
  - the input data graph, and
  - the report as a graph according to a SHACL [validation report](https://www.w3.org/TR/shacl/#validation-report).
@@ -57,13 +72,7 @@ The response will be a RDF graph consisting of
  -F "config=@tests/files/config.json;type=application/json" \
 -X POST http://localhost:8000/validator
 ```
-Where `config.json` file may have the following properties, ref [the openAPI specification](./dcat_ap_no_validator_service.yaml) :
-```
-{
-  "expand": "true",
-  "includeExpandedTriples": "true"
-}
-```
+
 ### List all available shacl shapes
 ```
 % curl -i \
