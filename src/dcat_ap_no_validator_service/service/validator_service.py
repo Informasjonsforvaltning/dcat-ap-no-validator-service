@@ -148,15 +148,24 @@ class ValidatorService(object):
             return (conforms, self.data_graph, self.ontology_graph, results_graph)
 
     async def _expand_objects_triples(self, session: CachedSession) -> None:
-        """Get triples of objects and add to ontology graph."""
-        all_remote_triples = []
+        """Get triples of objects and add to ontology graph.
+
+        Search and collect all objects _o_ that is an URI, ignoring
+        - objects of the property RDF.type,
+        - objects that points to a triple already in the given data_graph.
+
+        Add all _o_'s to a set, which implies that only unique _o_'s are in the resulting set.
+        Iterate over the set, and fetch the triples _t_ that _o_ is reffering to.
+        The triple _t_ is finally added to the ontology_graph.
+        """
+        all_remote_triples = set()
         # 1. Collect all relevant remote triples:
         for p, o in self.data_graph.predicate_objects(subject=None):
             if p == RDF.type:
                 pass
             elif type(o) is URIRef:
                 if (o, None, None) not in self.data_graph:
-                    all_remote_triples.append(o)
+                    all_remote_triples.add(o)
         if len(all_remote_triples) == 0:
             # no remote_triples whatsoever, we can go on...
             return
@@ -191,7 +200,10 @@ class ValidatorService(object):
             # 4. start all over again to see if import statements have been imported
 
     async def fetch_triples(self, uri: str, session: CachedSession) -> None:
-        """Fetch remote triples."""
+        """Fetch remote triples and add them to the ontology_graph.
+
+        Only triples that are not allready in the data_graph and/or ontology_graph are added.
+        """
         if (uri, None, None) not in self.data_graph:
             if (uri, None, None) not in self.ontology_graph:
                 logging.debug(f"Trying to fetch remote triples {uri}.")
