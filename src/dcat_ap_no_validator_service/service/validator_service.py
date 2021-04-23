@@ -60,11 +60,8 @@ class ValidatorService(object):
 
     # Instance variables:
     data_graph: Any
-    data_graph_url: str
     shapes_graph: Any
-    shapes_graph_url: str
     ontology_graph: Any
-    ontology_graph_url: str
     config: Config
     session: CachedSession
 
@@ -82,29 +79,45 @@ class ValidatorService(object):
         """Initialize service instance."""
         self = ValidatorService()
         async with CachedSession(cache=cache) as session:
+            all_graph_urls = dict()
             # Process data graph:
-            self.data_graph_url = data_graph_url
             self.data_graph = (
-                await fetch_graph(session, data_graph_url, use_cache=False)
-                if self.data_graph_url
+                all_graph_urls.update({"data_graph": data_graph_url})
+                if data_graph_url
                 else parse_text(data_graph)
             )
             # Process shapes graph:
-            self.shapes_graph_url = shapes_graph_url
             self.shapes_graph = (
-                await fetch_graph(session, shapes_graph_url, use_cache=False)
-                if self.shapes_graph_url
+                all_graph_urls.update({"shapes_graph": shapes_graph_url})
+                if shapes_graph_url
                 else parse_text(shapes_graph)
             )
             # Process ontology graph if given:
             if ontology_graph_url:
-                self.ontology_graph = await fetch_graph(
-                    session, ontology_graph_url, use_cache=False
-                )
+                all_graph_urls.update({"ontology_graph": ontology_graph_url})
             elif ontology_graph:
                 self.ontology_graph = parse_text(ontology_graph)
             else:
                 self.ontology_graph = Graph()
+            # Process all_graph_urls:
+            logging.debug(f"all_graph_urls len: {len(all_graph_urls)}")
+            results = await asyncio.gather(
+                *[
+                    fetch_graph(session, url, use_cache=False)
+                    for url in all_graph_urls.values()
+                ]
+            )
+            # Store the resulting graphs:
+            # The order of result values corresponds to the order of awaitables in all_graph_urls.
+            # Ref: https://docs.python.org/3/library/asyncio-task.html#running-tasks-concurrently
+            for key, g in zip(all_graph_urls.keys(), results):
+                # Did not find any other solution than this brute force chain of ifs
+                if key == "data_graph":
+                    self.data_graph = g
+                elif key == "shapes_graph":
+                    self.shapes_graph = g
+                elif key == "ontology_graph":
+                    self.ontology_graph = g
             # Config:
             if config is None:
                 self.config = Config()
