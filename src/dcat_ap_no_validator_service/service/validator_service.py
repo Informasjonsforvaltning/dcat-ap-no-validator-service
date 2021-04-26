@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import asyncio
 from dataclasses import dataclass
+from enum import Enum
 import logging
 import os
 import traceback
@@ -34,6 +35,14 @@ else:  # pragma: no cover
         address=f"redis://{REDIS_HOST}",
         password=REDIS_PASSWORD,
     )
+
+
+class GraphType(str, Enum):
+    """Enum representing different graph types."""
+
+    DATA_GRAPH = "data_graph"
+    SHAPES_GRAPH = "shapes_graph"
+    ONTOLOGY_GRAPH = "ontology_graph"
 
 
 @dataclass
@@ -82,19 +91,19 @@ class ValidatorService(object):
             all_graph_urls = dict()
             # Process data graph:
             self.data_graph = (
-                all_graph_urls.update({"data_graph": data_graph_url})
+                all_graph_urls.update({GraphType.DATA_GRAPH: data_graph_url})
                 if data_graph_url
                 else parse_text(data_graph)
             )
             # Process shapes graph:
             self.shapes_graph = (
-                all_graph_urls.update({"shapes_graph": shapes_graph_url})
+                all_graph_urls.update({GraphType.SHAPES_GRAPH: shapes_graph_url})
                 if shapes_graph_url
                 else parse_text(shapes_graph)
             )
             # Process ontology graph if given:
             if ontology_graph_url:
-                all_graph_urls.update({"ontology_graph": ontology_graph_url})
+                all_graph_urls.update({GraphType.ONTOLOGY_GRAPH: ontology_graph_url})
             elif ontology_graph:
                 self.ontology_graph = parse_text(ontology_graph)
             else:
@@ -112,11 +121,11 @@ class ValidatorService(object):
             # Ref: https://docs.python.org/3/library/asyncio-task.html#running-tasks-concurrently
             for key, g in zip(all_graph_urls.keys(), results):
                 # Did not find any other solution than this brute force chain of ifs
-                if key == "data_graph":
+                if key == GraphType.DATA_GRAPH:
                     self.data_graph = g
-                elif key == "shapes_graph":
+                elif key == GraphType.SHAPES_GRAPH:
                     self.shapes_graph = g
-                elif key == "ontology_graph":
+                elif key == GraphType.ONTOLOGY_GRAPH:
                     self.ontology_graph = g
             # Config:
             if config is None:
@@ -184,7 +193,7 @@ class ValidatorService(object):
             return
         # 2.Get all remote triples:
         await asyncio.gather(
-            *[self.fetch_triples(uri, session) for uri in all_remote_triples]
+            *[self.add_triples(uri, session) for uri in all_remote_triples]
         )
 
     async def _import_ontologies(self, session: CachedSession) -> None:
@@ -208,11 +217,11 @@ class ValidatorService(object):
                 self.ontology_graph.remove(t)
             # 3. get all the imported vocabularies and import them
             await asyncio.gather(
-                *[self.fetch_triples(uri, session) for (_s, _p, uri) in all_imports]
+                *[self.add_triples(uri, session) for (_s, _p, uri) in all_imports]
             )
             # 4. start all over again to see if import statements have been imported
 
-    async def fetch_triples(self, uri: str, session: CachedSession) -> None:
+    async def add_triples(self, uri: str, session: CachedSession) -> None:
         """Fetch remote triples and add them to the ontology_graph.
 
         Only triples that are not allready in the data_graph and/or ontology_graph are added.
