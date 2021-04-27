@@ -1,7 +1,9 @@
 """Module for validator service."""
 from __future__ import annotations
 
+import asyncio
 from dataclasses import dataclass
+from enum import Enum
 import logging
 import os
 import traceback
@@ -35,6 +37,14 @@ else:  # pragma: no cover
     )
 
 
+class GraphType(str, Enum):
+    """Enum representing different graph types."""
+
+    DATA_GRAPH = "data_graph"
+    SHAPES_GRAPH = "shapes_graph"
+    ONTOLOGY_GRAPH = "ontology_graph"
+
+
 @dataclass
 class Config:
     """Class for keeping track of config item."""
@@ -59,11 +69,8 @@ class ValidatorService(object):
 
     # Instance variables:
     data_graph: Any
-    data_graph_url: str
     shapes_graph: Any
-    shapes_graph_url: str
     ontology_graph: Any
-    ontology_graph_url: str
     config: Config
     session: CachedSession
 
@@ -81,29 +88,45 @@ class ValidatorService(object):
         """Initialize service instance."""
         self = ValidatorService()
         async with CachedSession(cache=cache) as session:
+            all_graph_urls = dict()
             # Process data graph:
-            self.data_graph_url = data_graph_url
             self.data_graph = (
-                await fetch_graph(session, data_graph_url, use_cache=False)
-                if self.data_graph_url
+                all_graph_urls.update({GraphType.DATA_GRAPH: data_graph_url})
+                if data_graph_url
                 else parse_text(data_graph)
             )
             # Process shapes graph:
-            self.shapes_graph_url = shapes_graph_url
             self.shapes_graph = (
-                await fetch_graph(session, shapes_graph_url, use_cache=False)
-                if self.shapes_graph_url
+                all_graph_urls.update({GraphType.SHAPES_GRAPH: shapes_graph_url})
+                if shapes_graph_url
                 else parse_text(shapes_graph)
             )
             # Process ontology graph if given:
             if ontology_graph_url:
-                self.ontology_graph = await fetch_graph(
-                    session, ontology_graph_url, use_cache=False
-                )
+                all_graph_urls.update({GraphType.ONTOLOGY_GRAPH: ontology_graph_url})
             elif ontology_graph:
                 self.ontology_graph = parse_text(ontology_graph)
             else:
                 self.ontology_graph = Graph()
+            # Process all_graph_urls:
+            logging.debug(f"all_graph_urls len: {len(all_graph_urls)}")
+            results = await asyncio.gather(
+                *[
+                    fetch_graph(session, url, use_cache=False)
+                    for url in all_graph_urls.values()
+                ]
+            )
+            # Store the resulting graphs:
+            # The order of result values corresponds to the order of awaitables in all_graph_urls.
+            # Ref: https://docs.python.org/3/library/asyncio-task.html#running-tasks-concurrently
+            for key, g in zip(all_graph_urls.keys(), results):
+                # Did not find any other solution than this brute force chain of ifs
+                if key == GraphType.DATA_GRAPH:
+                    self.data_graph = g
+                elif key == GraphType.SHAPES_GRAPH:
+                    self.shapes_graph = g
+                elif key == GraphType.ONTOLOGY_GRAPH:
+                    self.ontology_graph = g
             # Config:
             if config is None:
                 self.config = Config()
@@ -147,26 +170,31 @@ class ValidatorService(object):
             return (conforms, self.data_graph, self.ontology_graph, results_graph)
 
     async def _expand_objects_triples(self, session: CachedSession) -> None:
-        """Get triples of objects and add to ontology graph."""
-        # TODO: this loop should be parallellized
+        """Get triples of objects and add to ontology graph.
+
+        Search and collect all objects _o_ that is an URI, ignoring
+        - objects of the property RDF.type,
+        - objects that points to a triple already in the given data_graph.
+
+        Add all _o_'s to a set, which implies that only unique _o_'s are in the resulting set.
+        Iterate over the set, and fetch the triples _t_ that _o_ is reffering to.
+        The triple _t_ is finally added to the ontology_graph.
+        """
+        all_remote_triples = set()
+        # 1. Collect all relevant remote triples:
         for p, o in self.data_graph.predicate_objects(subject=None):
-            # logging.debug(f"{p} a {type(p)}, {o} a {type(o)}.")
             if p == RDF.type:
                 pass
             elif type(o) is URIRef:
                 if (o, None, None) not in self.data_graph:
-                    if (o, None, None) not in self.ontology_graph:
-                        logging.debug(f"Trying to fetch remote triples about {o}.")
-                        try:
-                            g = await fetch_graph(session, o)
-                            if g:
-                                self.ontology_graph += g
-                        except FetchError:
-                            logging.debug(traceback.format_exc())
-                            pass
-                        except SyntaxError:
-                            logging.debug(traceback.format_exc())
-                            pass
+                    all_remote_triples.add(o)
+        if len(all_remote_triples) == 0:
+            # no remote_triples whatsoever, we can go on...
+            return
+        # 2.Get all remote triples:
+        await asyncio.gather(
+            *[self.add_triples(uri, session) for uri in all_remote_triples]
+        )
 
     async def _import_ontologies(self, session: CachedSession) -> None:
         """Import relevant ontologies into ontology graph.
@@ -188,15 +216,26 @@ class ValidatorService(object):
             for t in all_imports:
                 self.ontology_graph.remove(t)
             # 3. get all the imported vocabularies and import them
-            for (_s, _p, uri) in all_imports:
-                if (uri, None, None) not in self.data_graph:
-                    if (uri, None, None) not in self.ontology_graph:
-                        logging.debug(f"Trying to fetch remote triples about {uri}.")
-                        try:
-                            _g = await fetch_graph(session, uri)
-                            if _g:
-                                self.ontology_graph += _g
-                        except FetchError:
-                            logging.debug(traceback.format_exc())
-                            pass
+            await asyncio.gather(
+                *[self.add_triples(uri, session) for (_s, _p, uri) in all_imports]
+            )
             # 4. start all over again to see if import statements have been imported
+
+    async def add_triples(self, uri: str, session: CachedSession) -> None:
+        """Fetch remote triples and add them to the ontology_graph.
+
+        Only triples that are not allready in the data_graph and/or ontology_graph are added.
+        """
+        if (uri, None, None) not in self.data_graph:
+            if (uri, None, None) not in self.ontology_graph:
+                logging.debug(f"Trying to fetch remote triples {uri}.")
+                try:
+                    _g = await fetch_graph(session, uri)
+                    if _g:
+                        self.ontology_graph += _g
+                except FetchError:
+                    logging.debug(traceback.format_exc())
+                    pass
+                except SyntaxError:
+                    logging.debug(traceback.format_exc())
+                    pass
