@@ -1,4 +1,4 @@
-"""Resource module for liveness resources."""
+"""Resource module for shapes resources."""
 
 from aiohttp import web
 

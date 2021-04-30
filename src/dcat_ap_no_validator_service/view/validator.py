@@ -1,4 +1,4 @@
-"""Resource module for liveness resources."""
+"""Resource module for validator resources."""
 from enum import Enum
 import logging
 import traceback
