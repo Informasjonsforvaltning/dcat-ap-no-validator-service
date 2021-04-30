@@ -1,4 +1,4 @@
-"""Integration test cases for the ready route."""
+"""Integration test cases for the validator route."""
 import json
 from typing import Any, Dict
 
@@ -11,7 +11,6 @@ from pytest_mock import MockFixture
 from rdflib import Graph
 from rdflib.compare import graph_diff, isomorphic
 
-from dcat_ap_no_validator_service.service import ShapesService
 
 _MOCK_SHAPES_STORE: Dict[str, Dict] = dict(
     {
@@ -135,7 +134,10 @@ def mocks(mock_aioresponse: Any, mocker: MockFixture) -> Any:
         body=valid_ontology_graph,
     )
     # Patch the Shapes graph store:
-    mocker.patch.object(ShapesService, "_SHAPES_STORE", _MOCK_SHAPES_STORE)
+    mocker.patch(
+        "dcat_ap_no_validator_service.adapter.shapes_graph_adapter._SHAPES_STORE",
+        _MOCK_SHAPES_STORE,
+    )
 
 
 @pytest.mark.integration

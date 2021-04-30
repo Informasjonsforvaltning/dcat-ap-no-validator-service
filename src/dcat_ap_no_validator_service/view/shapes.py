@@ -1,8 +1,7 @@
 """Resource module for shapes resources."""
-
 from aiohttp import web
 
-from dcat_ap_no_validator_service.service import ShapesService
+from dcat_ap_no_validator_service.adapter import ShapesGraphAdapter
 
 
 class ShapesCollection(web.View):
@@ -10,8 +9,11 @@ class ShapesCollection(web.View):
 
     async def get(self) -> web.Response:
         """Shapes route function."""
-        shapes = await ShapesService().get_all_shapes()
-        return web.json_response(shapes)
+        response = dict()
+        shapes = [x.__dict__ for x in await ShapesGraphAdapter.get_all()]
+        response["shapes"] = shapes
+
+        return web.json_response(response)
 
 
 class Shapes(web.View):
@@ -20,8 +22,8 @@ class Shapes(web.View):
     async def get(self) -> web.Response:
         """Shape route function."""
         id = self.request.match_info["id"]
-        shape = await ShapesService().get_shapes_by_id(id)
+        shape = await ShapesGraphAdapter.get_by_id(id)
 
         if shape:
-            return web.json_response(shape)
+            return web.json_response(shape.__dict__)
         raise web.HTTPNotFound

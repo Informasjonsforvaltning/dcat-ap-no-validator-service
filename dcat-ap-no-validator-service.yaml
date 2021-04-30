@@ -10,7 +10,7 @@ info:
     name: License of API
     url: 'http://data.norge.no/nlod/no/2.0'
 servers:
-  - url: https://validator.staging.fellesdatakatalog.digdir
+  - url: https://validator.fellesdatakatalog.digdir.no
 paths:
   /validator:
     post:
@@ -43,7 +43,7 @@ paths:
                   ontology-graph-file:
                     type: string
                     format: binary
-                    description: a file containing extra ontological information. Supports owl:imports 
+                    description: a file containing extra ontological information. Supports owl:imports
                   ontology-graph-url:
                     type: string
                     format: uri
@@ -73,10 +73,10 @@ paths:
           content:
             application/json:
               schema:
-               $ref: '#/components/schemas/ShapesGraphCollection'
+               $ref: '#/components/schemas/GraphDescriptionCollection'
   /shapes/{id}:
     get:
-      description: returns the content of a shapes graph given by id
+      description: returns the description of a shapes graph given by id
       parameters:
       - name: id
         in: path
@@ -91,7 +91,35 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ShapesGraph'
+                $ref: '#/components/schemas/GraphDescription'
+  /ontologies:
+    get:
+      description: returns a list of default ontologies graphs the validator can use
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+               $ref: '#/components/schemas/GraphDescriptionCollection'
+  /ontologies/{id}:
+    get:
+      description: returns the description of an ontologies graph given by id
+      parameters:
+      - name: id
+        in: path
+        description: ontologies id
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GraphDescription'
 components:
   schemas:
     Config:
@@ -105,40 +133,40 @@ components:
           type: boolean
           default: false
           description: whether service should return remote triples referenced by input graph
-    ShapesGraphCollection:
+    GraphDescriptionCollection:
       type: object
       properties:
-        shapes:
+        graphDescriptions:
           type: array
           items:
-            $ref: '#/components/schemas/ShapesGraph'
-    ShapesGraph:
+            $ref: '#/components/schemas/GraphDescription'
+    GraphDescription:
       type: object
       properties:
         id:
           type: string
           format: uuid
-          description: generated unique id for the shapes graph
+          description: generated unique id for the graph
         name:
           type: string
-          description: The official name of the shapes graph
+          description: The official name of the graph
         description:
           type: string
-          description: A description of the shapes graph
+          description: A description of the graph
         version:
           type: string
-          description: Version of the shapes graph
+          description: Version of the graph
         url:
           type: string
           format: uri
-          description: URL to where the shapes graph is published
-        specificationName:
+          description: URL to where the graph is published
+        specification_name:
           type: string
-          description: Name of he specification the shapes graph enforces
-        specificationVersion:
+          description: Name of he specification the graph enforces
+        specification_version:
           type: string
-          description: Version of he specification the shapes graph enforces
-        specificationUrl:
+          description: Version of he specification the graph enforces
+        specification_url:
           type: string
           format: uri
-          description: URL to the specification the shapes graph enforces
+          description: URL to the specification the graph enforces

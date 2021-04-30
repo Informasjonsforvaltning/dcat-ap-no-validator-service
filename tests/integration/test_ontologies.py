@@ -1,32 +1,32 @@
-"""Integration test cases for the ready route."""
-from typing import Any, Dict
+"""Integration test cases for the ontologies route."""
+from typing import Dict
 
 from aiohttp import hdrs
 from aiohttp.test_utils import TestClient as _TestClient
 import pytest
 from pytest_mock import MockFixture
 
-from dcat_ap_no_validator_service.service import OntologiesService
 
-
-_MOCK_ONTOLOGIES_STORE: Dict[str, Dict] = dict(
+_MOCK_ONTOLOGY_STORE: Dict[str, Dict] = dict(
     {
-        "1": {"id": "1", "name": "DCAT-AP-NO", "version": "1.1"},
-        "2": {"id": "2", "name": "DCAT-AP-NO", "version": "2.0"},
+        "1": {
+            "id": "1",
+            "name": "The ontologies used by DCAT-AP-NO",
+            "version": "0.1",
+            "url": "https://raw.githubusercontent.com/Informasjonsforvaltning/dcat-ap-no/develop/shacl/ontologies.ttl",  # noqa
+        },
     }
 )
-
-
-@pytest.fixture(scope="function")
-def mocked_response(mocker: MockFixture) -> Any:
-    """Patch the in memory ontologies db."""
-    # Set up the mock
-    mocker.patch.object(OntologiesService, "_ONTOLOGIES_STORE", _MOCK_ONTOLOGIES_STORE)
 
 
 @pytest.mark.integration
 async def test_get_all_ontologies(client: _TestClient, mocker: MockFixture) -> None:
     """Should return OK."""
+    mocker.patch(
+        "dcat_ap_no_validator_service.adapter.ontology_graph_adapter._ONTOLOGY_STORE",
+        _MOCK_ONTOLOGY_STORE,
+    )
+
     resp = await client.get("/ontologies")
     assert resp.status == 200
     assert "application/json" in resp.headers[hdrs.CONTENT_TYPE]
@@ -37,11 +37,31 @@ async def test_get_all_ontologies(client: _TestClient, mocker: MockFixture) -> N
 @pytest.mark.integration
 async def test_get_ontology_by_id(client: _TestClient, mocker: MockFixture) -> None:
     """Should return OK."""
+    mocker.patch(
+        "dcat_ap_no_validator_service.adapter.ontology_graph_adapter._ONTOLOGY_STORE",
+        _MOCK_ONTOLOGY_STORE,
+    )
+
     resp = await client.get("/ontologies/1")
     assert resp.status == 200
     assert "application/json" in resp.headers[hdrs.CONTENT_TYPE]
     body = await resp.json()
     assert len(body) > 0
+    assert identical_content(body, _MOCK_ONTOLOGY_STORE["1"])
+
+
+def identical_content(s: dict, d: dict) -> bool:
+    """Check for equal content."""
+    return (
+        s["id"] == d["id"]
+        and s["name"] == d["name"]
+        and s["version"] == d["version"]
+        and s["url"] == d["url"]
+        and s["description"] is None
+        and s["specification_name"] is None
+        and s["specification_version"] is None
+        and s["specification_url"] is None
+    )
 
 
 # --- Bad cases ---
