@@ -11,9 +11,9 @@ _ONTOLOGY_STORE: Dict[str, Dict] = dict(
             "description": "This document specifies the ontology information needed by the DCAT-AP-NO validator tool.",  # noqa
             "version": "0.1",
             "url": "https://raw.githubusercontent.com/Informasjonsforvaltning/dcat-ap-no/develop/shacl/ontologies.ttl",  # noqa
-            "specificationName": "DCAT-AP-NO",
-            "specificationVersion": "2.0",
-            "specificationUrl": "https://data.norge.no/specification/dcat-ap-no/v2",  # noqa
+            "specification_name": "DCAT-AP-NO",
+            "specification_version": "2.0",
+            "specification_url": "https://data.norge.no/specification/dcat-ap-no/v2",  # noqa
         },
     }
 )

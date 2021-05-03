@@ -160,13 +160,13 @@ components:
           type: string
           format: uri
           description: URL to where the graph is published
-        specification_name:
+        specificationName:
           type: string
           description: Name of he specification the graph enforces
-        specification_version:
+        specificationVersion:
           type: string
           description: Version of he specification the graph enforces
-        specification_url:
+        specificationUrl:
           type: string
           format: uri
           description: URL to the specification the graph enforces

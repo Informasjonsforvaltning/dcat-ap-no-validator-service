@@ -10,7 +10,7 @@ class Ontologies(web.View):
     async def get(self) -> web.Response:
         """Ontologies route function."""
         response = dict()
-        ontologies = [x.__dict__ for x in await OntologyGraphAdapter.get_all()]
+        ontologies = [x.to_dict() for x in await OntologyGraphAdapter.get_all()]  # type: ignore
         response["ontologies"] = ontologies
 
         return web.json_response(response)
@@ -25,5 +25,5 @@ class Ontology(web.View):
         ontology = await OntologyGraphAdapter.get_by_id(id)
 
         if ontology:
-            return web.json_response(ontology.__dict__)
+            return web.json_response(ontology.to_dict())  # type: ignore
         raise web.HTTPNotFound

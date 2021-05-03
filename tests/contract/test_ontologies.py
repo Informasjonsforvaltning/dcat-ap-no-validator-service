@@ -32,14 +32,14 @@ async def test_get_all_ontologies(http_service: Any) -> None:
         assert "version" in s, "No version property in ontology graph object"
         assert "url" in s, "No url property in ontology graph object"
         assert (
-            "specification_name" in s
-        ), "No specification_name property in ontology graph object"
+            "specificationName" in s
+        ), "No specificationName property in ontology graph object"
         assert (
-            "specification_version" in s
-        ), "No specification_version property in ontology graph object"
+            "specificationVersion" in s
+        ), "No specificationVersion property in ontology graph object"
         assert (
-            "specification_url" in s
-        ), "No specification_url property in ontology graph object"
+            "specificationUrl" in s
+        ), "No specificationUrl property in ontology graph object"
 
 
 @pytest.mark.contract
@@ -63,14 +63,14 @@ async def test_get_ontology_by_id(http_service: Any) -> None:
     assert "version" in ontology, "No version property in ontology graph object"
     assert "url" in ontology, "No url property in ontology graph object"
     assert (
-        "specification_name" in ontology
-    ), "No ontology specification_name property in ontology graph object"
+        "specificationName" in ontology
+    ), "No ontology specificationName property in ontology graph object"
     assert (
-        "specification_version" in ontology
-    ), "No specification_version property in ontology graph object"
+        "specificationVersion" in ontology
+    ), "No specificationVersion property in ontology graph object"
     assert (
-        "specification_url" in ontology
-    ), "No specification_url property in ontology graph object"
+        "specificationUrl" in ontology
+    ), "No specificationUrl property in ontology graph object"
 
 
 # ---------------------------------------------------------------------- #

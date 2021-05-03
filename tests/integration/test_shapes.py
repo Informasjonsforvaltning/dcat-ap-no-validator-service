@@ -64,9 +64,9 @@ def identical_content(s: dict, d: dict) -> bool:
         and s["version"] == d["version"]
         and s["url"] == d["url"]
         and s["description"] is None
-        and s["specification_name"] is None
-        and s["specification_version"] is None
-        and s["specification_url"] is None
+        and s["specificationName"] is None
+        and s["specificationVersion"] is None
+        and s["specificationUrl"] is None
     )
 
 

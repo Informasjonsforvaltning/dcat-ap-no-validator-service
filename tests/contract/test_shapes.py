@@ -32,14 +32,14 @@ async def test_get_all_shapes(http_service: Any) -> None:
         assert "version" in s, "No version property in shapes graph object"
         assert "url" in s, "No url property in shapes graph object"
         assert (
-            "specification_name" in s
-        ), "No specification_name property in shapes graph object"
+            "specificationName" in s
+        ), "No specificationName property in shapes graph object"
         assert (
-            "specification_version" in s
-        ), "No specification_version property in shapes graph object"
+            "specificationVersion" in s
+        ), "No specificationVersion property in shapes graph object"
         assert (
-            "specification_url" in s
-        ), "No specification_url property in shapes graph object"
+            "specificationUrl" in s
+        ), "No specificationUrl property in shapes graph object"
 
 
 @pytest.mark.contract
@@ -63,14 +63,14 @@ async def test_get_shape_by_id(http_service: Any) -> None:
     assert "version" in shape, "No version property in shapes graph object"
     assert "url" in shape, "No url property in shapes graph object"
     assert (
-        "specification_name" in shape
-    ), "No specification_name property in shapes graph object"
+        "specificationName" in shape
+    ), "No specificationName property in shapes graph object"
     assert (
-        "specification_version" in shape
-    ), "No specification_version property in shapes graph object"
+        "specificationVersion" in shape
+    ), "No specificationVersion property in shapes graph object"
     assert (
-        "specification_url" in shape
-    ), "No specification_url property in shapes graph object"
+        "specificationUrl" in shape
+    ), "No specificationUrl property in shapes graph object"
 
 
 # ---------------------------------------------------------------------- #

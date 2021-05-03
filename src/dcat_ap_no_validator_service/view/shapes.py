@@ -10,7 +10,7 @@ class ShapesCollection(web.View):
     async def get(self) -> web.Response:
         """Shapes route function."""
         response = dict()
-        shapes = [x.__dict__ for x in await ShapesGraphAdapter.get_all()]
+        shapes = [x.to_dict() for x in await ShapesGraphAdapter.get_all()]  # type: ignore
         response["shapes"] = shapes
 
         return web.json_response(response)
@@ -25,5 +25,5 @@ class Shapes(web.View):
         shape = await ShapesGraphAdapter.get_by_id(id)
 
         if shape:
-            return web.json_response(shape.__dict__)
+            return web.json_response(shape.to_dict())  # type: ignore
         raise web.HTTPNotFound
