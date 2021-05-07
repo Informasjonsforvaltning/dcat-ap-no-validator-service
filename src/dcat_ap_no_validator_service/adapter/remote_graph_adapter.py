@@ -32,7 +32,12 @@ async def fetch_graph(
                 response = await session.get(url, headers={hdrs.ACCEPT: "text/turtle"})
                 body = await response.text()
     except ClientError:
-        raise FetchError(f"Could not fetch remote graph from {url}.")
+        raise FetchError(f"Could not fetch remote graph from {url}: ClientError.")
+    except UnicodeDecodeError:
+        raise FetchError(
+            f"Could not fetch remote graph from {url}: UnicodeDecodeError."
+        )
+
     logging.debug(f"Got status_code {response.status}.")
     if response.status == 200:
         logging.debug(f"Got valid remote graph from {url}")
@@ -41,7 +46,9 @@ async def fetch_graph(
         except SyntaxError as e:
             raise SyntaxError(f"Bad syntax in graph {url}.") from e
     else:
-        raise FetchError(f"Could not fetch remote graph from {url}.")
+        raise FetchError(
+            f"Could not fetch remote graph from {url}: Status = {response.status}."
+        )
 
 
 def parse_text(input_graph: str) -> Graph:
