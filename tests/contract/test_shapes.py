@@ -42,6 +42,37 @@ async def test_get_all_shapes(http_service: Any) -> None:
         ), "No specificationUrl property in shapes graph object"
 
 
+@pytest.mark.contract
+@pytest.mark.asyncio
+async def test_get_shape_by_id(http_service: Any) -> None:
+    """Should return 200 and a shape description."""
+    shape_id = 1
+    url = f"{http_service}/shapes/{shape_id}"
+
+    session = ClientSession()
+    async with session.get(url) as resp:
+        shape = await resp.json()
+    await session.close()
+
+    assert resp.status == 200
+    assert "application/json" in resp.headers[hdrs.CONTENT_TYPE]
+    assert type(shape) is dict
+    assert "id" in shape, "No id property in shapes graph object"
+    assert "name" in shape, "No name property in shapes graph object"
+    assert "description" in shape, "No description property in shapes graph object"
+    assert "version" in shape, "No version property in shapes graph object"
+    assert "url" in shape, "No url property in shapes graph object"
+    assert (
+        "specificationName" in shape
+    ), "No specificationName property in shapes graph object"
+    assert (
+        "specificationVersion" in shape
+    ), "No specificationVersion property in shapes graph object"
+    assert (
+        "specificationUrl" in shape
+    ), "No specificationUrl property in shapes graph object"
+
+
 # ---------------------------------------------------------------------- #
 # Utils for displaying debug information
 

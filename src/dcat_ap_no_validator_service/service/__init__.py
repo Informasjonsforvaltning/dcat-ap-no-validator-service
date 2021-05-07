@@ -1,3 +1,2 @@
-"""Package for all views."""
-from .shapes_service import ShapesService
+"""Package for all services."""
 from .validator_service import Config, ValidatorService

@@ -1,4 +1,4 @@
-"""Integration test cases for the shapes route."""
+"""Integration test cases for the ontologies route."""
 from typing import Dict
 
 from aiohttp import hdrs
@@ -7,33 +7,27 @@ import pytest
 from pytest_mock import MockFixture
 
 
-_MOCK_SHAPES_STORE: Dict[str, Dict] = dict(
+_MOCK_ONTOLOGY_STORE: Dict[str, Dict] = dict(
     {
         "1": {
             "id": "1",
-            "name": "DCAT-AP-NO",
-            "version": "1.1",
-            "url": "https://raw.githubusercontent.com/Informasjonsforvaltning/dcat-ap-no/v1.1/shacl/dcat-ap_shacl_shapes_1.1.ttl",
-        },
-        "2": {
-            "id": "2",
-            "name": "DCAT-AP-NO",
-            "version": "2.0",
-            "url": "https://raw.githubusercontent.com/Informasjonsforvaltning/dcat-ap-no/v2/shacl/DCAT-AP-NO-shacl_shapes_2.00.ttl",  # noqa
+            "name": "The ontologies used by DCAT-AP-NO",
+            "version": "0.1",
+            "url": "https://raw.githubusercontent.com/Informasjonsforvaltning/dcat-ap-no/develop/shacl/ontologies.ttl",  # noqa
         },
     }
 )
 
 
 @pytest.mark.integration
-async def test_get_all_shapes(client: _TestClient, mocker: MockFixture) -> None:
+async def test_get_all_ontologies(client: _TestClient, mocker: MockFixture) -> None:
     """Should return OK."""
     mocker.patch(
-        "dcat_ap_no_validator_service.adapter.shapes_graph_adapter._SHAPES_STORE",
-        _MOCK_SHAPES_STORE,
+        "dcat_ap_no_validator_service.adapter.ontology_graph_adapter._ONTOLOGY_STORE",
+        _MOCK_ONTOLOGY_STORE,
     )
 
-    resp = await client.get("/shapes")
+    resp = await client.get("/ontologies")
     assert resp.status == 200
     assert "application/json" in resp.headers[hdrs.CONTENT_TYPE]
     body = await resp.json()
@@ -41,19 +35,19 @@ async def test_get_all_shapes(client: _TestClient, mocker: MockFixture) -> None:
 
 
 @pytest.mark.integration
-async def test_get_shapes_by_id(client: _TestClient, mocker: MockFixture) -> None:
+async def test_get_ontology_by_id(client: _TestClient, mocker: MockFixture) -> None:
     """Should return OK."""
     mocker.patch(
-        "dcat_ap_no_validator_service.adapter.shapes_graph_adapter._SHAPES_STORE",
-        _MOCK_SHAPES_STORE,
+        "dcat_ap_no_validator_service.adapter.ontology_graph_adapter._ONTOLOGY_STORE",
+        _MOCK_ONTOLOGY_STORE,
     )
 
-    resp = await client.get("/shapes/1")
+    resp = await client.get("/ontologies/1")
     assert resp.status == 200
     assert "application/json" in resp.headers[hdrs.CONTENT_TYPE]
     body = await resp.json()
     assert len(body) > 0
-    assert identical_content(body, _MOCK_SHAPES_STORE["1"])
+    assert identical_content(body, _MOCK_ONTOLOGY_STORE["1"])
 
 
 def identical_content(s: dict, d: dict) -> bool:
@@ -72,11 +66,11 @@ def identical_content(s: dict, d: dict) -> bool:
 
 # --- Bad cases ---
 @pytest.mark.integration
-async def test_get_shapes_by_id_not_found(
+async def test_get_ontology_by_id_not_found(
     client: _TestClient, mocker: MockFixture
 ) -> None:
     """Should return OK."""
-    resp = await client.get("/shapes/doesnotexist")
+    resp = await client.get("/ontologies/doesnotexist")
     assert resp.status == 404
 
 
