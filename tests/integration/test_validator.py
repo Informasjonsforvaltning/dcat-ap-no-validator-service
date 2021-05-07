@@ -134,6 +134,13 @@ def mocks(mock_aioresponse: Any, mocker: MockFixture) -> Any:
         "http://example.com/ontologies/1",
         body=valid_ontology_graph,
     )
+    mock_aioresponse.get(
+        "https://www.ssb.no/a/metadata/metadatadokumenter/GSIM-brosjyre.pdf",
+        exception=UnicodeDecodeError(
+            "utf-8", b"\x00\x00", 1, 2, "This is just a fake reason!"
+        ),
+    )
+
     # Patch the Shapes graph store:
     mocker.patch.object(ShapesService, "_SHAPES_STORE", _MOCK_SHAPES_STORE)
 
@@ -795,6 +802,42 @@ async def test_validator_all_graph_url(client: _TestClient, mocks: Any) -> None:
     )
 
 
+@pytest.mark.integration
+async def test_validator_all_graph_references_not_readable_page(
+    client: _TestClient, mocks: Any
+) -> None:
+    """Should return status 200 and unsuccessful validation."""
+    data_graph_file = "tests/files/valid_catalog_references_non_readable_file.ttl"
+    shapes_graph_file = "tests/files/mock_dcat-ap-no-shacl_shapes_2.00.ttl"
+    ontology_graph_file = "tests/files/ontologies.ttl"
+
+    with MultipartWriter("mixed") as mpwriter:
+        p = mpwriter.append(open(data_graph_file, "rb"))
+        p.set_content_disposition(
+            "attachment", name="data-graph-file", filename=data_graph_file
+        )
+        p = mpwriter.append(open(shapes_graph_file, "rb"))
+        p.set_content_disposition(
+            "attachment", name="shapes-graph-file", filename=shapes_graph_file
+        )
+        p = mpwriter.append(open(ontology_graph_file, "rb"))
+        p.set_content_disposition(
+            "attachment", name="ontology-graph-file", filename=ontology_graph_file
+        )
+
+    resp = await client.post("/validator", data=mpwriter)
+    assert resp.status == 200
+    assert resp.headers[hdrs.CONTENT_TYPE] == "text/turtle"
+    body = await resp.text()
+
+    # need to get the text from url, which actually is content of file:
+    with open(data_graph_file, "r") as file:
+        text = file.read()
+    await _assess_response_body_unsuccessful(
+        data=text, format="text/turtle", body=body, content_type="text/turtle"
+    )
+
+
 # -- Bad cases
 @pytest.mark.integration
 async def test_validator_data_graph_url_and_file(
@@ -934,7 +977,7 @@ async def test_validator_file_accept_header_not_valid(
 async def test_validator_data_graph_url_does_not_exist(
     client: _TestClient, mocks: Any
 ) -> None:
-    r"""Should return status 400 and message \"Could not fetch remote graph from {url}\"."""
+    r"""Should return status 400 and message \"Could not fetch remote graph from {url}: : Status = 404\"."""
     data_graph_url = "https://example.com/graphs/not_found_graph"
     shapes_graph_file = "tests/files/mock_dcat-ap-no-shacl_shapes_2.00.ttl"
 
@@ -952,7 +995,8 @@ async def test_validator_data_graph_url_does_not_exist(
 
     body = await resp.json()
     assert (
-        f"Could not fetch remote graph from {data_graph_url}." in body["detail"]
+        f"Could not fetch remote graph from {data_graph_url}: Status = 404."
+        in body["detail"]
     ), "Wrong message."
 
 
@@ -960,7 +1004,7 @@ async def test_validator_data_graph_url_does_not_exist(
 async def test_validator_shapes_graph_url_does_not_exist(
     client: _TestClient, mocks: Any
 ) -> None:
-    r"""Should return status 400 and message \"Could not fetch remote graph from {url}.\"."""
+    r"""Should return status 400 and message \"Could not fetch remote graph from {url}: Status = 404.\"."""
     data_graph_file = "tests/files/valid_catalog.ttl"
     shapes_graph_url = "https://example.com/graphs/not_found_graph"
 
@@ -978,7 +1022,8 @@ async def test_validator_shapes_graph_url_does_not_exist(
 
     body = await resp.json()
     assert (
-        f"Could not fetch remote graph from {shapes_graph_url}." in body["detail"]
+        f"Could not fetch remote graph from {shapes_graph_url}: Status = 404."
+        in body["detail"]
     ), "Wrong message."
 
 
@@ -1078,7 +1123,7 @@ async def test_validator_shapes_graph_empty(client: _TestClient, mocks: Any) -> 
 async def test_validator_connection_error_caused_by_bad_url(
     client: _TestClient, mocks: Any
 ) -> None:
-    r"""Should return status 400 and message \"Could not fetch remote graph from http://slfkjasdf\"."""
+    r"""Should return status 400 and message \"Could not fetch remote graph from http://slfkjasdf: ClientError\"."""
     data_graph_url = "http://slfkjasdf"
     shapes_graph_file = "tests/files/mock_dcat-ap-no-shacl_shapes_2.00.ttl"
 
@@ -1096,7 +1141,8 @@ async def test_validator_connection_error_caused_by_bad_url(
 
     body = await resp.json()
     assert (
-        f"Could not fetch remote graph from {data_graph_url}." in body["detail"]
+        f"Could not fetch remote graph from {data_graph_url}: ClientError."
+        in body["detail"]
     ), "Wrong message."
 
 
@@ -1218,7 +1264,7 @@ async def test_validator_ontology_graph_file_not_readable(
 async def test_validator_ontology_graph_url_references_no_response_graph(
     client: _TestClient, mocks: Any
 ) -> None:
-    r"""Should return status 400 and message \"Could not fetch remote graph from {url}.\"."""
+    r"""Should return status 400 and message \"Could not fetch remote graph from {url}: ClientError.\"."""
     data_graph_file = "tests/files/valid_catalog.ttl"
     shapes_graph_file = "tests/files/mock_dcat-ap-no-shacl_shapes_2.00.ttl"
     ontology_graph_url = "http://slfkjasdf"
@@ -1241,7 +1287,8 @@ async def test_validator_ontology_graph_url_references_no_response_graph(
 
     body = await resp.json()
     assert (
-        f"Could not fetch remote graph from {ontology_graph_url}." in body["detail"]
+        f"Could not fetch remote graph from {ontology_graph_url}: ClientError."
+        in body["detail"]
     ), "Wrong message."
 
 

@@ -1,0 +1,29 @@
+@prefix dcat: <http://www.w3.org/ns/dcat#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcard: <http://www.w3.org/2006/vcard/ns#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix rov: <http://www.w3.org/ns/regorg#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
+
+<http://dataset-publisher:8080/catalogs/1> a dcat:Catalog ;
+    dct:identifier "1" ;
+    dct:publisher <https://www.ssb.no/a/metadata/metadatadokumenter/GSIM-brosjyre.pdf> ;
+    dct:title "Testcatalog"@en ;
+    dct:description "A test catalog that is valid according to dcat-ap-no v2"@en ;
+    dcat:dataset <http://dataset-publisher:8080/datasets/1> ;
+    .
+
+<http://dataset-publisher:8080/datasets/1> a dcat:Dataset ;
+    dct:identifier "1" ;
+    dct:title "Test dataset"@en ;
+    dct:description "A valid test dataset"@en ;
+    dct:publisher <https://example.com/non_parsable_graph> ;
+    dct:creator <https://example.com/non_parsable_graph> ;
+    dcat:theme <http://publications.europa.eu/resource/authority/data-theme/GOVE>,
+               <https://psi.norge.no/los/tema/barnehage> ;
+    .
