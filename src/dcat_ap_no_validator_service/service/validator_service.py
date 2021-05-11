@@ -192,8 +192,10 @@ class ValidatorService(object):
             # no remote_triples whatsoever, we can go on...
             return
         # 2.Get all remote triples:
+        logging.debug(f"Trying to expand {len(all_remote_triples)} triples .")
         await asyncio.gather(
-            *[self.add_triples(uri, session) for uri in all_remote_triples]
+            *[self.add_triples(uri, session) for uri in all_remote_triples],
+            return_exceptions=True,
         )
 
     async def _import_ontologies(self, session: CachedSession) -> None:
@@ -216,6 +218,7 @@ class ValidatorService(object):
             for t in all_imports:
                 self.ontology_graph.remove(t)
             # 3. get all the imported vocabularies and import them
+            logging.debug(f"Trying to import {len(all_imports)} ontologies.")
             await asyncio.gather(
                 *[self.add_triples(uri, session) for (_s, _p, uri) in all_imports]
             )
