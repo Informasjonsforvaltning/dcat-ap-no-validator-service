@@ -60,7 +60,10 @@ def parse_text(input_graph: str) -> Graph:
         # no easy way to catch specific errors from the parse function.
         # TODO: find a way to solve this without ignoring S110
         try:
-            return Graph().parse(data=input_graph, format=_format)
+            return Graph().parse(
+                data=input_graph,
+                format=_format if _format != "application/ld+json" else "json-ld",
+            )
         except Exception:
             pass
     # If we reached this point, we were unable to parse.

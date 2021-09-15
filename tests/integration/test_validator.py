@@ -1310,9 +1310,15 @@ async def _assess_response_body_successful(
          sh:conforms true
          .
     """
-    g0 = Graph().parse(data=data, format=format)
+    g0 = Graph().parse(
+        data=data,
+        format=format if format != "application/ld+json" else "json-ld",
+    )
     g1 = g0 + Graph().parse(data=src, format="turtle")
-    g2 = Graph().parse(data=body, format=content_type)
+    g2 = Graph().parse(
+        data=body,
+        format=content_type if content_type != "application/ld+json" else "json-ld",
+    )
 
     _isomorphic = isomorphic(g1, g2)
     if not _isomorphic:
@@ -1334,9 +1340,15 @@ async def _assess_response_body_unsuccessful(
          sh:conforms true
          .
     """
-    g0 = Graph().parse(data=data, format=format)
+    g0 = Graph().parse(
+        data=data,
+        format=format if format != "application/ld+json" else "json-ld",
+    )
     g1 = g0 + Graph().parse(data=src, format="turtle")
-    g2 = Graph().parse(data=body, format=content_type)
+    g2 = Graph().parse(
+        data=body,
+        format=content_type if content_type != "application/ld+json" else "json-ld",
+    )
 
     _isomorphic = isomorphic(g1, g2)
     if not _isomorphic:
