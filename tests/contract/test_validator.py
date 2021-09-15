@@ -118,8 +118,8 @@ async def test_validator_accept_json_ld(http_service: Any) -> None:
         text = file.read()
 
     g0 = Graph().parse(data=text, format="text/turtle")
-    g1 = g0 + Graph().parse(data=src, format="application/ld+json")
-    g2 = Graph().parse(data=body, format="application/ld+json")
+    g1 = g0 + Graph().parse(data=src, format="json-ld")
+    g2 = Graph().parse(data=body, format="json-ld")
 
     _isomorphic = isomorphic(g1, g2)
     if not _isomorphic:
@@ -173,7 +173,7 @@ async def test_validator_file_content_type_json_ld(http_service: Any) -> None:
     with open(data_graph_file, "r") as file:
         text = file.read()
 
-    g0 = Graph().parse(data=text, format="application/ld+json")
+    g0 = Graph().parse(data=text, format="json-ld")
     g1 = g0 + Graph().parse(data=src, format="text/turtle")
     g2 = Graph().parse(data=body, format="text/turtle")
 
