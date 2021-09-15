@@ -27,7 +27,7 @@ jobs:
       - name: Cache Docker layers
         uses: actions/cache@v2.1.6
         with:
-          path: /tmp/.cache
+          path: .cache
           key: ${{ runner.os }}-nox-${{ github.sha }}
           restore-keys: |
             ${{ runner.os }}-nox-
