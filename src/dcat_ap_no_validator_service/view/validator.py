@@ -70,7 +70,9 @@ class Validator(web.View):
                 try:
                     data_graph = (await part.read()).decode()
                 except ValueError:
-                    raise web.HTTPBadRequest(reason="Data graph file is not readable.")
+                    raise web.HTTPBadRequest(
+                        reason="Data graph file is not readable."
+                    ) from None
                 # logging.debug(f"Content of {part.filename}:\n{data_graph}.")
                 data_graph_matrix[part.name] = part.filename
                 pass
@@ -92,7 +94,7 @@ class Validator(web.View):
                 except ValueError:
                     raise web.HTTPBadRequest(
                         reason="Shapes graph file is not readable."
-                    )
+                    ) from None
                 # logging.debug(f"Content of {part.filename}:\n{shapes_graph}.")
                 shapes_graph_matrix[part.name] = part.filename
                 pass
@@ -115,7 +117,7 @@ class Validator(web.View):
                 except ValueError:
                     raise web.HTTPBadRequest(
                         reason="Ontology graph file is not readable."
-                    )
+                    ) from None
 
         # check if we got any input:
         # validate data-graph input:
@@ -145,10 +147,10 @@ class Validator(web.View):
             )
         except FetchError as e:
             logging.debug(traceback.format_exc())
-            raise web.HTTPBadRequest(reason=str(e))
+            raise web.HTTPBadRequest(reason=str(e)) from None
         except SyntaxError as e:
             logging.debug(traceback.format_exc())
-            raise web.HTTPBadRequest(reason=str(e))
+            raise web.HTTPBadRequest(reason=str(e)) from None
 
         try:
             # validate:
@@ -161,7 +163,7 @@ class Validator(web.View):
 
         except ValueError as e:
             logging.debug(traceback.format_exc())
-            raise web.HTTPBadRequest(reason=str(e))
+            raise web.HTTPBadRequest(reason=str(e)) from None
 
         # Try to content-negotiate:
         logging.debug(
@@ -181,12 +183,16 @@ class Validator(web.View):
             response_graph += ontology_graph
         try:
             return web.Response(
-                body=response_graph.serialize(format=content_type),
+                body=response_graph.serialize(
+                    format=content_type
+                    if content_type != "application/ld+json"
+                    else "application/json+ld"
+                ),
                 content_type=content_type,
             )
         except PluginException:  # rdflib raises PluginException, in this context imples 406
             logging.debug(traceback.format_exc())
-            raise web.HTTPNotAcceptable()  # 406
+            raise web.HTTPNotAcceptable() from None  # 406
 
 
 def _create_config(config: dict) -> Config:
