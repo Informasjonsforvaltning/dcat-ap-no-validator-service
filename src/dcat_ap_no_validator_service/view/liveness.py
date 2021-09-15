@@ -31,7 +31,7 @@ class Ready(web.View):
                 logging.error(traceback.format_exc())
                 raise web.HTTPInternalServerError(
                     reason=f"Redis cache not available at {address}."
-                )
+                ) from None
         return web.Response(text="OK")
 
 
