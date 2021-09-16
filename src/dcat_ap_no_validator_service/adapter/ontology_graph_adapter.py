@@ -8,12 +8,22 @@ _ONTOLOGY_STORE: Dict[str, Dict] = dict(
         "1": {
             "id": "1",
             "name": "The ontologies used by DCAT-AP-NO",
-            "description": "This document specifies the ontology information needed by the DCAT-AP-NO validator tool.",  # noqa
+            "description": "This document specifies the ontology information needed for DCAT-AP-NO by the validator tool.",  # noqa
             "version": "0.1",
             "url": "https://raw.githubusercontent.com/Informasjonsforvaltning/dcat-ap-no/develop/shacl/ontologies.ttl",  # noqa
             "specification_name": "DCAT-AP-NO",
             "specification_version": "2.0",
-            "specification_url": "https://data.norge.no/specification/dcat-ap-no/v2",  # noqa
+            "specification_url": "https://data.norge.no/specification/dcat-ap-no/v2",
+        },
+        "2": {
+            "id": "2",
+            "name": "The ontologies used by SKOS-AP-NO-Begrep",
+            "description": "This document specifies the ontology information needed for SKOS-AP-NO-Begrep by the validator tool.",  # noqa
+            "version": "0.1",
+            "url": "https://raw.githubusercontent.com/Informasjonsforvaltning/skos-ap-no-begrep/develop/ontology/skosno-v1.ttl",  # noqa
+            "specification_name": "SKOS-AP-NO-Begrep",
+            "specification_version": "1.0",
+            "specification_url": "https://data.norge.no/specification/skos-ap-no-begrep/",
         },
     }
 )

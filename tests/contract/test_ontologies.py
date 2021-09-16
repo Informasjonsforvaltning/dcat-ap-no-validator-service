@@ -24,7 +24,7 @@ async def test_get_all_ontologies(http_service: Any) -> None:
     assert "application/json" in resp.headers[hdrs.CONTENT_TYPE]
     assert type(body) is dict
     assert "ontologies" in body
-    assert len(body["ontologies"]) == 1
+    assert len(body["ontologies"]) == 2
     for s in body["ontologies"]:
         assert "id" in s, "No id property in ontology graph object"
         assert "name" in s, "No name property in ontology graph object"
