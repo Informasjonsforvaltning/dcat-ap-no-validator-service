@@ -5,6 +5,7 @@
 @prefix rov:   <http://www.w3.org/ns/regorg#> .
 @prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
 @prefix brskos: <https://raw.githubusercontent.com/Informasjonsforvaltning/organization-catalogue/master/src/main/resources/ontology/org-status.ttl#> .
+@prefix brtype: <https://raw.githubusercontent.com/Informasjonsforvaltning/organization-catalogue/master/src/main/resources/ontology/org-type.ttl#> .
 @prefix foaf:  <http://xmlns.com/foaf/0.1/> .
 
 <https://organization-catalogue.fellesdatakatalog.digdir.no/organizations/991825827>
@@ -13,9 +14,7 @@
         org:subOrganizationOf  <https://organization-catalogue.fellesdatakatalog.digdir.no/organizations/972417858> ;
         rov:legalName          "DIGITALISERINGSDIREKTORATET" ;
         rov:orgStatus          brskos:NormalAktivitet ;
-        rov:orgType            [ a               skos:Concept ;
-                                 skos:prefLabel  "ORGL"
-                               ] ;
+        rov:orgType            brtype:STAT ;
         rov:registration       [ a                  adms:Identifier ;
                                  dct:issued         "2007-10-15" ;
                                  skos:notation      "991825827" ;

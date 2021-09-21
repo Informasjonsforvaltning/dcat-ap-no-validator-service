@@ -1,0 +1,76 @@
+@prefix schema: <http://schema.org/> .
+@prefix adms:  <http://www.w3.org/ns/adms#> .
+@prefix spdx:  <http://spdx.org/rdf/terms#> .
+@prefix iso:   <http://iso.org/25012/2008/dataquality/> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix skosxl: <http://www.w3.org/2008/05/skos-xl#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix dqv:   <http://www.w3.org/ns/dqv#> .
+@prefix skosno: <https://data.norge.no/vocabulary/skosno#> .
+@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcard: <http://www.w3.org/2006/vcard/ns#> .
+@prefix xkos:  <http://rdf-vocabulary.ddialliance.org/xkos#> .
+@prefix oa:    <http://www.w3.org/ns/prov#> .
+@prefix dct:   <http://purl.org/dc/terms/> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix dcat:  <http://www.w3.org/ns/dcat#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+
+<https://registrering-begrep-api.fellesdatakatalog.digdir.no/915429785/dcce4961-0632-481b-91ef-bdecd4a00a0c>
+        a                  skos:Concept ;
+        dct:identifier     <https://registrering-begrep-api.fellesdatakatalog.digdir.no/915429785/dcce4961-0632-481b-91ef-bdecd4a00a0c> ;
+        dct:modified       "2019-10-22"^^xsd:date ;
+        dct:publisher      <https://data.brreg.no/enhetsregisteret/api/enheter/915429785> ;
+        dct:subject        "Grensepassering"@nb ;
+        skosxl:prefLabel   [ a                   skosxl:Label ;
+                             skosxl:literalForm  "Grenseovergangssted"@nb
+                           ] ;
+        skosno:definisjon  [ a                       skosno:Definisjon ;
+                             rdfs:label              "offentlig godkjent sted for passering av grensen"@nb ;
+                             dct:source              [ rdfs:label    ""@nb ;
+                                                       rdfs:seeAlso  <http://example.com/>
+                                                     ] ;
+                             skosno:forholdTilKilde  skosno:egendefinert
+                           ] .
+
+<https://registrering-begrep-api.fellesdatakatalog.digdir.no/915429785/59c4c030-3668-497f-b2a9-58c8a93ab2f8>
+        a                  skos:Concept ;
+        dct:identifier     <https://registrering-begrep-api.fellesdatakatalog.digdir.no/915429785/59c4c030-3668-497f-b2a9-58c8a93ab2f8> ;
+        dct:modified       "2019-09-12"^^xsd:date ;
+        dct:publisher      <https://data.brreg.no/enhetsregisteret/api/enheter/915429785> ;
+        dct:subject        "Grensekontrollør"@nb ;
+        skosxl:prefLabel   [ a                   skosxl:Label ;
+                             skosxl:literalForm  "Grensekontrollør andrelinje grensekontroll"@nb
+                           ] ;
+        skosno:definisjon  [ a                       skosno:Definisjon ;
+                             rdfs:label              "grensekontrollør som foretar utvidet kontroll av reisende "@nb ;
+                             dct:source              [ rdfs:label    ""@nb ;
+                                                       rdfs:seeAlso  <http://example.com/>
+                                                     ] ;
+                             skosno:forholdTilKilde  skosno:egendefinert
+                           ] .
+
+<https://registrering-begrep-api.fellesdatakatalog.digdir.no/915429785/218b23ea-c54e-4912-b4e4-f2615bf23c42>
+        a                  skos:Concept ;
+        dct:identifier     <https://registrering-begrep-api.fellesdatakatalog.digdir.no/915429785/218b23ea-c54e-4912-b4e4-f2615bf23c42> ;
+        dct:modified       "2019-09-12"^^xsd:date ;
+        dct:publisher      <https://data.brreg.no/enhetsregisteret/api/enheter/915429785> ;
+        dct:subject        "Grensekontrollør"@nb ;
+        skosxl:prefLabel   [ a                   skosxl:Label ;
+                             skosxl:literalForm  "Grensekontrollør"@nb
+                           ] ;
+        skosno:definisjon  [ a                       skosno:Definisjon ;
+                             rdfs:label              "person i rollen som foretar kontroll av reisende ved grenseovergangssted"@nb ;
+                             dct:source              [ rdfs:label    ""@nb ;
+                                                       rdfs:seeAlso  <http://example.com/>
+                                                     ] ;
+                             skosno:forholdTilKilde  skosno:egendefinert
+                           ] .
+
+<https://registrering-begrep-api.fellesdatakatalog.digdir.no/915429785>
+        a               skos:Collection ;
+        rdfs:label      "Concept collection belonging to 915429785" ;
+        dct:identifier  <https://registrering-begrep-api.fellesdatakatalog.digdir.no/915429785> ;
+        dct:publisher   <https://data.brreg.no/enhetsregisteret/api/enheter/915429785> ;
+        skos:member     <https://registrering-begrep-api.fellesdatakatalog.digdir.no/915429785/218b23ea-c54e-4912-b4e4-f2615bf23c42> , <https://registrering-begrep-api.fellesdatakatalog.digdir.no/915429785/dcce4961-0632-481b-91ef-bdecd4a00a0c> , <https://registrering-begrep-api.fellesdatakatalog.digdir.no/915429785/59c4c030-3668-497f-b2a9-58c8a93ab2f8> .
