@@ -1,32 +1,32 @@
-@prefix :     <https://raw.githubusercontent.com/Informasjonsforvaltning/organization-catalogue/master/src/main/resources/ontology/org-status.ttl#> .
+@prefix :           <https://raw.githubusercontent.com/Informasjonsforvaltning/organization-catalogue/master/src/main/resources/ontology/org-type.ttl#> .
 @prefix skos:       <http://www.w3.org/2004/02/skos/core#> .
 @prefix skosno:     <https://data.norge.no/vocabulary/skosno#> .
 @prefix dct:        <http://purl.org/dc/terms/> .
 @prefix rdfs:       <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix skosxl:     <http://www.w3.org/2008/05/skos-xl#> .
 
-:NormalAktivitet
+:ORGL
     a                   skos:Concept ;
-    dct:identifier      :NormalAktivitet ;
-    skos:prefLabel      "Normal aktivitet"@nb , "Normal aktivitet"@nn , "Normal activity"@en ;
+    dct:identifier      :ORGL ;
+    skos:prefLabel      "ORGL" ;
     skosxl:prefLabel    [ a                   skosxl:Label ;
-                          skosxl:literalForm  "Normal aktivitet"@nb , "Normal aktivitet"@nn , "Normal activity"@en
+                          skosxl:literalForm  "ORGL"
                         ] ;
     dct:publisher       <https://organization-catalogue.fellesdatakatalog.digdir.no/organizations/974760673> ;
     skosno:definisjon   [ a                       skosno:Definisjon ;
-                          rdfs:label              "Normal aktivitet."@nb ;
+                          rdfs:label              "Organisasjonsledd."@nb ;
                           skosno:forholdTilKilde  skosno:egendefinert
                         ] .
 
-:Avviklet
+:STAT
     a                   skos:Concept ;
-    dct:identifier      :Avviklet ;
-    skos:prefLabel      "Avviklet"@nb , "Avvikla"@nn , "Liquidated"@en ;
+    dct:identifier      :STAT ;
+    skos:prefLabel      "STAT" ;
     skosxl:prefLabel    [ a                   skosxl:Label ;
-                          skosxl:literalForm  "Avviklet"@nb , "Avvikla"@nn , "Liquidated"@en
+                          skosxl:literalForm  "STAT"
                         ] ;
     dct:publisher       <https://organization-catalogue.fellesdatakatalog.digdir.no/organizations/974760673> ;
     skosno:definisjon   [ a                       skosno:Definisjon ;
-                          rdfs:label              "Avviklet."@nb ;
+                          rdfs:label              "Staten."@nb ;
                           skosno:forholdTilKilde  skosno:egendefinert
                         ] .

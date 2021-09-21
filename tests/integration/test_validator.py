@@ -100,10 +100,16 @@ def mocks(mock_aioresponse: Any, mocker: MockFixture) -> Any:
         body=valid_catalog,
     )
     with open("tests/files/mock_org-status.ttl", "r") as file:
-        valid_catalog = file.read()
+        org_status = file.read()
     mock_aioresponse.get(
         "https://raw.githubusercontent.com/Informasjonsforvaltning/organization-catalogue/master/src/main/resources/ontology/org-status.ttl",  # noqa
-        body=valid_catalog,
+        body=org_status,
+    )
+    with open("tests/files/mock_org-types.ttl", "r") as file:
+        org_types = file.read()
+    mock_aioresponse.get(
+        "https://raw.githubusercontent.com/Informasjonsforvaltning/organization-catalogue/master/src/main/resources/ontology/org-type.ttl",  # noqa
+        body=org_types,
     )
     with open(
         "tests/files/mock_publications_europa_eu_resource_authority_licence.xml", "r"
@@ -1292,6 +1298,40 @@ async def test_validator_ontology_graph_url_references_no_response_graph(
         f"Could not fetch remote graph from {ontology_graph_url}: ClientError."
         in body["detail"]
     ), "Wrong message."
+
+
+@pytest.mark.integration
+async def test_validator_skos_ap_no_begrep(client: _TestClient, mocks: Any) -> None:
+    """Should return OK and successful validation."""
+    data_graph_file = "tests/files/valid_collection.ttl"
+    shapes_graph_file = "tests/files/mock_skos-ap-no-shacl_shapes.ttl"
+    ontology_graph_file = "tests/files/skos_ontologies.ttl"
+
+    with MultipartWriter("mixed") as mpwriter:
+        p = mpwriter.append(open(data_graph_file, "rb"))
+        p.set_content_disposition(
+            "attachment", name="data-graph-file", filename=data_graph_file
+        )
+        p = mpwriter.append(open(shapes_graph_file, "rb"))
+        p.set_content_disposition(
+            "attachment", name="shapes-graph-file", filename=shapes_graph_file
+        )
+        p = mpwriter.append(open(ontology_graph_file, "rb"))
+        p.set_content_disposition(
+            "attachment", name="ontology-graph-file", filename=ontology_graph_file
+        )
+
+    resp = await client.post("/validator", data=mpwriter)
+    assert resp.status == 200
+    assert resp.headers[hdrs.CONTENT_TYPE] == "text/turtle"
+
+    body = await resp.text()
+
+    with open(data_graph_file, "r") as file:
+        text = file.read()
+    await _assess_response_body_successful(
+        data=text, format="text/turtle", body=body, content_type="text/turtle"
+    )
 
 
 # -- Helper methods
