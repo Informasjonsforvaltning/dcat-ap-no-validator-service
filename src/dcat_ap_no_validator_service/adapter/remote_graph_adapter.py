@@ -62,7 +62,7 @@ def parse_text(input_graph: str) -> Graph:
         try:
             return Graph().parse(
                 data=input_graph,
-                format=_format if _format != "application/ld+json" else "json-ld",
+                format=_format,
             )
         except Exception:
             pass
