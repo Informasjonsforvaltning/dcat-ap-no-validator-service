@@ -182,14 +182,8 @@ class Validator(web.View):
         if config and config.include_expanded_triples is True:
             response_graph += ontology_graph
         try:
-            # TODO: the test on content_type below is to avoid a bug in rdflib,
-            # ref https://github.com/RDFLib/rdflib/issues/1387
             return web.Response(
-                body=response_graph.serialize(
-                    format=content_type
-                    if content_type != "application/ld+json"
-                    else "json-ld"
-                ),
+                body=response_graph.serialize(format=content_type),
                 content_type=content_type,
             )
         except PluginException:  # rdflib raises PluginException, in this context imples 406
