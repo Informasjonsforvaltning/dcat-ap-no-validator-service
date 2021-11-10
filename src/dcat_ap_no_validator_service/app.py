@@ -1,8 +1,10 @@
 """Package for exposing validation endpoint."""
 import logging
 import os
+from typing import Any
 
 from aiohttp import web
+from aiohttp_client_cache.backends.redis import RedisBackend
 from aiohttp_middlewares import cors_middleware, error_middleware
 from dotenv import load_dotenv
 
@@ -10,6 +12,9 @@ from .view import Ontologies, Ontology, Ping, Ready, Shapes, ShapesCollection, V
 
 load_dotenv()
 LOGGING_LEVEL = os.getenv("LOGGING_LEVEL", "INFO")
+CONFIG = os.getenv("CONFIG", "production")
+REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
+REDIS_PASSWORD = os.getenv("REDIS_PASSWORD")
 
 
 async def create_app() -> web.Application:
@@ -39,5 +44,24 @@ async def create_app() -> web.Application:
         level=LOGGING_LEVEL,
     )
     logging.getLogger("chardet.charsetprober").setLevel(logging.INFO)
+
+    async def redis_context(app: Any) -> Any:
+        # Enable cache in all other cases than test:
+        if CONFIG in {"test", "dev"}:
+            cache = None
+        else:  # pragma: no cover
+            cache = RedisBackend(
+                "aiohttp-cache",
+                address=f"redis://{REDIS_HOST}",
+                password=REDIS_PASSWORD,
+            )
+        app["cache"] = cache
+
+        yield
+
+        if cache:
+            await cache.close()  # pragma: no cover
+
+    app.cleanup_ctx.append(redis_context)
 
     return app

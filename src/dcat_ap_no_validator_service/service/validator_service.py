@@ -5,13 +5,10 @@ import asyncio
 from dataclasses import dataclass
 from enum import Enum
 import logging
-import os
 import traceback
 from typing import Any, Tuple
 
 from aiohttp_client_cache import CachedSession
-from aiohttp_client_cache.backends.redis import RedisBackend
-from dotenv import load_dotenv
 from pyshacl import validate
 from rdflib import Graph, OWL, RDF, URIRef
 
@@ -19,22 +16,6 @@ from rdflib import Graph, OWL, RDF, URIRef
 from dcat_ap_no_validator_service.adapter import fetch_graph, FetchError, parse_text
 
 SUPPORTED_FORMATS = set(["text/turtle", "application/ld+json", "application/rdf+xml"])
-
-
-# Setting up cache
-load_dotenv()
-# Enable cache in all other cases than test:
-CONFIG = os.getenv("CONFIG", "production")
-if CONFIG in {"test", "dev"}:
-    cache = None
-else:  # pragma: no cover
-    REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
-    REDIS_PASSWORD = os.getenv("REDIS_PASSWORD")
-    cache = RedisBackend(
-        "aiohttp-cache",
-        address=f"redis://{REDIS_HOST}",
-        password=REDIS_PASSWORD,
-    )
 
 
 class GraphType(str, Enum):
@@ -77,6 +58,7 @@ class ValidatorService(object):
     @classmethod
     async def create(
         cls: Any,
+        cache: Any,
         data_graph_url: Any,
         data_graph: Any,
         shapes_graph: Any,
@@ -134,17 +116,11 @@ class ValidatorService(object):
                 self.config = config
             return self
 
-    async def validate(self) -> Tuple[bool, Graph, Graph, Graph]:
+    async def validate(self, cache: Any) -> Tuple[bool, Graph, Graph, Graph]:
         """Validate function."""
         async with CachedSession(cache=cache) as session:
 
             # Do some sanity checks on preconditions:
-            # No need to validate when empty data graph:
-            if self.data_graph is None or len(self.data_graph) == 0:
-                raise ValueError("Data graph cannot be empty.")
-            # No need to validate when empty shapes graph:
-            if self.shapes_graph is None or len(self.shapes_graph) == 0:
-                raise ValueError("Shapes graph cannot be empty.")
             # If user has given an ontology graph, we check for and do imports:
             if self.ontology_graph and len(self.ontology_graph) > 0:
                 await self._import_ontologies(session)
