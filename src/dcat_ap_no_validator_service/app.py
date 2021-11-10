@@ -1,4 +1,5 @@
 """Package for exposing validation endpoint."""
+from datetime import timedelta
 import logging
 import os
 from typing import Any
@@ -54,13 +55,14 @@ async def create_app() -> web.Application:
                 "aiohttp-cache",
                 address=f"redis://{REDIS_HOST}",
                 password=REDIS_PASSWORD,
+                expire_after=timedelta(days=1),
             )
         app["cache"] = cache
 
         yield
 
-        if cache:
-            await cache.close()  # pragma: no cover
+        if cache:  # pragma: no cover
+            await cache.close()
 
     app.cleanup_ctx.append(redis_context)
 
