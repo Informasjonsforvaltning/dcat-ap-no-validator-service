@@ -1,5 +1,5 @@
 """Module for fetching shapes graph descriptions."""
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
 
 from dcat_ap_no_validator_service.model import ShapesGraphDescription
 
@@ -48,7 +48,7 @@ class ShapesGraphAdapter:
     """
 
     @classmethod
-    async def get_all(cls: Any) -> list[ShapesGraphDescription]:
+    async def get_all(cls: Any) -> List[ShapesGraphDescription]:
         """List all shapes graph objects in store."""
         return [ShapesGraphDescription(**x) for x in _SHAPES_STORE.values()]
 
