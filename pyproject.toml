@@ -1,70 +1,70 @@
 [tool.poetry]
-name = "dcat-ap-no-validator-service"
-version = "0.1.0"
-description = "The service validates a graph against dcat-ap-no specification"
 authors = ["Stig B. Dørmænen <stigbd@gmail.com>"]
-license = "Apache-2.0"
-readme = "README.md"
-homepage = "https://github.com/Informasjonsforvaltning/dcat-ap-no-validator-service"
-repository = "https://github.com/Informasjonsforvaltning/dcat-ap-no-validator-service"
-classifiers=[
+classifiers = [
   "Programming Language :: Python :: 3",
   "License :: OSI Approved :: Apache Software License",
   "Operating System :: OS Independent",
 ]
+description = "The service validates a graph against dcat-ap-no specification"
+homepage = "https://github.com/Informasjonsforvaltning/dcat-ap-no-validator-service"
+license = "Apache-2.0"
+name = "dcat-ap-no-validator-service"
+readme = "README.md"
+repository = "https://github.com/Informasjonsforvaltning/dcat-ap-no-validator-service"
+version = "0.1.0"
 [tool.poetry.dependencies]
-python = "^3.7"
-gunicorn = "^20.0.4"
-rdflib = "^6.0.0"
 aiohttp = "^3.7.2"
-python-dotenv = "^0.19.0"
-pyshacl = "^0.17.0.post2"
-aiohttp-middlewares = "^1.1.0"
-multidict = "^5.1.0"
-certifi = "^2021.5.30"
 aiohttp-client-cache = {extras = ["backends"], version = "^0.5.1"}
-python-json-logger = "^2.0.2"
-dataclasses-json = "^0.5.6"
+aiohttp-middlewares = "^1.1.0"
 aioredis = "^1.3.1"
+certifi = "^2021.5.30"
+dataclasses-json = "^0.5.6"
+gunicorn = "^20.0.4"
+multidict = "^5.1.0"
+pyshacl = "^0.17.0.post2"
+python = "^3.7"
+python-dotenv = "^0.19.0"
+python-json-logger = "^2.0.2"
+rdflib = "^6.0.0"
 
 [tool.poetry.dev-dependencies]
-pytest = "^6.2.5"
-pytest-docker = "^0.10.3"
+aiohttp-devtools = "^0.13.1"
+aioresponses = "^0.7.2"
+black = "^21.9b0"
+codecov = "^2.1.12"
+coverage = "^6.0.2"
 docker-compose = "^1.29.2"
+flake8 = "^4.0.1"
+flake8-annotations = "^2.4.1"
 flake8-bandit = "^2.1.2"
 flake8-black = "^0.2.3"
 flake8-bugbear = "^21.9.1"
 flake8-docstrings = "^1.5.0"
 flake8-import-order = "^0.18.1"
-pep8-naming = "^0.12.1"
-safety = "^1.9.0"
 mypy = "^0.910"
-flake8-annotations = "^2.4.1"
-codecov = "^2.1.12"
-pytest-mock = "^3.6.1"
+pep8-naming = "^0.12.1"
+pytest = "^6.2.5"
 pytest-aiohttp = "^0.3.0"
-aiohttp-devtools = "^0.13.1"
-pytest-profiling = "^1.7.0"
-aioresponses = "^0.7.2"
-requests = "^2.26.0"
-black = "^21.9b0"
-coverage = "^6.0.2"
-flake8 = "^4.0.1"
-pytest-cov = "^3.0.0"
 pytest-asyncio = "^0.16.0"
+pytest-cov = "^3.0.0"
+pytest-docker = "^0.10.3"
+pytest-mock = "^3.6.1"
+pytest-profiling = "^1.7.0"
+requests = "^2.26.0"
+safety = "^1.9.0"
 
 [tool.coverage.paths]
 source = ["src", "*/site-packages"]
 
 [tool.coverage.run]
 branch = false
-source = ["dcat_ap_no_validator_service"]
 omit = ["*gunicorn_config.py"]
+source = ["dcat_ap_no_validator_service"]
 
 [tool.coverage.report]
-show_missing = true
 fail_under = 100
+show_missing = true
 
 [build-system]
-requires = ["poetry>=0.12"]
-build-backend = "poetry.masonry.api"
+build-backend = "poetry.core.masonry.api"
+requires = ["poetry-core>=1.0.0"]
