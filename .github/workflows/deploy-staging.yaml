@@ -43,6 +43,7 @@ jobs:
           pipx install poetry==1.1.11
           pipx install nox==2021.10.1
           pipx inject nox nox-poetry
+          pipx install pyparsing==3.0.4
 
       - name: Build image and test with nox
         run: nox
