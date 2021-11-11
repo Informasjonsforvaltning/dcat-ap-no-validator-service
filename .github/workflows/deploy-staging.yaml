@@ -40,9 +40,9 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install nox==2021.10.1
-          pip install poetry==1.1.11
-          pip install nox-poetry==0.8.6
+          pip install poetry==1.1.6
+          pip install nox==2020.12.31
+          pip install nox-poetry==0.8.4
 
       - name: Build image and test with nox
         run: nox
