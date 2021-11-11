@@ -1085,7 +1085,7 @@ async def test_validator_data_graph_url_bad_syntax(
 
 @pytest.mark.integration
 async def test_validator_data_graph_empty(client: _TestClient, mocks: Any) -> None:
-    r"""Should return status 400 and message \"Data graph cannot be empty.\"."""
+    r"""Should return status 400 and message \"No data graph in input.\"."""
     data = ""
     shapes_graph_file = "tests/files/mock_dcat-ap-no-shacl_shapes_2.00.ttl"
 
@@ -1102,12 +1102,12 @@ async def test_validator_data_graph_empty(client: _TestClient, mocks: Any) -> No
     assert "application/json" in resp.headers[hdrs.CONTENT_TYPE], "Wrong content-type."
 
     body = await resp.json()
-    assert "Data graph cannot be empty." in body["detail"], "Wrong message."
+    assert "No data graph in input." in body["detail"], "Wrong message."
 
 
 @pytest.mark.integration
 async def test_validator_shapes_graph_empty(client: _TestClient, mocks: Any) -> None:
-    r"""Should return status 400 and message \"Shapes graph cannot be empty.\"."""
+    r"""Should return status 400 and message \"No shapes graph in input.\"."""
     data_graph_file = "tests/files/valid_catalog.ttl"
     shapes_graph = ""
 
@@ -1124,7 +1124,7 @@ async def test_validator_shapes_graph_empty(client: _TestClient, mocks: Any) -> 
     assert "application/json" in resp.headers[hdrs.CONTENT_TYPE], "Wrong content-type."
 
     body = await resp.json()
-    assert "Shapes graph cannot be empty." in body["detail"], "Wrong message."
+    assert "No shapes graph in input." in body["detail"], "Wrong message."
 
 
 @pytest.mark.integration

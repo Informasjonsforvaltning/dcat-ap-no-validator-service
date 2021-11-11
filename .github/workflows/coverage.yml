@@ -9,9 +9,15 @@ jobs:
       with:
         python-version: '3.9'
         architecture: x64
-    - run: pip install nox==2020.12.31
-    - run: pip install poetry==1.1.6
-    - run: pip install nox-poetry==0.8.4
-    - run: nox --sessions integration_tests coverage
+
+    - name: Install dependencies
+      run: |
+          pipx install poetry==1.1.11
+          pipx install nox==2021.10.1
+          pipx inject nox nox-poetry
+          pip install pyparsing==3.0.4
+
+    - name: Run coverage on integration tests
+      run: nox --sessions integration_tests coverage
       env:
         CODECOV_TOKEN: ${{secrets.CODECOV_TOKEN}}

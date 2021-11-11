@@ -40,9 +40,10 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install poetry==1.1.6
-          pip install nox==2020.12.31
-          pip install nox-poetry==0.8.4
+          pipx install poetry==1.1.11
+          pipx install nox==2021.10.1
+          pipx inject nox nox-poetry
+          pip install pyparsing==3.0.4
 
       - name: Build image and test with nox
         run: nox

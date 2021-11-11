@@ -28,6 +28,8 @@ class Validator(web.View):
 
     async def post(self) -> web.Response:
         """Validate route function."""
+        cache = self.request.app["cache"]
+
         logging.debug(
             f"Got following content-type-headers: {self.request.headers[hdrs.CONTENT_TYPE]}."
         )
@@ -52,7 +54,8 @@ class Validator(web.View):
                 # Get config:
                 config_json = await part.json()
                 logging.debug(f"Got config: {config_json}.")
-                config = _create_config(config_json)
+                if config_json:
+                    config = _create_config(config_json)
                 pass
             # Data graph, url:
             if Part(part.name) is Part.DATA_GRAPH_URL:
@@ -74,7 +77,8 @@ class Validator(web.View):
                         reason="Data graph file is not readable."
                     ) from None
                 # logging.debug(f"Content of {part.filename}:\n{data_graph}.")
-                data_graph_matrix[part.name] = part.filename
+                if part.filename:
+                    data_graph_matrix[part.name] = part.filename
                 pass
             # Shapes graph, url:
             if Part(part.name) is Part.SHAPES_GRAPH_URL:
@@ -96,7 +100,8 @@ class Validator(web.View):
                         reason="Shapes graph file is not readable."
                     ) from None
                 # logging.debug(f"Content of {part.filename}:\n{shapes_graph}.")
-                shapes_graph_matrix[part.name] = part.filename
+                if part.filename:
+                    shapes_graph_matrix[part.name] = part.filename
                 pass
             # Ontology graph, url:
             if Part(part.name) is Part.ONTOLOGY_GRAPH_URL:
@@ -137,6 +142,7 @@ class Validator(web.View):
         try:
             # instantiate validator service:
             service = await ValidatorService.create(
+                cache=cache,
                 data_graph_url=data_graph_url,
                 data_graph=data_graph,
                 shapes_graph_url=shapes_graph_url,
@@ -152,18 +158,13 @@ class Validator(web.View):
             logging.debug(traceback.format_exc())
             raise web.HTTPBadRequest(reason=str(e)) from None
 
-        try:
-            # validate:
-            (
-                conforms,
-                data_graph,
-                ontology_graph,
-                results_graph,
-            ) = await service.validate()
-
-        except ValueError as e:
-            logging.debug(traceback.format_exc())
-            raise web.HTTPBadRequest(reason=str(e)) from None
+        # validate:
+        (
+            conforms,
+            data_graph,
+            ontology_graph,
+            results_graph,
+        ) = await service.validate(cache=cache)
 
         # Try to content-negotiate:
         logging.debug(

@@ -1,5 +1,5 @@
 """Module for fetching ontology graph descriptions."""
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
 
 from dcat_ap_no_validator_service.model import OntologyGraphDescription
 
@@ -38,7 +38,7 @@ class OntologyGraphAdapter:
     """
 
     @classmethod
-    async def get_all(cls: Any) -> list[OntologyGraphDescription]:
+    async def get_all(cls: Any) -> List[OntologyGraphDescription]:
         """List all ontology graph objects in store."""
         return [OntologyGraphDescription(**x) for x in _ONTOLOGY_STORE.values()]
 
