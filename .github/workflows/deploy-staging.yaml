@@ -33,7 +33,7 @@ jobs:
             ${{ runner.os }}-nox-
 
       - name: Set up Python 3.9
-        uses: actions/setup-python@v1
+        uses: actions/setup-python@v2
         with:
           python-version: 3.9
           architecture: x64
@@ -43,6 +43,7 @@ jobs:
           pip install poetry==1.1.6
           pip install nox==2020.12.31
           pip install nox-poetry==0.8.4
+          pip install pyparsing==3.0.4
 
       - name: Build image and test with nox
         run: nox
