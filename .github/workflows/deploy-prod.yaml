@@ -43,6 +43,7 @@ jobs:
           pip install nox==2020.12.31
           pip install nox-poetry==0.8.4
           pip install pyparsing==3.0.4
+          pip install virtualenv==20.10.0
 
       - name: Build image and test with nox
         run: nox
