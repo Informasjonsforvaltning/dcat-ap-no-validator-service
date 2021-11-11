@@ -18,5 +18,5 @@ jobs:
 
     - name: Run coverage on integration tests
       run: nox --sessions integration_tests coverage
-        env:
-          CODECOV_TOKEN: ${{secrets.CODECOV_TOKEN}}
+      env:
+        CODECOV_TOKEN: ${{secrets.CODECOV_TOKEN}}
