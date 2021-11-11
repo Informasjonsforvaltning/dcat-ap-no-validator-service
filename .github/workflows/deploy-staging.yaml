@@ -32,31 +32,20 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-nox-
 
-      - name: Set up Python 3.8
-        uses: actions/setup-python@v2
+      - name: Set up Python 3.7
+        uses: actions/setup-python@v1
         with:
-          python-version: '3.8'
-          architecture: 'x64'
+          python-version: 3.7
+          architecture: x64
 
-      - name: Upgrade pip
+      - name: Install dependencies
         run: |
-          pip install --constraint=.github/workflows/constraints.txt pip
-          pip --version
-
-      - name: Install Poetry
-        run: |
-          pipx install --pip-args=--constraint=.github/workflows/constraints.txt poetry
-          poetry --version
-
-      - name: Install Nox
-        run: |
-          pipx install --pip-args=--constraint=.github/workflows/constraints.txt nox
-          pipx inject --pip-args=--constraint=.github/workflows/constraints.txt nox nox-poetry
-          nox --version
-
+          pip install nox==2021.10.1
+          pip install poetry==1.1.11
+          pip install nox-poetry==0.8.6
 
       - name: Build image and test with nox
-        run: nox  --force-color --python=3.8
+        run: nox
 
       - name: Tag and publish docker image to Google Cloud
         run: |
