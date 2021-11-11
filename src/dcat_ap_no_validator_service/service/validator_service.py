@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import asyncio
 from dataclasses import dataclass
+from datetime import timedelta
 from enum import Enum
 import logging
 import os
@@ -34,6 +35,7 @@ else:  # pragma: no cover
         "aiohttp-cache",
         address=f"redis://{REDIS_HOST}",
         password=REDIS_PASSWORD,
+        expire_after=timedelta(days=1),
     )
 
 
