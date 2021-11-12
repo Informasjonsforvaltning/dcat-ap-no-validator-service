@@ -43,7 +43,6 @@ jobs:
           pipx install poetry==1.1.11
           pipx install nox==2021.10.1
           pipx inject nox nox-poetry
-          pip install pyparsing==3.0.4
 
       - name: Build image and test with nox
         run: nox
@@ -80,7 +79,7 @@ jobs:
         uses: 8398a7/action-slack@v3
         with:
           status: ${{ job.status }}
-          author_name: 'Application: dcat-ap-no-validator-service | Environment: staging'
+          author_name: "Application: dcat-ap-no-validator-service | Environment: staging"
           fields: commit,author,workflow
         env:
           GITHUB_TOKEN: ${{ github.token }}

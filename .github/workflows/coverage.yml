@@ -4,20 +4,19 @@ jobs:
   coverage:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-python@v1
-      with:
-        python-version: '3.9'
-        architecture: x64
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v1
+        with:
+          python-version: "3.9"
+          architecture: x64
 
-    - name: Install dependencies
-      run: |
+      - name: Install dependencies
+        run: |
           pipx install poetry==1.1.11
           pipx install nox==2021.10.1
           pipx inject nox nox-poetry
-          pip install pyparsing==3.0.4
 
-    - name: Run coverage on integration tests
-      run: nox --sessions integration_tests coverage
-      env:
-        CODECOV_TOKEN: ${{secrets.CODECOV_TOKEN}}
+      - name: Run coverage on integration tests
+        run: nox --sessions integration_tests coverage
+        env:
+          CODECOV_TOKEN: ${{secrets.CODECOV_TOKEN}}
