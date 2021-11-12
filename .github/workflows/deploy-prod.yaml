@@ -42,8 +42,7 @@ jobs:
           pipx install poetry==1.1.11
           pipx install nox==2021.10.1
           pipx inject nox nox-poetry
-          pip install pyparsing==3.0.4
-          
+
       - name: Build image and test with nox
         run: nox
 
@@ -78,10 +77,10 @@ jobs:
       - name: Notify slack
         uses: 8398a7/action-slack@v3
         with:
-          mention: 'channel'
+          mention: "channel"
           if_mention: failure
           status: ${{ job.status }}
-          author_name: 'Application: dcat-ap-no-validator-service | Environment: prod'
+          author_name: "Application: dcat-ap-no-validator-service | Environment: prod"
           fields: commit,author,workflow,message
         env:
           GITHUB_TOKEN: ${{ github.token }}
