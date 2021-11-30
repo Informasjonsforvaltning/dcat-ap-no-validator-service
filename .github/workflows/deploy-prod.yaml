@@ -12,7 +12,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v2
 
       - name: Setup gcloud CLI for image-store
         uses: google-github-actions/setup-gcloud@master
@@ -24,7 +25,7 @@ jobs:
         run: gcloud auth configure-docker eu.gcr.io
 
       - name: Cache Docker layers
-        uses: actions/cache@v2.1.6
+        uses: actions/cache@v2
         with:
           path: .cache
           key: ${{ runner.os }}-nox-${{ github.sha }}
@@ -73,6 +74,11 @@ jobs:
         run: |
           gcloud container clusters get-credentials digdir-fdk-prod --region europe-north1-a --project digdir-fdk-prod
           kubectl apply -f ./kubectlapply.yaml --force
+          if ! kubectl --namespace=prod rollout status deployment dcat-ap-no-validator-service; then
+            kubectl --namespace=prod rollout undo deployment dcat-ap-no-validator-service
+            kubectl --namespace=prod rollout status deployment dcat-ap-no-validator-service
+            exit 1
+          fi
 
       - name: Notify slack
         uses: 8398a7/action-slack@v3
