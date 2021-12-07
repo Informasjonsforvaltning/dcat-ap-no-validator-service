@@ -10,8 +10,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
-
       - name: Apply Helm template
         run: |
           helm repo add fdk https://informasjonsforvaltning.github.io/helm-chart/
@@ -22,16 +20,20 @@ jobs:
           chmod o+w ./kubectlapply.yaml
           cat kubectlapply.yaml
 
-      - name: Setup gcloud CLI for deploy
-        uses: google-github-actions/setup-gcloud@master
+      - name: Auth gcloud CLI for deploy
+        uses: google-github-actions/auth@main
         with:
-          service_account_key: ${{ secrets.DIGDIR_FDK_DEV_AUTODEPLOY }}
-          export_default_credentials: true
+          credentials_json: ${{ secrets.DIGDIR_FDK_DEV_AUTODEPLOY }}
 
       - name: Deploy to GCP
         run: |
           gcloud container clusters get-credentials digdir-fdk-dev --region europe-north1-a --project digdir-fdk-dev
           kubectl apply -f ./kubectlapply.yaml --force
+          if ! kubectl --namespace=demo rollout status deployment dcat-ap-no-validator-service; then
+            kubectl --namespace=demo rollout undo deployment dcat-ap-no-validator-service
+            kubectl --namespace=demo rollout status deployment dcat-ap-no-validator-service
+            exit 1
+          fi
 
       - name: Notify slack
         uses: 8398a7/action-slack@v3
