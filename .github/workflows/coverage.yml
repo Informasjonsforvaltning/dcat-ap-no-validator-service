@@ -12,9 +12,10 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pipx install poetry==1.1.11
-          pipx install nox==2021.10.1
-          pipx inject nox nox-poetry
+          pip install --constraint=.github/workflows/constraints.txt pip
+          pipx install --pip-args=--constraint=.github/workflows/constraints.txt poetry
+          pipx install --pip-args=--constraint=.github/workflows/constraints.txt nox
+          pipx inject --pip-args=--constraint=.github/workflows/constraints.txt nox nox-poetry
 
       - name: Run coverage on integration tests
         run: nox --sessions integration_tests coverage
