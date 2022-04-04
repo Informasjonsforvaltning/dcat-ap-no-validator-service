@@ -34,7 +34,7 @@ def mocks(mock_aioresponse: Any, mocker: MockFixture) -> Any:
     with open("tests/files/mock_organization_catalogue_961181399.ttl", "r") as file:
         org_961181399 = file.read()
     mock_aioresponse.get(
-        "https://organization-catalogue.fellesdatakatalog.digdir.no/organizations/961181399",
+        "https://organization-catalog.fellesdatakatalog.digdir.no/organizations/961181399",
         body=org_961181399,
     )
     with open("tests/files/mock_los_tema_barnehage.xml", "r") as file:
@@ -52,7 +52,7 @@ def mocks(mock_aioresponse: Any, mocker: MockFixture) -> Any:
     with open("tests/files/mock_organization_catalogue_991825827.ttl", "r") as file:
         org_991825827 = file.read()
     mock_aioresponse.get(
-        "https://organization-catalogue.fellesdatakatalog.digdir.no/organizations/991825827",
+        "https://organization-catalog.fellesdatakatalog.digdir.no/organizations/991825827",
         body=org_991825827,
     )
     with open("tests/files/mock_regorg.ttl", "r") as file:
@@ -436,9 +436,8 @@ async def test_validator_file_content_type_json_ld(
     ontology_graph_file = "tests/files/ontologies.ttl"
 
     with MultipartWriter("mixed") as mpwriter:
-        p = mpwriter.append(
-            open(data_graph_file, "rb"), {"CONTENT-TYPE": "application/ld+json"}
-        )
+        p = mpwriter.append(open(data_graph_file, "rb"))
+        p.headers[hdrs.CONTENT_TYPE] = "application/ld+json"
         p.set_content_disposition(
             "attachment", name="data-graph-file", filename=data_graph_file
         )
@@ -1090,7 +1089,9 @@ async def test_validator_data_graph_empty(client: _TestClient, mocks: Any) -> No
     shapes_graph_file = "tests/files/mock_dcat-ap-no-shacl_shapes_2.00.ttl"
 
     with MultipartWriter("mixed") as mpwriter:
-        p = mpwriter.append(data, {"CONTENT-TYPE": "text/turtle"})
+        p = mpwriter.append(data)
+        p.headers[hdrs.CONTENT_TYPE] = "text/turtle"
+
         p.set_content_disposition("attachment", name="data-graph-file")
         p = mpwriter.append(open(shapes_graph_file, "rb"))
         p.set_content_disposition(
@@ -1116,7 +1117,8 @@ async def test_validator_shapes_graph_empty(client: _TestClient, mocks: Any) -> 
         p.set_content_disposition(
             "attachment", name="data-graph-file", filename=data_graph_file
         )
-        p = mpwriter.append(shapes_graph, {"CONTENT-TYPE": "text/turtle"})
+        p = mpwriter.append(shapes_graph)
+        p.headers[hdrs.CONTENT_TYPE] = "text/turtle"
         p.set_content_disposition("attachment", name="shapes-graph-file")
 
     resp = await client.post("/validator", data=mpwriter)

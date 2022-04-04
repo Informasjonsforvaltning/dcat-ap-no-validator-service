@@ -1,7 +1,7 @@
 """Module for fetching remote graph."""
 import logging
 
-from aiohttp import ClientError, hdrs
+from aiohttp import ClientError, ClientTimeout, hdrs
 from aiohttp_client_cache import CachedSession
 from rdflib import Graph
 
@@ -23,13 +23,18 @@ async def fetch_graph(
 ) -> Graph:
     """Fetch remote graph at url and return as Graph."""
     logging.debug(f"Trying to fetch remote graph {url}.")
+    timeout = ClientTimeout(total=5)
     try:
         if use_cache:
-            response = await session.get(url, headers={hdrs.ACCEPT: "text/turtle"})
+            response = await session.get(
+                url, headers={hdrs.ACCEPT: "text/turtle"}, timeout=timeout
+            )
             body = await response.text()
         else:
             async with session.disabled():
-                response = await session.get(url, headers={hdrs.ACCEPT: "text/turtle"})
+                response = await session.get(
+                    url, headers={hdrs.ACCEPT: "text/turtle"}, timeout=timeout
+                )
                 body = await response.text()
     except ClientError:
         raise FetchError(
@@ -42,7 +47,7 @@ async def fetch_graph(
 
     logging.debug(f"Got status_code {response.status}.")
     if response.status == 200:
-        logging.debug(f"Got valid remote graph from {url}")
+        logging.debug(f"Trying to parse response from {url}")
         try:
             return parse_text(input_graph=body)
         except SyntaxError as e:
