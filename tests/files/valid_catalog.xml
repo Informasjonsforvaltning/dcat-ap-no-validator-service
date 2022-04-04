@@ -10,11 +10,11 @@
     <dct:description xml:lang="en">A test catalog that is valid according to dcat-ap-no v2</dct:description>
     <dct:title xml:lang="en">Testcatalog</dct:title>
     <dct:identifier>1</dct:identifier>
-    <dct:publisher rdf:resource="https://organization-catalogue.fellesdatakatalog.digdir.no/organizations/961181399"/>
+    <dct:publisher rdf:resource="https://organization-catalog.fellesdatakatalog.digdir.no/organizations/961181399"/>
   </rdf:Description>
   <rdf:Description rdf:about="http://dataset-publisher:8080/datasets/1">
-    <dct:creator rdf:resource="https://organization-catalogue.fellesdatakatalog.digdir.no/organizations/991825827"/>
-    <dct:publisher rdf:resource="https://organization-catalogue.fellesdatakatalog.digdir.no/organizations/961181399"/>
+    <dct:creator rdf:resource="https://organization-catalog.fellesdatakatalog.digdir.no/organizations/991825827"/>
+    <dct:publisher rdf:resource="https://organization-catalog.fellesdatakatalog.digdir.no/organizations/961181399"/>
     <dct:identifier>1</dct:identifier>
     <dct:description xml:lang="en">A valid test dataset</dct:description>
     <dcat:theme rdf:resource="http://publications.europa.eu/resource/authority/data-theme/GOVE"/>

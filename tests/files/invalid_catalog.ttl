@@ -11,7 +11,7 @@
 
 <http://dataset-publisher:8080/catalogs/1> a dcat:Catalog ;
     dct:identifier "1" ;
-    dct:publisher <https://organization-catalogue.fellesdatakatalog.digdir.no/organizations/961181399> ;
+    dct:publisher <https://organization-catalog.fellesdatakatalog.digdir.no/organizations/961181399> ;
     dct:title "Invalid testcatalog"@en ;
     dct:description "A test catalog that is not valid according to dcat-ap-no v2"@en ;
     dcat:dataset <http://dataset-publisher:8080/datasets/1> ;
@@ -21,5 +21,5 @@
 <http://dataset-publisher:8080/datasets/1> a dcat:Dataset ;
     dct:identifier "1" ;
     dct:title "Test dataset"@en ;
-    dct:publisher <https://organization-catalogue.fellesdatakatalog.digdir.no/organizations/961181399> ;
+    dct:publisher <https://organization-catalog.fellesdatakatalog.digdir.no/organizations/961181399> ;
     .

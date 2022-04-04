@@ -28,7 +28,7 @@
     ];
     dct:license <http://publications.europa.eu/resource/authority/licence/CC_BY_4_0> ;
     rdfs:commet "Validated SUCCESS at https://www.itb.ec.europa.eu/shacl/shacl/upload"@en ;
-    dct:publisher <https://organization-catalogue.fellesdatakatalog.digdir.no/organizations/991825827> ;
+    dct:publisher <https://organization-catalog.fellesdatakatalog.digdir.no/organizations/991825827> ;
     dct:description "This document specifies the constraints on properties and classes expressed by SKOS-AP-NO-Begrep in SHACL."@en ;
     dct:title "The constraints of SKOS-AP-NO-Begrep"@en ;
     dct:modified "2021-09-02"^^xsd:date ;

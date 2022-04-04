@@ -12,7 +12,7 @@
     skosxl:prefLabel    [ a                   skosxl:Label ;
                           skosxl:literalForm  "ORGL"
                         ] ;
-    dct:publisher       <https://organization-catalogue.fellesdatakatalog.digdir.no/organizations/974760673> ;
+    dct:publisher       <https://organization-catalog.fellesdatakatalog.digdir.no/organizations/974760673> ;
     skosno:definisjon   [ a                       skosno:Definisjon ;
                           rdfs:label              "Organisasjonsledd."@nb ;
                           skosno:forholdTilKilde  skosno:egendefinert
@@ -25,7 +25,7 @@
     skosxl:prefLabel    [ a                   skosxl:Label ;
                           skosxl:literalForm  "STAT"
                         ] ;
-    dct:publisher       <https://organization-catalogue.fellesdatakatalog.digdir.no/organizations/974760673> ;
+    dct:publisher       <https://organization-catalog.fellesdatakatalog.digdir.no/organizations/974760673> ;
     skosno:definisjon   [ a                       skosno:Definisjon ;
                           rdfs:label              "Staten."@nb ;
                           skosno:forholdTilKilde  skosno:egendefinert

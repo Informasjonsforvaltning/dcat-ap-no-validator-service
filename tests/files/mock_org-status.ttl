@@ -12,7 +12,7 @@
     skosxl:prefLabel    [ a                   skosxl:Label ;
                           skosxl:literalForm  "Normal aktivitet"@nb , "Normal aktivitet"@nn , "Normal activity"@en
                         ] ;
-    dct:publisher       <https://organization-catalogue.fellesdatakatalog.digdir.no/organizations/974760673> ;
+    dct:publisher       <https://organization-catalog.fellesdatakatalog.digdir.no/organizations/974760673> ;
     skosno:definisjon   [ a                       skosno:Definisjon ;
                           rdfs:label              "Normal aktivitet."@nb ;
                           skosno:forholdTilKilde  skosno:egendefinert
@@ -25,7 +25,7 @@
     skosxl:prefLabel    [ a                   skosxl:Label ;
                           skosxl:literalForm  "Avviklet"@nb , "Avvikla"@nn , "Liquidated"@en
                         ] ;
-    dct:publisher       <https://organization-catalogue.fellesdatakatalog.digdir.no/organizations/974760673> ;
+    dct:publisher       <https://organization-catalog.fellesdatakatalog.digdir.no/organizations/974760673> ;
     skosno:definisjon   [ a                       skosno:Definisjon ;
                           rdfs:label              "Avviklet."@nb ;
                           skosno:forholdTilKilde  skosno:egendefinert

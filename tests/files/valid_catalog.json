@@ -20,7 +20,7 @@
       },
       "dct:identifier": "1",
       "dct:publisher": {
-        "@id": "https://organization-catalogue.fellesdatakatalog.digdir.no/organizations/961181399"
+        "@id": "https://organization-catalog.fellesdatakatalog.digdir.no/organizations/961181399"
       },
       "dct:title": {
         "@language": "en",
@@ -39,7 +39,7 @@
         }
       ],
       "dct:creator": {
-        "@id": "https://organization-catalogue.fellesdatakatalog.digdir.no/organizations/991825827"
+        "@id": "https://organization-catalog.fellesdatakatalog.digdir.no/organizations/991825827"
       },
       "dct:description": {
         "@language": "en",
@@ -47,7 +47,7 @@
       },
       "dct:identifier": "1",
       "dct:publisher": {
-        "@id": "https://organization-catalogue.fellesdatakatalog.digdir.no/organizations/961181399"
+        "@id": "https://organization-catalog.fellesdatakatalog.digdir.no/organizations/961181399"
       },
       "dct:title": {
         "@language": "en",
