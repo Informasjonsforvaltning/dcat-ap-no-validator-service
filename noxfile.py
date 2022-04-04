@@ -1,4 +1,5 @@
 """Nox sessions."""
+import sys
 
 import nox
 from nox_poetry import Session, session
@@ -119,9 +120,17 @@ def safety(session: Session) -> None:
 @session
 def mypy(session: Session) -> None:
     """Type-check using mypy."""
-    args = session.posargs or locations
-    session.install("mypy")
+    args = session.posargs or [
+        "--install-types",
+        "--non-interactive",
+        "src",
+        "tests",
+    ]
+    session.install(".")
+    session.install("mypy", "pytest")
     session.run("mypy", *args)
+    if not session.posargs:
+        session.run("mypy", f"--python-executable={sys.executable}", "noxfile.py")
 
 
 @session

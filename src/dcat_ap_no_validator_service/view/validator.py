@@ -161,8 +161,8 @@ class Validator(web.View):
         # validate:
         (
             conforms,
-            data_graph,
-            ontology_graph,
+            result_data_graph,
+            result_ontology_graph,
             results_graph,
         ) = await service.validate(cache=cache)
 
@@ -179,9 +179,9 @@ class Validator(web.View):
             content_type = self.request.headers[hdrs.ACCEPT]
         response_graph = Graph()
         response_graph += results_graph
-        response_graph += data_graph
+        response_graph += result_data_graph
         if config and config.include_expanded_triples is True:
-            response_graph += ontology_graph
+            response_graph += result_ontology_graph
         try:
             return web.Response(
                 body=response_graph.serialize(format=content_type),
