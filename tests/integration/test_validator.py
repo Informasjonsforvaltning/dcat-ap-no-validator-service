@@ -102,13 +102,13 @@ def mocks(mock_aioresponse: Any, mocker: MockFixture) -> Any:
     with open("tests/files/mock_org-status.ttl", "r") as file:
         org_status = file.read()
     mock_aioresponse.get(
-        "https://raw.githubusercontent.com/Informasjonsforvaltning/organization-catalogue/master/src/main/resources/ontology/org-status.ttl",  # noqa
+        "https://raw.githubusercontent.com/Informasjonsforvaltning/organization-catalog/master/src/main/resources/ontology/org-status.ttl",  # noqa
         body=org_status,
     )
     with open("tests/files/mock_org-types.ttl", "r") as file:
         org_types = file.read()
     mock_aioresponse.get(
-        "https://raw.githubusercontent.com/Informasjonsforvaltning/organization-catalogue/master/src/main/resources/ontology/org-type.ttl",  # noqa
+        "https://raw.githubusercontent.com/Informasjonsforvaltning/organization-catalog/master/src/main/resources/ontology/org-type.ttl",  # noqa
         body=org_types,
     )
     with open(
