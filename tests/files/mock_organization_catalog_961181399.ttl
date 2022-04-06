@@ -1,4 +1,4 @@
-@prefix br:    <https://raw.githubusercontent.com/Informasjonsforvaltning/organization-catalog/master/src/main/resources/ontology/organization-catalogue.owl#> .
+@prefix br:    <https://raw.githubusercontent.com/Informasjonsforvaltning/organization-catalog/master/src/main/resources/ontology/organization-catalog.owl#> .
 @prefix dct:   <http://purl.org/dc/terms/> .
 @prefix adms:  <http://www.w3.org/ns/adms#> .
 @prefix org:   <http://www.w3.org/ns/org#> .
@@ -8,21 +8,21 @@
 @prefix brtype: <https://raw.githubusercontent.com/Informasjonsforvaltning/organization-catalog/master/src/main/resources/ontology/org-type.ttl#> .
 @prefix foaf:  <http://xmlns.com/foaf/0.1/> .
 
-<https://organization-catalog.fellesdatakatalog.digdir.no/organizations/991825827>
+<https://organization-catalog.fellesdatakatalog.digdir.no/organizations/961181399>
         a                      rov:RegisteredOrganization ;
-        dct:identifier         "991825827" ;
-        org:subOrganizationOf  <https://organization-catalog.fellesdatakatalog.digdir.no/organizations/972417858> ;
-        rov:legalName          "DIGITALISERINGSDIREKTORATET" ;
+        dct:identifier         "961181399" ;
+        org:subOrganizationOf  <https://organization-catalog.fellesdatakatalog.digdir.no/organizations/972417866> ;
+        rov:legalName          "ARKIVVERKET" ;
         rov:orgStatus          brskos:NormalAktivitet ;
-        rov:orgType            brtype:STAT ;
+        rov:orgType            brtype:ORGL ;
         rov:registration       [ a                  adms:Identifier ;
-                                 dct:issued         "2007-10-15" ;
-                                 skos:notation      "991825827" ;
+                                 dct:issued         "1995-08-09" ;
+                                 skos:notation      "961181399" ;
                                  adms:schemaAgency  "Brønnøysundregistrene"
                                ] ;
-        foaf:name              "DIGITALISERINGSDIREKTORATET"@nb ;
+        foaf:name              "ARKIVVERKET"@nb ;
         br:municipality        <https://data.geonorge.no/administrativeEnheter/kommune/id/173018> ;
-        br:nace                "84.110" ;
-        br:norwegianRegistry   <https://data.brreg.no/enhetsregisteret/api/enheter/991825827> ;
-        br:orgPath             "/STAT/972417858/991825827" ;
+        br:nace                "91.013" ;
+        br:norwegianRegistry   <https://data.brreg.no/enhetsregisteret/api/enheter/961181399> ;
+        br:orgPath             "/STAT/972417866/961181399" ;
         br:sectorCode          "6100" .

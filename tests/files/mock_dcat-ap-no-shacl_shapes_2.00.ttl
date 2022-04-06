@@ -95,7 +95,7 @@
 # Katalogpost (dcat:CatalogRecord), only added the Norwegian sh:name
 :CatalogRecord_Shape
     a sh:NodeShape ;
-    sh:name "Catalogue Record"@en , "Katalogpost"@nb ;
+    sh:name "Catalog Record"@en , "Katalogpost"@nb ;
     sh:property [
         sh:maxCount 1 ;
         sh:minCount 1 ;
@@ -792,7 +792,7 @@
 # Katalog (dcat:Catalog), only with the Norwegian sh:name
 :Catalog_Shape
     a sh:NodeShape ;
-    sh:name "Registry Catalogue"@en , "Katalog"@nb ;
+    sh:name "Registry Catalog"@en , "Katalog"@nb ;
     sh:property [
         sh:minCount 1 ;
         sh:nodeKind sh:Literal ;

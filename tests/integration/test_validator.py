@@ -31,7 +31,7 @@ def mock_aioresponse() -> Any:
 def mocks(mock_aioresponse: Any, mocker: MockFixture) -> Any:
     """Patch the calls to aiohttp.Client.get."""
     # Set up the mocks
-    with open("tests/files/mock_organization_catalogue_961181399.ttl", "r") as file:
+    with open("tests/files/mock_organization_catalog_961181399.ttl", "r") as file:
         org_961181399 = file.read()
     mock_aioresponse.get(
         "https://organization-catalog.fellesdatakatalog.digdir.no/organizations/961181399",
@@ -49,7 +49,7 @@ def mocks(mock_aioresponse: Any, mocker: MockFixture) -> Any:
         "http://publications.europa.eu/resource/authority/data-theme/GOVE",
         body=theme,
     )
-    with open("tests/files/mock_organization_catalogue_991825827.ttl", "r") as file:
+    with open("tests/files/mock_organization_catalog_991825827.ttl", "r") as file:
         org_991825827 = file.read()
     mock_aioresponse.get(
         "https://organization-catalog.fellesdatakatalog.digdir.no/organizations/991825827",
