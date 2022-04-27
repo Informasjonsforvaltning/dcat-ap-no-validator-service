@@ -1,0 +1,43 @@
+@prefix dcat: <http://www.w3.org/ns/dcat#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcard: <http://www.w3.org/2006/vcard/ns#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix rov: <http://www.w3.org/ns/regorg#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix cv: <http://data.europa.eu/m8g/> . 
+@prefix xkos: <http://rdf-vocabulary.ddialliance.org/xkos#> . 
+@prefix adms: <http://www.w3.org/ns/adms#> . 
+@prefix cpsv: <http://purl.org/vocab/cpsv#> . 
+@prefix dcatno: <https://data.norge.no/vocabulary/dcatno#> .
+
+
+<http://public-service-publisher:8080/catalogs/1> a dcat:Catalog ;
+    dct:description "A test catalog that is valid according to cpsv-ap-no v1"@en ;
+    dct:identifier "1" ;
+    dct:title "Testcatalog"@en ;
+    dcatno:containsService <http://public-service-publisher:8080/public-service/1> ;
+    dct:publisher <https://organization-catalog.fellesdatakatalog.digdir.no/organizations/961181399> ;
+    .
+
+<http://public-service-publisher:8080/public-service/1> a cpsv:PublicService ;
+    dct:description "A valid test dataset"@en ;
+    cv:hasCompetentAuthority <https://organization-catalog.fellesdatakatalog.digdir.no/organizations/961181399> ;
+    dct:identifier "1" ;
+    dcat:contactPoint [ a  vcard:Organization ; # kontaktpunkt
+                           vcard:hasTelephone "tel:+4775012000" ;
+    ] ;
+    dct:title "Test Public Service 1"@en ;
+    cpsv:produces <http://public-service-publisher:8080/output/1> ;
+    .
+
+
+<http://public-service-publisher:8080/output/1> a cv:Output ;
+    dct:identifier "1" ;
+    dct:title    "Skjenkebevilling til «Den beste restauranten AS»"@nb ,
+                 "Skjenkebevilling til «Den beste restauranten AS»"@nn ,
+                 "Liquor license for \"Den beste restauranten AS\""@en ;
+   .

@@ -35,6 +35,16 @@ _SHAPES_STORE: Dict[str, Dict] = dict(
             "specification_version": "1.0",
             "specification_url": "https://data.norge.no/specification/skos-ap-no-begrep/",
         },
+        "4": {
+            "id": "4",
+            "name": "SHACL-rules for CPSV-AP-NO",
+            "description": "This document specifies the constraints on properties and classes in CPSV-AP-NO, expressed in SHACL.",  # noqa
+            "version": "0.9.04",
+            "url": "https://raw.githubusercontent.com/Informasjonsforvaltning/cpsv-ap-no/develop/shacl/CPSV-AP-NO_shacl_shapes_v09xx.ttl",  # noqa
+            "specification_name": "CPSV-AP-NO",
+            "specification_version": "0.9",
+            "specification_url": "https://informasjonsforvaltning.github.io/cpsv-ap-no/",
+        },
     }
 )
 
