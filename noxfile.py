@@ -9,7 +9,6 @@ nox.options.stop_on_first_error = True
 nox.options.sessions = (
     "lint",
     "mypy",
-    "safety",
     "unit_tests",
     "integration_tests",
     "contract_tests",
@@ -114,7 +113,7 @@ def safety(session: Session) -> None:
     """Scan dependencies for insecure packages."""
     requirements = session.poetry.export_requirements()
     session.install("safety")
-    session.run("safety", "check", f"--file={requirements}", "--bare")
+    session.run("safety", "check", f"--file={requirements}", "--full-report")
 
 
 @session
