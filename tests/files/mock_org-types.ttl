@@ -1,4 +1,4 @@
-@prefix :           <https://raw.githubusercontent.com/Informasjonsforvaltning/organization-catalog/master/src/main/resources/ontology/org-type.ttl#> .
+@prefix :           <https://raw.githubusercontent.com/Informasjonsforvaltning/organization-catalog/main/src/main/resources/ontology/org-type.ttl#> .
 @prefix skos:       <http://www.w3.org/2004/02/skos/core#> .
 @prefix skosno:     <https://data.norge.no/vocabulary/skosno#> .
 @prefix dct:        <http://purl.org/dc/terms/> .
