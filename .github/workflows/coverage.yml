@@ -2,22 +2,11 @@ name: Coverage
 on: push
 jobs:
   coverage:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-python@v1
-        with:
-          python-version: "3.9"
-          architecture: x64
-
-      - name: Install dependencies
-        run: |
-          pip install --constraint=.github/workflows/constraints.txt pip
-          pipx install --pip-args=--constraint=.github/workflows/constraints.txt poetry
-          pipx install --pip-args=--constraint=.github/workflows/constraints.txt nox
-          pipx inject --pip-args=--constraint=.github/workflows/constraints.txt nox nox-poetry
-
-      - name: Run coverage on integration tests
-        run: nox --sessions integration_tests coverage
-        env:
-          CODECOV_TOKEN: ${{secrets.CODECOV_TOKEN}}
+    name: Coverage
+    uses: Informasjonsforvaltning/workflows/.github/workflows/coverage-nox.yaml@main
+    with:
+      python_version: '3.9'
+      python_architecture: x64
+      sessions: integration_tests
+    secrets:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
