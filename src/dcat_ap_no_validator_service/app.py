@@ -57,6 +57,7 @@ async def create_app() -> web.Application:
                 password=REDIS_PASSWORD,
                 expire_after=timedelta(days=1),
             )
+            cache.clear()
         app["cache"] = cache
 
         yield
