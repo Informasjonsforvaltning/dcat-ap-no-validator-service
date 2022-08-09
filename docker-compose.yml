@@ -6,9 +6,10 @@ services:
     ports:
       - "8000:8080"
     environment:
-      - REDIS_HOST=redis
-      - REDIS_PASSWORD=secret
-      - CONFIG=production
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - CONFIG=${CONFIG}
+      - TIMEOUT=${TIMEOUT}
     depends_on:
       - "redis"
   redis:

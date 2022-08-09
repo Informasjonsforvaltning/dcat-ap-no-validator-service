@@ -1,10 +1,14 @@
 """Module for fetching remote graph."""
 import logging
+import os
 
 from aiohttp import ClientError, ClientTimeout, hdrs
 from aiohttp_client_cache import CachedSession
+from dotenv import load_dotenv
 from rdflib import Graph
 
+load_dotenv()
+TIMEOUT = int(os.getenv("TIMEOUT", "5"))
 
 SUPPORTED_FORMATS = set(["text/turtle", "application/ld+json", "application/rdf+xml"])
 
@@ -23,7 +27,7 @@ async def fetch_graph(
 ) -> Graph:
     """Fetch remote graph at url and return as Graph."""
     logging.debug(f"Trying to fetch remote graph {url}.")
-    timeout = ClientTimeout(total=5)
+    timeout = ClientTimeout(total=TIMEOUT)
     try:
         if use_cache:
             response = await session.get(

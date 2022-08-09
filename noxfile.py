@@ -79,7 +79,12 @@ def contract_tests(session: Session) -> None:
         "-m contract",
         "-rfE",
         *args,
-        env={"REDIS_PASSWORD": "secret"},
+        env={
+            "REDIS_HOST": "redis",
+            "REDIS_PASSWORD": "secret",
+            "CONFIG": "production",
+            "TIMEOUT": "30",
+        },
     )
 
 
