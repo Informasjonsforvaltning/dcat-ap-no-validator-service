@@ -196,7 +196,8 @@ class ValidatorService(object):
             # 3. get all the imported vocabularies and import them
             logging.debug(f"Trying to import {len(all_imports)} ontologies.")
             await asyncio.gather(
-                *[self.add_triples(uri, session) for (_s, _p, uri) in all_imports]
+                *[self.add_triples(uri, session) for (_s, _p, uri) in all_imports],
+                return_exceptions=True,
             )
             # 4. start all over again to see if import statements have been imported
 
