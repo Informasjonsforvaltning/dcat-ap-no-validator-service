@@ -123,12 +123,12 @@ class ValidatorService(object):
             # Do some sanity checks on preconditions:
             # If user has given an ontology graph, we check for and do imports:
             if self.ontology_graph and len(self.ontology_graph) > 0:
-                logging.debug("Importing in ontologies.")
+                logging.debug("Importing ontologies...")
                 await self._import_ontologies(session)
 
             # Add triples from remote predicates if user has asked for that:
             if self.config.expand is True:
-                logging.debug("Expanding triples")
+                logging.debug("Expanding triples...")
                 await self._expand_objects_triples(session)
 
             # Validate!
@@ -145,7 +145,7 @@ class ValidatorService(object):
                 do_owl_imports=False,  # owl_imports in pyshacl represent performance penalty
                 advanced=False,
             )
-            logging.debug(f"Validating result: {conforms}")
+            logging.debug(f"Validation result: {conforms}")
             return (conforms, self.data_graph, self.ontology_graph, results_graph)
 
     async def _expand_objects_triples(self, session: CachedSession) -> None:
