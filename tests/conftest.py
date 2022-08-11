@@ -54,10 +54,3 @@ def http_service(docker_ip: Any, docker_services: Any) -> Any:
 def docker_compose_file(pytestconfig: Any) -> Any:
     """Override default location of docker-compose.yml file."""
     return os.path.join(str(pytestconfig.rootdir), "./", "docker-compose.yml")
-
-
-@pytest.mark.contract
-@pytest.fixture(scope="session")
-def docker_cleanup(pytestconfig: Any) -> Any:
-    """Skip cleanup to inspect logs."""
-    return False
