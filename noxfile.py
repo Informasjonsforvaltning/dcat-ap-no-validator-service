@@ -84,7 +84,7 @@ def contract_tests(session: Session) -> None:
             "REDIS_PASSWORD": "secret",
             "CONFIG": "production",
             "TIMEOUT": "0",
-            "LOGGING_LEVEL": "INFO",
+            "LOGGING_LEVEL": "DEBUG",
         },
     )
 
