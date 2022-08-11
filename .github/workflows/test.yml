@@ -32,4 +32,5 @@ jobs:
           nox
 
       - name: Dump docker logs on failure
+        if: failure()
         uses: jwalton/gh-docker-logs@v1
