@@ -121,15 +121,21 @@ class ValidatorService(object):
         async with CachedSession(cache=cache) as session:
 
             # Do some sanity checks on preconditions:
+            tasks = []
             # If user has given an ontology graph, we check for and do imports:
             if self.ontology_graph and len(self.ontology_graph) > 0:
-                logging.debug("Importing ontologies...")
-                await self._import_ontologies(session)
+                logging.debug("Add import ontologies task to tasks.")
+                tasks.append(self._import_ontologies(session))
 
             # Add triples from remote predicates if user has asked for that:
             if self.config.expand is True:
-                logging.debug("Expanding triples...")
-                await self._expand_objects_triples(session)
+                logging.debug("Add expand object triples task to tasks.")
+                tasks.append(self._expand_objects_triples(session))
+
+            await asyncio.wait(
+                tasks,
+                return_when=asyncio.ALL_COMPLETED,
+            )
 
             # Validate!
             # `inference` should be set to one of the followoing {"none", "rdfs", "owlrl", "both"}
