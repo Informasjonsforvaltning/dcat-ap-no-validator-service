@@ -13,7 +13,7 @@ from pyshacl import validate
 from rdflib import Graph, OWL, RDF, URIRef
 
 
-from dcat_ap_no_validator_service.adapter import fetch_graph, FetchError, parse_text
+from dcat_ap_no_validator_service.adapter import fetch_graph, parse_text
 
 SUPPORTED_FORMATS = set(["text/turtle", "application/ld+json", "application/rdf+xml"])
 
@@ -156,23 +156,31 @@ class ValidatorService(object):
         Iterate over the set, and fetch the triples _t_ that _o_ is reffering to.
         The triple _t_ is finally added to the ontology_graph.
         """
-        all_remote_triples = set()
-        # 1. Collect all relevant remote triples:
+        remote_triples = set()
+        # 1. Collect all relevant remote triples
         for p, o in self.data_graph.predicate_objects(subject=None):
-            if p == RDF.type:
-                pass
-            elif type(o) is URIRef:
-                if (o, None, None) not in self.data_graph:
-                    all_remote_triples.add(o)
-        if len(all_remote_triples) == 0:
+            if p != RDF.type and type(o) is URIRef:
+                if (o, None, None) not in self.data_graph and (
+                    o,
+                    None,
+                    None,
+                ) not in self.ontology_graph:
+                    remote_triples.add(o)
+        if len(remote_triples) == 0:
             # no remote_triples whatsoever, we can go on...
             return
+
         # 2.Get all remote triples:
-        logging.debug(f"Trying to expand {len(all_remote_triples)} triples .")
-        await asyncio.gather(
-            *[self.add_triples(uri, session) for uri in all_remote_triples],
+        logging.debug(f"Trying to expand {len(remote_triples)} triples .")
+        for graph in await asyncio.gather(
+            *[fetch_graph(session, uri) for uri in remote_triples],
             return_exceptions=True,
-        )
+        ):
+            if not isinstance(graph, Exception):
+                # Append imported graphs to graph
+                self.ontology_graph += graph
+            else:
+                logging.debug(traceback.format_exc())
 
     async def _import_ontologies(self, session: CachedSession) -> None:
         """Import relevant ontologies into ontology graph.
@@ -183,39 +191,32 @@ class ValidatorService(object):
         Based on https://owl-rl.readthedocs.io/en/latest/_modules/owlrl.html#interpret_owl_imports
         """
         while True:
-            # 1. collect the import statements:
-            all_imports = [
-                t for t in self.ontology_graph.triples((None, OWL.imports, None))
-            ]
-            if len(all_imports) == 0:
-                # no import statement whatsoever, we can go on...
-                return
-            # 2. remove all the import statements from the graph
-            for t in all_imports:
+            # 1. Collect the owl import statements
+            graphs = []
+            for t in list(self.ontology_graph.triples((None, OWL.imports, None))):
+                # 2. Remove all the import statements from the graph
                 self.ontology_graph.remove(t)
-            # 3. get all the imported vocabularies and import them
-            logging.debug(f"Trying to import {len(all_imports)} ontologies.")
-            await asyncio.gather(
-                *[self.add_triples(uri, session) for (_s, _p, uri) in all_imports],
-                return_exceptions=True,
-            )
-            # 4. start all over again to see if import statements have been imported
 
-    async def add_triples(self, uri: str, session: CachedSession) -> None:
-        """Fetch remote triples and add them to the ontology_graph.
+                _s, _p, uri = t
+                # Only triples that are not already in the data_graph and/or ontology_graph are added
+                if (uri, None, None) not in self.data_graph and (
+                    uri,
+                    None,
+                    None,
+                ) not in self.ontology_graph:
+                    graphs.append(fetch_graph(session, uri))
 
-        Only triples that are not allready in the data_graph and/or ontology_graph are added.
-        """
-        if (uri, None, None) not in self.data_graph:
-            if (uri, None, None) not in self.ontology_graph:
-                logging.debug(f"Trying to fetch remote triples {uri}.")
-                try:
-                    _g = await fetch_graph(session, uri)
-                    if _g:
-                        self.ontology_graph += _g
-                except FetchError:
+            if len(graphs) == 0:
+                # All owl statements are imported, nothing more to do
+                return
+
+            logging.debug(f"Trying to import {len(graphs)} ontologies.")
+            # 3. Fetch remote triples and add them to the ontology_graph
+            for graph in await asyncio.gather(*graphs, return_exceptions=True):
+                if not isinstance(graph, Exception):
+                    # Append imported graphs to graph
+                    self.ontology_graph += graph
+                else:
                     logging.debug(traceback.format_exc())
-                    pass
-                except SyntaxError:
-                    logging.debug(traceback.format_exc())
-                    pass
+
+            # 4. Start all over again to see if import statements have been imported
