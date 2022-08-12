@@ -56,6 +56,7 @@ async def create_app() -> web.Application:
                 address=f"redis://{REDIS_HOST}",
                 password=REDIS_PASSWORD,
                 expire_after=timedelta(days=1),
+                timeout=5,
             )
             logging.debug(f"Cache enabled: {cache}")
             await cache.clear()
