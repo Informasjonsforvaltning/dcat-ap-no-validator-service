@@ -1,6 +1,7 @@
 """Module for fetching remote graph."""
 import logging
 import os
+import traceback
 
 from aiohttp import ClientError, ClientTimeout, hdrs
 from aiohttp_client_cache import CachedSession
@@ -40,14 +41,16 @@ async def fetch_graph(
                     url, headers={hdrs.ACCEPT: "text/turtle"}, timeout=timeout
                 )
                 body = await response.text()
-    except ClientError:
+    except ClientError as e:
+        logging.debug(traceback.format_exc())
         raise FetchError(
             f"Could not fetch remote graph from {url}: ClientError."
-        ) from None
-    except UnicodeDecodeError:
+        ) from e
+    except UnicodeDecodeError as e:
+        logging.debug(traceback.format_exc())
         raise FetchError(
             f"Could not fetch remote graph from {url}: UnicodeDecodeError."
-        ) from None
+        ) from e
 
     logging.debug(f"Got status_code {response.status}.")
     if response.status == 200:
