@@ -1,8 +1,16 @@
 """Module for fetching remote graph."""
+import asyncio
 import logging
 import os
+import traceback
 
-from aiohttp import ClientError, ClientTimeout, hdrs
+from aiohttp import (
+    ClientError,
+    ClientOSError,
+    ClientTimeout,
+    hdrs,
+    ServerDisconnectedError,
+)
 from aiohttp_client_cache import CachedSession
 from dotenv import load_dotenv
 from rdflib import Graph
@@ -28,26 +36,44 @@ async def fetch_graph(
     """Fetch remote graph at url and return as Graph."""
     logging.debug(f"Trying to fetch remote graph {url}.")
     timeout = ClientTimeout(total=TIMEOUT)
-    try:
-        if use_cache:
-            response = await session.get(
-                url, headers={hdrs.ACCEPT: "text/turtle"}, timeout=timeout
-            )
-            body = await response.text()
-        else:
-            async with session.disabled():
+
+    max_retries = 5
+    attempt = 0
+
+    while True:
+        try:
+            if use_cache:
                 response = await session.get(
                     url, headers={hdrs.ACCEPT: "text/turtle"}, timeout=timeout
                 )
                 body = await response.text()
-    except ClientError:
-        raise FetchError(
-            f"Could not fetch remote graph from {url}: ClientError."
-        ) from None
-    except UnicodeDecodeError:
-        raise FetchError(
-            f"Could not fetch remote graph from {url}: UnicodeDecodeError."
-        ) from None
+            else:
+                async with session.disabled():
+                    response = await session.get(
+                        url, headers={hdrs.ACCEPT: "text/turtle"}, timeout=timeout
+                    )
+                    body = await response.text()
+            break
+        except (
+            ClientOSError,
+            ServerDisconnectedError,
+        ) as e:  # pragma: no cover
+            if attempt < max_retries:
+                attempt += 1
+                await asyncio.sleep(1)
+            else:
+                logging.debug(traceback.format_exc())
+                raise FetchError(f"Max retries reached. Reason: {e}") from e
+        except ClientError as e:
+            logging.debug(traceback.format_exc())
+            raise FetchError(
+                f"Could not fetch remote graph from {url}: ClientError."
+            ) from e
+        except UnicodeDecodeError as e:
+            logging.debug(traceback.format_exc())
+            raise FetchError(
+                f"Could not fetch remote graph from {url}: UnicodeDecodeError."
+            ) from e
 
     logging.debug(f"Got status_code {response.status}.")
     if response.status == 200:

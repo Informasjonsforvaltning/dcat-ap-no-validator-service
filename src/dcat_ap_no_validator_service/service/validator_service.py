@@ -121,17 +121,25 @@ class ValidatorService(object):
         async with CachedSession(cache=cache) as session:
 
             # Do some sanity checks on preconditions:
+            tasks = []
             # If user has given an ontology graph, we check for and do imports:
             if self.ontology_graph and len(self.ontology_graph) > 0:
-                await self._import_ontologies(session)
+                logging.debug("Add import ontologies task to tasks.")
+                tasks.append(self._import_ontologies(session))
 
-            logging.debug(f"Validating with following config: {self.config}.")
             # Add triples from remote predicates if user has asked for that:
             if self.config.expand is True:
-                await self._expand_objects_triples(session)
+                logging.debug("Add expand object triples task to tasks.")
+                tasks.append(self._expand_objects_triples(session))
+
+            await asyncio.wait(
+                tasks,
+                return_when=asyncio.ALL_COMPLETED,
+            )
 
             # Validate!
             # `inference` should be set to one of the followoing {"none", "rdfs", "owlrl", "both"}
+            logging.debug(f"Validating with following config: {self.config}.")
             conforms, results_graph, _ = validate(
                 data_graph=self.data_graph,
                 ont_graph=self.ontology_graph,
@@ -143,6 +151,7 @@ class ValidatorService(object):
                 do_owl_imports=False,  # owl_imports in pyshacl represent performance penalty
                 advanced=False,
             )
+            logging.debug(f"Validation result: {conforms}")
             return (conforms, self.data_graph, self.ontology_graph, results_graph)
 
     async def _expand_objects_triples(self, session: CachedSession) -> None:
@@ -168,7 +177,7 @@ class ValidatorService(object):
             # no remote_triples whatsoever, we can go on...
             return
         # 2.Get all remote triples:
-        logging.debug(f"Trying to expand {len(all_remote_triples)} triples .")
+        logging.debug(f"Trying to expand {len(all_remote_triples)} remote triples .")
         await asyncio.gather(
             *[self.add_triples(uri, session) for uri in all_remote_triples],
             return_exceptions=True,
@@ -213,6 +222,8 @@ class ValidatorService(object):
                     _g = await fetch_graph(session, uri)
                     if _g:
                         self.ontology_graph += _g
+                        logging.debug("Remote triples added to graph")
+
                 except FetchError:
                     logging.debug(traceback.format_exc())
                     pass
