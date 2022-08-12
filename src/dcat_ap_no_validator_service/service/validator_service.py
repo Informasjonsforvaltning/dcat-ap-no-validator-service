@@ -94,7 +94,7 @@ class ValidatorService(object):
             logging.debug(f"all_graph_urls len: {len(all_graph_urls)}")
             results = await asyncio.gather(
                 *[
-                    fetch_graph(session, url, use_cache=False)
+                    asyncio.create_task(fetch_graph(session, url, use_cache=False))
                     for url in all_graph_urls.values()
                 ]
             )
@@ -173,7 +173,7 @@ class ValidatorService(object):
         # 2.Get all remote triples:
         logging.debug(f"Trying to expand {len(remote_triples)} triples .")
         for graph in await asyncio.gather(
-            *[fetch_graph(session, uri) for uri in remote_triples],
+            *[asyncio.create_task(fetch_graph(session, uri)) for uri in remote_triples],
             return_exceptions=True,
         ):
             if not isinstance(graph, Exception):
@@ -204,7 +204,7 @@ class ValidatorService(object):
                     None,
                     None,
                 ) not in self.ontology_graph:
-                    graphs.append(fetch_graph(session, uri))
+                    graphs.append(asyncio.create_task(fetch_graph(session, uri)))
 
             if len(graphs) == 0:
                 # All owl statements are imported, nothing more to do
