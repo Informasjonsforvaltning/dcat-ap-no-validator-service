@@ -59,5 +59,5 @@ def docker_compose_file(pytestconfig: Any) -> Any:
 @pytest.mark.contract
 @pytest.fixture(scope="session")
 def docker_cleanup(pytestconfig: Any) -> Any:
-    """Skip cleanup to inspect logs."""
-    return False
+    """Override cleanup: do not remove containsers in order to inspect logs."""
+    return "stop"
