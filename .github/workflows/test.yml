@@ -5,6 +5,9 @@ on:
     types: [ready_for_review, opened, reopened, synchronize]
     branches:
       - main
+  push:
+    branches:
+      - main
 
 jobs:
   install-build-and-test:
