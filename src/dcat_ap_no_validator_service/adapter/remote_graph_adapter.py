@@ -16,7 +16,7 @@ from dotenv import load_dotenv
 from rdflib import Graph
 
 load_dotenv()
-TIMEOUT = int(os.getenv("TIMEOUT", "5"))
+TIMEOUT = int(os.getenv("TIMEOUT", "3"))
 
 SUPPORTED_FORMATS = set(["text/turtle", "application/ld+json", "application/rdf+xml"])
 
