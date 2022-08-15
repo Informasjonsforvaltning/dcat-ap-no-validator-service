@@ -55,6 +55,7 @@ async def create_app() -> web.Application:
                 "aiohttp-cache",
                 address=f"redis://{REDIS_HOST}",
                 password=REDIS_PASSWORD,
+                timeout=5,
                 expire_after=timedelta(days=1),
             )
             logging.debug(f"Cache enabled: {cache}")
