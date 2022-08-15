@@ -1,10 +1,8 @@
 """Resource module for liveness resources."""
-import logging
 import os
-import traceback
 
 from aiohttp import web
-from aioredis import create_redis
+import redis.asyncio as redis
 
 CONFIG = os.getenv("CONFIG", "production")
 
@@ -18,20 +16,12 @@ class Ready(web.View):
         if CONFIG in {"test", "dev"}:
             pass
         else:  # pragma: no cover
-            redis_host = os.getenv("REDIS_HOST", "localhost")
-            redis_password = os.getenv("REDIS_PASSWORD")
-            address = f"redis://{redis_host}"
-            try:
-                redis = await create_redis(address, timeout=1, password=redis_password)
-                await redis.ping()
+            host = os.getenv("REDIS_HOST", "localhost")
+            password = os.getenv("REDIS_PASSWORD")
+            connection: redis.Redis = redis.Redis(host=host, password=password)
+            await connection.ping()
 
-                redis.close()
-                await redis.wait_closed()
-            except OSError:
-                logging.error(traceback.format_exc())
-                raise web.HTTPInternalServerError(
-                    reason=f"Redis cache not available at {address}."
-                ) from None
+            await connection.close()
         return web.Response(text="OK")
 
 
