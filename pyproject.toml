@@ -15,9 +15,8 @@ version = "0.1.0"
 
 [tool.poetry.dependencies]
 aiohttp = "^3.8.1"
-aiohttp-client-cache = {extras = ["backends"], version = "^0.5.1"}
+aiohttp-client-cache = {extras = ["redis"], version = "^0.7.3"}
 aiohttp-middlewares = "^2.0.0"
-aioredis = ">=1.3.1,<2.0"
 certifi = "^2022.6.15"
 dataclasses-json = "^0.5.7"
 gunicorn = "^20.1.0"
@@ -27,6 +26,7 @@ python = ">=3.7,<3.10"
 python-dotenv = "^0.20.0"
 python-json-logger = "^2.0.2"
 rdflib = "^6.1.1"
+redis = {extras = ["hiredis"], version = "^4.3.4"}
 
 [tool.poetry.dev-dependencies]
 aiohttp-devtools = "^1.0.post0"
@@ -55,6 +55,7 @@ pytest-mock = "^3.8.1"
 pytest-profiling = "^1.7.0"
 requests = "^2.28.0"
 safety = "^2.1.1"
+types-redis = "^4.3.14"
 types-requests = "^2.28.8"
 
 [tool.coverage.paths]
@@ -85,7 +86,6 @@ module = [
   "aioresponses.*",
   "pyshacl.*",
   "pythonjsonlogger.*",
-  "aioredis.*",
 ]
 
 [tool.pytest.ini_options]
