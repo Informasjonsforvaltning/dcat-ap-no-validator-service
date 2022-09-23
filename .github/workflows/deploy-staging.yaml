@@ -24,3 +24,11 @@ jobs:
       GCP_SA_DIGDIR_FDK_GCR_KEY: ${{ secrets.GCP_SA_DIGDIR_FDK_GCR_KEY }}
       DIGDIR_FDK_AUTODEPLOY: ${{ secrets.DIGDIR_FDK_DEV_AUTODEPLOY }}
       SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+  run-codeql:
+    name: Run codeql scan
+    if: github.event.pull_request.draft == false
+    uses: Informasjonsforvaltning/workflows/.github/workflows/codeql.yaml@chore/hos/codeql
+    secrets:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
