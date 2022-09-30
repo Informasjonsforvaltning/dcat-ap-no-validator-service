@@ -188,7 +188,7 @@
       :hasMin0Max1Shape-dctIssued, # utgivelsesdato
    # optional
       :hasMin0Max1Shape-dctIsPartOfCatalog, # er del av
-      :hasMin0MaxNShape-dctHasPartCatalog, # har del
+#      :hasMin0MaxNShape-dctHasPartCatalog, # har del
       :hasMin0MaxNShape-dcatnoContainsEvent, # inneholder hendelse
       :hasMin0Max1Shape-dctCreator, # produsent
       :hasMin0MaxNShape-dctRights # rettigheter
