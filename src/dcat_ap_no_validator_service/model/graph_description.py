@@ -8,7 +8,7 @@ from dataclasses_json import dataclass_json, LetterCase
 
 @dataclass_json(letter_case=LetterCase.CAMEL)
 @dataclass
-class GraphDescription(ABC):
+class GraphDescription(ABC):  # noqa: B024
     """Abstract data class with details regarding a graph."""
 
     id: str
