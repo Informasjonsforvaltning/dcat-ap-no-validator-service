@@ -8,10 +8,10 @@ services:
     environment:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
-      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - REDIS_PASSWORD=secret
       - CONFIG=production
-      - TIMEOUT=${TIMEOUT}
-      - LOGGING_LEVEL=${LOGGING_LEVEL}
+      - TIMEOUT=0
+      - LOGGING_LEVEL=DEBUG
     depends_on:
       - "redis"
   redis:

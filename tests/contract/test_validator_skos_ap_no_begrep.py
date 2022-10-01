@@ -7,7 +7,9 @@ from rdflib import Graph
 from rdflib.compare import graph_diff, isomorphic
 
 
-@pytest.mark.skip(reason="Currently not working.")
+@pytest.mark.skip(
+    reason="Currently not working due to https://github.com/Informasjonsforvaltning/organization-catalog/issues/124."
+)
 @pytest.mark.contract
 @pytest.mark.asyncio
 async def test_validator_with_skos_ap_no(http_service: Any) -> None:

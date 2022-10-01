@@ -15,7 +15,7 @@ nox.options.sessions = (
 )
 
 
-@session(python=["3.9"])
+@session(python=["3.10"])
 def unit_tests(session: Session) -> None:
     """Run the unit test suite."""
     args = session.posargs
@@ -37,7 +37,7 @@ def unit_tests(session: Session) -> None:
     )
 
 
-@session(python=["3.9"])
+@session(python=["3.10"])
 def integration_tests(session: Session) -> None:
     """Run the integration test suite."""
     args = session.posargs or ["--cov"]
@@ -61,7 +61,7 @@ def integration_tests(session: Session) -> None:
     )
 
 
-@session(python=["3.9"])
+@session(python=["3.10"])
 def contract_tests(session: Session) -> None:
     """Run the contract test suite."""
     args = session.posargs
@@ -89,7 +89,7 @@ def contract_tests(session: Session) -> None:
     )
 
 
-@session(python=["3.9"])
+@session(python=["3.10"])
 def black(session: Session) -> None:
     """Run black code formatter."""
     args = session.posargs or locations
@@ -97,7 +97,7 @@ def black(session: Session) -> None:
     session.run("black", *args)
 
 
-@session(python=["3.9"])
+@session(python=["3.10"])
 def lint(session: Session) -> None:
     """Lint using flake8."""
     args = session.posargs or locations
@@ -114,7 +114,7 @@ def lint(session: Session) -> None:
     session.run("flake8", *args)
 
 
-@session(python=["3.9"])
+@session(python=["3.10"])
 def safety(session: Session) -> None:
     """Scan dependencies for insecure packages."""
     requirements = session.poetry.export_requirements()
@@ -122,7 +122,7 @@ def safety(session: Session) -> None:
     session.run("safety", "check", f"--file={requirements}", "--output", "text")
 
 
-@session(python=["3.9"])
+@session(python=["3.10"])
 def mypy(session: Session) -> None:
     """Type-check using mypy."""
     args = session.posargs or [
@@ -138,7 +138,7 @@ def mypy(session: Session) -> None:
         session.run("mypy", f"--python-executable={sys.executable}", "noxfile.py")
 
 
-@session(python=["3.9"])
+@session(python=["3.10"])
 def coverage(session: Session) -> None:
     """Upload coverage data."""
     session.install("coverage[toml]", "codecov")
