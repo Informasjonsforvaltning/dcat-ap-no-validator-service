@@ -2,7 +2,7 @@
 import json
 from typing import Any
 
-from aiohttp import ClientSession, hdrs, MultipartWriter
+from aiohttp import ClientSession, ClientTimeout, hdrs, MultipartWriter
 import pytest
 from rdflib import Graph
 from rdflib.compare import graph_diff, isomorphic
@@ -31,8 +31,9 @@ async def test_validator_with_file(http_service: Any) -> None:
             "attachment", name="ontology-graph-file", filename=ontology_graph_file
         )
 
+    timeout = ClientTimeout(total=None)  # unlimited timeout for first test run
     session = ClientSession()
-    async with session.post(url, data=mpwriter) as resp:
+    async with session.post(url, data=mpwriter, timeout=timeout) as resp:
         body = await resp.text()
     await session.close()
 
