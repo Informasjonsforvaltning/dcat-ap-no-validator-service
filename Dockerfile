@@ -1,15 +1,15 @@
-FROM python:3.9
+FROM python:3.10
 
 RUN mkdir -p /app
 WORKDIR /app
 
 RUN pip install --upgrade pip
-RUN pip install "poetry==1.1.11"
+RUN pip install "poetry==1.2.0"
 COPY poetry.lock pyproject.toml /app/
 
 # Project initialization:
 RUN poetry config virtualenvs.create false \
-  && poetry install --no-dev --no-interaction --no-ansi
+  && poetry install --only main --no-interaction --no-ansi
 
 ADD src /app/src
 
