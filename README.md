@@ -134,7 +134,7 @@ The response will be a RDF graph consisting of
 Start the server locally:
 
 ```sh
-% poetry run adev runserver src/dcat_ap_no_validator_service
+% poetry run adev runserver dcat_ap_no_validator_service
 ```
 
 ## Running the API in a wsgi-server (gunicorn)

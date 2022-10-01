@@ -4,7 +4,7 @@ import sys
 import nox
 from nox_poetry import Session, session
 
-locations = "src", "tests", "noxfile.py"
+locations = "dcat_ap_no_validator_service", "tests", "noxfile.py"
 nox.options.stop_on_first_error = True
 nox.options.sessions = (
     "lint",
@@ -128,7 +128,7 @@ def mypy(session: Session) -> None:
     args = session.posargs or [
         "--install-types",
         "--non-interactive",
-        "src",
+        "dcat_ap_no_validator_service",
         "tests",
     ]
     session.install(".")
