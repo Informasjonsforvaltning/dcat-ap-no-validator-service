@@ -16,7 +16,7 @@ version = "0.1.0"
 [tool.poetry.dependencies]
 aiohttp = "^3.8.1"
 aiohttp-client-cache = {extras = ["redis"], version = "^0.7.3"}
-aiohttp-middlewares = "^2.0.0"
+aiohttp-middlewares = "^2.2.0"
 certifi = "^2022.6.15"
 dataclasses-json = "^0.5.7"
 gunicorn = "^20.1.0"
