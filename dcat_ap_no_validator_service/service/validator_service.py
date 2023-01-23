@@ -101,7 +101,7 @@ class ValidatorService(object):
             # Store the resulting graphs:
             # The order of result values corresponds to the order of awaitables in all_graph_urls.
             # Ref: https://docs.python.org/3/library/asyncio-task.html#running-tasks-concurrently
-            for key, g in zip(all_graph_urls.keys(), results):
+            for key, g in zip(all_graph_urls.keys(), results, strict=False):
                 # Did not find any other solution than this brute force chain of ifs
                 if key == GraphType.DATA_GRAPH:
                     self.data_graph = g
