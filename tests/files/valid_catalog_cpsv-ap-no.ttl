@@ -27,6 +27,7 @@
     dct:description "A valid test dataset"@en ;
     cv:hasCompetentAuthority <https://organization-catalog.fellesdatakatalog.digdir.no/organizations/961181399> ;
     dct:identifier "1" ;
+    cv:ownedBy <https://organization-catalog.fellesdatakatalog.digdir.no/organizations/961181399> ;
     dcat:contactPoint [ a  vcard:Organization ; # kontaktpunkt
                            vcard:hasTelephone "tel:+4775012000" ;
     ] ;

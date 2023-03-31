@@ -28,7 +28,7 @@ def is_responsive(url: Any) -> Any:
     """Return true if response from service is 200."""
     url = f"{url}/ready"
     try:
-        response = requests.get(url)
+        response = requests.get(url, timeout=10000)
         if response.status_code == 200:
             time.sleep(2)  # sleep extra 2 sec
             return True
