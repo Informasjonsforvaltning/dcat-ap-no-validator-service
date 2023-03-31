@@ -2,6 +2,7 @@
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
 
 #
 # This file provides the imports that are implicitly the result of reusing them in the DCAT-AP application profile.
@@ -22,3 +23,14 @@
   rdf:type owl:Ontology ;
   owl:imports <http://publications.europa.eu/resource/authority/licence> ;
 .
+
+<https://psi.norge.no/los/tema/barnehage> a skos:Concept ;
+    skos:broader <https://psi.norge.no/los/tema/familie-og-barn> ;
+    skos:inScheme <https://psi.norge.no/los/ontologi/tema> ;
+    skos:narrower <https://psi.norge.no/los/ord/barnehage-innhold-og-kvalitet>,
+        <https://psi.norge.no/los/ord/barnehageplass>,
+        <https://psi.norge.no/los/ord/pedagogisk-psykologisk-tjeneste>,
+        <https://psi.norge.no/los/ord/tilsyn-og-godkjenning-av-barnehager> ;
+    skos:prefLabel "Kindergartens"@en,
+        "Barnehage"@nb,
+        "Barnehage"@nn .
