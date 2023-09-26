@@ -53,8 +53,7 @@ async def create_app() -> web.Application:
         else:  # pragma: no cover
             cache = RedisBackend(
                 "aiohttp-cache",
-                address=f"redis://{REDIS_HOST}",
-                password=REDIS_PASSWORD,
+                address=f"redis://:{REDIS_PASSWORD}@{REDIS_HOST}",
                 expire_after=timedelta(days=1),
             )
             logging.debug(f"Cache enabled: {cache}")
