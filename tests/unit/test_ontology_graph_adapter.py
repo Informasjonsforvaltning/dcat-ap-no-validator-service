@@ -27,10 +27,10 @@ async def test_get_all(mocker: MockFixture) -> None:
         _MOCK_ONTOLOGY_STORE,
     )
     ontology_collection = await OntologyGraphAdapter.get_all()
-    assert type(ontology_collection) == list
+    assert isinstance(ontology_collection, list)
     assert len(ontology_collection) == 1
     for s in ontology_collection:
-        assert type(s) == OntologyGraphDescription
+        assert isinstance(s, OntologyGraphDescription)
     assert identical_content(s, _MOCK_ONTOLOGY_STORE[s.id])
 
 
@@ -42,7 +42,7 @@ async def test_get_by_id(mocker: MockFixture) -> None:
         _MOCK_ONTOLOGY_STORE,
     )
     ontology = await OntologyGraphAdapter.get_by_id("1")
-    assert type(ontology) == OntologyGraphDescription
+    assert isinstance(ontology, OntologyGraphDescription)
     assert identical_content(ontology, _MOCK_ONTOLOGY_STORE["1"])
 
 

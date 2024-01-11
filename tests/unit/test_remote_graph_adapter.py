@@ -27,7 +27,7 @@ async def test_fetch_graph_that_has_rdf_content_type(mock_aioresponse: Any) -> N
 
     async with CachedSession(cache=None) as session:
         o = await fetch_graph(session, url)
-        assert type(o) == Graph
+        assert isinstance(o, Graph)
         assert len(o) > 0
 
 
@@ -45,7 +45,7 @@ async def test_fetch_graph_that_does_not_have_rdf_content_type(
 
     async with CachedSession(cache=None) as session:
         o = await fetch_graph(session, url)
-        assert type(o) == Graph
+        assert isinstance(o, Graph)
         assert len(o) > 0
 
 

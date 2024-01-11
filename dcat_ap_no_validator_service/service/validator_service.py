@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from enum import Enum
 import logging
 import traceback
-from typing import Any, Tuple
+from typing import Any, Optional, Tuple
 
 from aiohttp_client_cache import CachedSession
 from pyshacl import validate
@@ -65,7 +65,7 @@ class ValidatorService(object):
         shapes_graph_url: Any,
         ontology_graph_url: Any,
         ontology_graph: Any,
-        config: Config = None,
+        config: Optional[Config] = None,
     ) -> ValidatorService:
         """Initialize service instance."""
         self = ValidatorService()
@@ -119,7 +119,6 @@ class ValidatorService(object):
     async def validate(self, cache: Any) -> Tuple[bool, Graph, Graph, Graph]:
         """Validate function."""
         async with CachedSession(cache=cache) as session:
-
             # Do some sanity checks on preconditions:
             tasks = []
             # If user has given an ontology graph, we check for and do imports:
