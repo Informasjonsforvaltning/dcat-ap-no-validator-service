@@ -33,10 +33,10 @@ async def test_get_all(mocker: MockFixture) -> None:
         _MOCK_SHAPES_STORE,
     )
     shapes_collection = await ShapesGraphAdapter.get_all()
-    assert type(shapes_collection) == list
+    assert isinstance(shapes_collection, list)
     assert len(shapes_collection) == 2
     for s in shapes_collection:
-        assert type(s) == ShapesGraphDescription
+        assert isinstance(s, ShapesGraphDescription)
     assert identical_content(s, _MOCK_SHAPES_STORE[s.id])
 
 
@@ -48,7 +48,7 @@ async def test_get_by_id(mocker: MockFixture) -> None:
         _MOCK_SHAPES_STORE,
     )
     shapes = await ShapesGraphAdapter.get_by_id("1")
-    assert type(shapes) == ShapesGraphDescription
+    assert isinstance(shapes, ShapesGraphDescription)
     assert identical_content(shapes, _MOCK_SHAPES_STORE["1"])
 
 

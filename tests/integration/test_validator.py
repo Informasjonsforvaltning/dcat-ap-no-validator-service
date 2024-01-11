@@ -1342,7 +1342,6 @@ async def test_validator_skos_ap_no_begrep(client: _TestClient, mocks: Any) -> N
 async def _assess_response_body_successful(
     data: str, format: str, body: str, content_type: Any = "text/turtle"
 ) -> None:
-
     # body (validation report) should be isomorphic to the following:
     src = """
     @prefix sh: <http://www.w3.org/ns/shacl#> .
@@ -1372,7 +1371,6 @@ async def _assess_response_body_successful(
 async def _assess_response_body_unsuccessful(
     data: str, format: str, body: str, content_type: Any = "text/turtle"
 ) -> None:
-
     # body (validation report) should be isomorphic to the following:
     src = """
     @prefix sh: <http://www.w3.org/ns/shacl#> .
