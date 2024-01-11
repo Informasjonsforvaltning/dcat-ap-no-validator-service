@@ -5,7 +5,6 @@ max-line-length = 120
 per-file-ignores =
   __init__.py: F401,
   tests/*: S101,
-  dcat_ap_no_validator_service/adapter/remote_graph_adapter.py: S110,
-  gunicorn_config.py:B026
+  dcat_ap_no_validator_service/adapter/remote_graph_adapter.py: S110
 application-import-names = dcat_ap_no_validator_service, tests
 import-order-style = google
