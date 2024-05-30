@@ -1,4 +1,5 @@
 """Contract test cases for ready."""
+
 from typing import Any
 
 from aiohttp import ClientSession

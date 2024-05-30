@@ -1,4 +1,5 @@
 """GraphDescription details data class."""
+
 from abc import ABC
 from dataclasses import dataclass, field
 from typing import Optional

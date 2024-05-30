@@ -1,4 +1,5 @@
 """Contract test cases for ontologies resource."""
+
 from typing import Any
 
 from aiohttp import ClientSession, hdrs

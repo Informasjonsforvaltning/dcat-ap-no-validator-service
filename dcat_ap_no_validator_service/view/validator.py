@@ -1,4 +1,5 @@
 """Resource module for validator resources."""
+
 from enum import Enum
 import logging
 import traceback
@@ -48,7 +49,7 @@ class Validator(web.View):
         config = None
         data_graph_matrix = dict()
         shapes_graph_matrix = dict()
-        async for part in (await self.request.multipart()):
+        async for part in await self.request.multipart():
             logging.debug(f"part.name {part.name}.")
             if Part(part.name) is Part.CONFIG:
                 # Get config:

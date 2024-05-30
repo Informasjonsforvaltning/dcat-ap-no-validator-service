@@ -1,4 +1,5 @@
 """Integration test cases for the graph_adapter."""
+
 from typing import Any
 
 from aiohttp_client_cache import CachedSession

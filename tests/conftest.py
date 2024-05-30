@@ -1,4 +1,5 @@
 """Conftest module."""
+
 import os
 from os import environ as env
 import time

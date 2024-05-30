@@ -1,4 +1,5 @@
 """Integration test cases for the shapes route."""
+
 from typing import Dict
 
 from aiohttp import hdrs

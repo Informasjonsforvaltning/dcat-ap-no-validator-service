@@ -1,4 +1,5 @@
 """Contract test cases for ready."""
+
 import json
 from typing import Any
 

@@ -1,4 +1,5 @@
 """Integration test cases for the ontology graph adapter."""
+
 from typing import Any, Dict
 
 import pytest

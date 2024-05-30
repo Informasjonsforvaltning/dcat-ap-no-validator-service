@@ -1,4 +1,5 @@
 """Gunicorn module for mapping a catalog to rdf."""
+
 import logging
 import multiprocessing
 from os import environ as env

@@ -1,4 +1,5 @@
 """Integration test cases for the shapes graph adapter."""
+
 from typing import Any, Dict
 
 import pytest
