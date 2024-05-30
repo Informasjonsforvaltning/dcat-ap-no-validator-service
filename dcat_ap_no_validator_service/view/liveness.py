@@ -1,4 +1,5 @@
 """Resource module for liveness resources."""
+
 import os
 
 from aiohttp import web

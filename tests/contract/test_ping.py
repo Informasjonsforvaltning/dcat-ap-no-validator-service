@@ -1,4 +1,5 @@
 """Contract test cases for ping."""
+
 from typing import Any
 
 from aiohttp import ClientSession

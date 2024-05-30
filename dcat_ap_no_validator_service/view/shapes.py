@@ -1,4 +1,5 @@
 """Resource module for shapes resources."""
+
 from aiohttp import web
 
 from dcat_ap_no_validator_service.adapter import ShapesGraphAdapter

@@ -1,4 +1,5 @@
 """Integration test cases for the ready route."""
+
 from aiohttp.test_utils import TestClient as _TestClient
 import pytest
 

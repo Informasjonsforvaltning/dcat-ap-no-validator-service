@@ -1,4 +1,5 @@
 """Module for fetching ontology graph descriptions."""
+
 from typing import Any, Dict, List, Optional
 
 from dcat_ap_no_validator_service.model import OntologyGraphDescription

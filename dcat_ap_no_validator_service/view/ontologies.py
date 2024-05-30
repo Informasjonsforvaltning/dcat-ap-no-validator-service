@@ -1,4 +1,5 @@
 """Resource module for ontology resources."""
+
 from aiohttp import web
 
 from dcat_ap_no_validator_service.adapter import OntologyGraphAdapter

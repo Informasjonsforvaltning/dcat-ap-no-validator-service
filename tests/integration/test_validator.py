@@ -1,4 +1,5 @@
 """Integration test cases for the validator route."""
+
 import json
 from typing import Any, Dict
 
