@@ -38,6 +38,16 @@ _SHAPES_STORE: Dict[str, Dict] = dict(
         },
         "4": {
             "id": "4",
+            "name": "The constraints of SKOS-AP-NO-Begrep",
+            "description": "This document specifies the constraints on properties and classes expressed by SKOS-AP-NO-Begrep in SHACL.",  # noqa
+            "version": "0.1",
+            "url": "https://raw.githubusercontent.com/Informasjonsforvaltning/skos-ap-no-begrep/develop/shacl/SKOS-AP-NO-Begrep-shape_shape_v2.ttl",  # noqa
+            "specification_name": "SKOS-AP-NO-Begrep",
+            "specification_version": "2.0",
+            "specification_url": "https://data.norge.no/specification/skos-ap-no-begrep/",
+        },
+        "5": {
+            "id": "5",
             "name": "SHACL-rules for CPSV-AP-NO",
             "description": "This document specifies the constraints on properties and classes in CPSV-AP-NO, expressed in SHACL.",  # noqa
             "version": "0.9.04",
