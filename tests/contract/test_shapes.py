@@ -23,7 +23,7 @@ async def test_get_all_shapes(http_service: Any) -> None:
     assert "application/json" in resp.headers[hdrs.CONTENT_TYPE]
     assert type(body) is dict
     assert "shapes" in body
-    assert len(body["shapes"]) == 4
+    assert len(body["shapes"]) == 5
     for s in body["shapes"]:
         assert "id" in s, "No id property in shapes graph object"
         assert "name" in s, "No name property in shapes graph object"
