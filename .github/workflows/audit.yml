@@ -1,0 +1,15 @@
+name: Audit
+on: push
+jobs:
+  audit:
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10"]
+    name: Audit python v${{ matrix.python-version }}
+    uses: Informasjonsforvaltning/workflows/.github/workflows/pip-audit.yaml@main
+    with:
+      python_version: ${{ matrix.python-version }}
+      python_architecture: x64
+    secrets:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
