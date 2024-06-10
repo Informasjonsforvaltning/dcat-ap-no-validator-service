@@ -1,7 +1,6 @@
 """Nox sessions."""
 
 import sys
-import tempfile
 
 import nox
 from nox_poetry import Session, session
@@ -114,25 +113,6 @@ def lint(session: Session) -> None:
         "pep8-naming",
     )
     session.run("flake8", *args)
-
-
-@session(python=["3.10"])
-def safety(session: Session) -> None:
-    """Scan dependencies for insecure packages."""
-    with tempfile.NamedTemporaryFile() as requirements:
-        session.run(
-            "poetry",
-            "export",
-            "--dev",
-            "--format=requirements.txt",
-            "--without-hashes",
-            f"--output={requirements.name}",
-            external=True,
-        )
-        session.install("safety")
-        session.run(
-            "safety", "check", f"--file={requirements.name}", "--output", "text"
-        )
 
 
 @session(python=["3.10"])
