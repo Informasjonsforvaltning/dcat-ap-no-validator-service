@@ -4,7 +4,7 @@ from enum import Enum
 import logging
 import traceback
 
-from aiohttp import hdrs, web
+from aiohttp import BodyPartReader, hdrs, web
 from rdflib import Graph
 from rdflib.plugin import PluginException
 
@@ -28,13 +28,16 @@ class Validator(web.View):
     """Class representing validator resource."""
 
     async def post(self) -> web.Response:
+        """Web request handler using POST."""
+        request = self.request
+
         """Validate route function."""
-        cache = self.request.app["cache"]
+        cache = request.app["cache"]
 
         logging.debug(
-            f"Got following content-type-headers: {self.request.headers[hdrs.CONTENT_TYPE]}."
+            f"Got following content-type-headers: {request.headers[hdrs.CONTENT_TYPE]}."
         )
-        if "multipart/" not in self.request.headers[hdrs.CONTENT_TYPE].lower():
+        if "multipart/" not in request.headers[hdrs.CONTENT_TYPE].lower():
             raise web.HTTPUnsupportedMediaType(
                 reason=f"multipart/* content type expected, got {hdrs.CONTENT_TYPE}."
             )
@@ -49,81 +52,91 @@ class Validator(web.View):
         config = None
         data_graph_matrix = dict()
         shapes_graph_matrix = dict()
-        async for part in await self.request.multipart():
-            logging.debug(f"part.name {part.name}.")
-            if Part(part.name) is Part.CONFIG:
-                # Get config:
-                config_json = await part.json()
-                logging.debug(f"Got config: {config_json}.")
-                if config_json:
-                    config = _create_config(config_json)
-                pass
-            # Data graph, url:
-            if Part(part.name) is Part.DATA_GRAPH_URL:
-                # Get data graph from url:
-                data_graph_url = (await part.read()).decode()
-                logging.debug(
-                    f"Got reference to data graph with url: {data_graph_url}."
-                )
-                data_graph_matrix[part.name] = data_graph_url
-                pass
-            # Data graph, file:
-            if Part(part.name) is Part.DATA_GRAPH_FILE:
-                # Process any files you uploaded
-                logging.debug(f"Got input data graph with filename: {part.filename}.")
-                try:
-                    data_graph = (await part.read()).decode()
-                except ValueError:
-                    raise web.HTTPBadRequest(
-                        reason="Data graph file is not readable."
-                    ) from None
-                # logging.debug(f"Content of {part.filename}:\n{data_graph}.")
-                if part.filename:
-                    data_graph_matrix[part.name] = part.filename
-                pass
-            # Shapes graph, url:
-            if Part(part.name) is Part.SHAPES_GRAPH_URL:
-                # Get shapes graph from url:
-                shapes_graph_url = (await part.read()).decode()
-                logging.debug(
-                    f"Got reference to shapes graph with url: {shapes_graph_url}."
-                )
-                shapes_graph_matrix[part.name] = shapes_graph_url
-                pass
-            # Shapes graph, file:
-            if Part(part.name) is Part.SHAPES_GRAPH_FILE:
-                # Process any files you uploaded
-                logging.debug(f"Got input shapes graph with filename: {part.filename}.")
-                try:
-                    shapes_graph = (await part.read()).decode()
-                except ValueError:
-                    raise web.HTTPBadRequest(
-                        reason="Shapes graph file is not readable."
-                    ) from None
-                # logging.debug(f"Content of {part.filename}:\n{shapes_graph}.")
-                if part.filename:
-                    shapes_graph_matrix[part.name] = part.filename
-                pass
-            # Ontology graph, url:
-            if Part(part.name) is Part.ONTOLOGY_GRAPH_URL:
-                # Get ontology graph from url:
-                ontology_graph_url = (await part.read()).decode()
-                logging.debug(
-                    f"Got reference to ontology graph with url: {ontology_graph_url}."
-                )
-                pass
-            # Ontology graph, file:
-            if Part(part.name) is Part.ONTOLOGY_GRAPH_FILE:
-                # Process any files you uploaded
-                logging.debug(
-                    f"Got input ontology graph with filename: {part.filename}."
-                )
-                try:
-                    ontology_graph = (await part.read()).decode()
-                except ValueError:
-                    raise web.HTTPBadRequest(
-                        reason="Ontology graph file is not readable."
-                    ) from None
+        reader = await request.multipart()
+        while True:
+            part = await reader.next()
+            if part is None:
+                break
+
+            if isinstance(part, BodyPartReader):
+                logging.debug(f"part.name {part.name}.")
+                if Part(part.name) is Part.CONFIG:
+                    # Get config:
+                    config_json = await part.json()
+                    logging.debug(f"Got config: {config_json}.")
+                    if config_json:
+                        config = _create_config(config_json)
+                    pass
+                # Data graph, url:
+                if Part(part.name) is Part.DATA_GRAPH_URL:
+                    # Get data graph from url:
+                    data_graph_url = (await part.read()).decode()
+                    logging.debug(
+                        f"Got reference to data graph with url: {data_graph_url}."
+                    )
+                    data_graph_matrix[part.name] = data_graph_url
+                    pass
+                # Data graph, file:
+                if Part(part.name) is Part.DATA_GRAPH_FILE:
+                    # Process any files you uploaded
+                    logging.debug(
+                        f"Got input data graph with filename: {part.filename}."
+                    )
+                    try:
+                        data_graph = (await part.read()).decode()
+                    except ValueError:
+                        raise web.HTTPBadRequest(
+                            reason="Data graph file is not readable."
+                        ) from None
+                    # logging.debug(f"Content of {part.filename}:\n{data_graph}.")
+                    if part.filename:
+                        data_graph_matrix[part.name] = part.filename
+                    pass
+                # Shapes graph, url:
+                if Part(part.name) is Part.SHAPES_GRAPH_URL:
+                    # Get shapes graph from url:
+                    shapes_graph_url = (await part.read()).decode()
+                    logging.debug(
+                        f"Got reference to shapes graph with url: {shapes_graph_url}."
+                    )
+                    shapes_graph_matrix[part.name] = shapes_graph_url
+                    pass
+                # Shapes graph, file:
+                if Part(part.name) is Part.SHAPES_GRAPH_FILE:
+                    # Process any files you uploaded
+                    logging.debug(
+                        f"Got input shapes graph with filename: {part.filename}."
+                    )
+                    try:
+                        shapes_graph = (await part.read()).decode()
+                    except ValueError:
+                        raise web.HTTPBadRequest(
+                            reason="Shapes graph file is not readable."
+                        ) from None
+                    # logging.debug(f"Content of {part.filename}:\n{shapes_graph}.")
+                    if part.filename:
+                        shapes_graph_matrix[part.name] = part.filename
+                    pass
+                # Ontology graph, url:
+                if Part(part.name) is Part.ONTOLOGY_GRAPH_URL:
+                    # Get ontology graph from url:
+                    ontology_graph_url = (await part.read()).decode()
+                    logging.debug(
+                        f"Got reference to ontology graph with url: {ontology_graph_url}."
+                    )
+                    pass
+                # Ontology graph, file:
+                if Part(part.name) is Part.ONTOLOGY_GRAPH_FILE:
+                    # Process any files you uploaded
+                    logging.debug(
+                        f"Got input ontology graph with filename: {part.filename}."
+                    )
+                    try:
+                        ontology_graph = (await part.read()).decode()
+                    except ValueError:
+                        raise web.HTTPBadRequest(
+                            reason="Ontology graph file is not readable."
+                        ) from None
 
         # check if we got any input:
         # validate data-graph input:
