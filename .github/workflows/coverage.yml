@@ -8,6 +8,7 @@ jobs:
       python_version: "3.10"
       python_architecture: x64
       sessions: integration_tests
+      coverage_file_path: "./coverage.xml"
     secrets:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
