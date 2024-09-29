@@ -26,7 +26,7 @@ python = ">=3.9,<3.11"
 python-dotenv = "^1.0.1"
 python-json-logger = "^2.0.7"
 rdflib = "^6.3.2"
-redis = {extras = ["hiredis"], version = "^5.0.4"}
+redis = {extras = ["hiredis"], version = "^5.1.0"}
 
 [tool.poetry.group.dev.dependencies]
 aiohttp-devtools = "^1.1.2"
