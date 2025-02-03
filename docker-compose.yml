@@ -1,8 +1,7 @@
-version: '3'
 services:
   dcat-ap-no-validator-service:
     build: .
-    image: eu.gcr.io/digdir-fdk-infra/dcat-ap-no-validator-service:test
+    image: ghcr.io/informasjonsforvaltning/dcat-ap-no-validator-service:test
     ports:
       - "8000:8080"
     environment:
