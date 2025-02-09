@@ -17,7 +17,7 @@ version = "0.1.0"
 aiohttp = "^3.9.5"
 aiohttp-client-cache = {extras = ["redis"], version = "^0.11.0"}
 aiohttp-middlewares = "^2.3.0"
-certifi = "^2024.2.2"
+certifi = "^2025.1.31"
 dataclasses-json = "^0.6.6"
 gunicorn = "^22.0.0"
 multidict = "^6.0.5"
