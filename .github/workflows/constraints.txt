@@ -1,6 +1,6 @@
-pip==24.0
-pipx==1.4.3
-nox==2024.4.15
-nox-poetry==1.0.3
-poetry==1.8.3
-virtualenv==20.26.2
+pip==25.0.1
+pipx==1.7.1
+nox==2025.2.9
+nox-poetry==1.1.0
+poetry==1.8.5
+virtualenv==20.29.2
