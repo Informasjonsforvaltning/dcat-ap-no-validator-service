@@ -14,7 +14,7 @@ repository = "https://github.com/Informasjonsforvaltning/dcat-ap-no-validator-se
 version = "0.1.0"
 
 [tool.poetry.dependencies]
-aiohttp = "^3.11.12"
+aiohttp = "^3.11.13"
 aiohttp-client-cache = {extras = ["redis"], version = "^0.12.4"}
 aiohttp-middlewares = "^2.4.0"
 certifi = "^2025.1.31"
