@@ -56,7 +56,7 @@ pytest-mock = "^3.14.0"
 pytest-profiling = "^1.8.1"
 requests = "^2.32.3"
 types-redis = "^4.6.0.20241004"
-types-requests = "^2.32.0.20240523"
+types-requests = "^2.32.0.20250301"
 
 [tool.coverage.paths]
 source = ["dcat_ap_no_validator_service", "*/site-packages"]
