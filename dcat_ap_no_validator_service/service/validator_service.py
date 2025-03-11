@@ -133,7 +133,7 @@ class ValidatorService(object):
                 tasks.append(self._expand_objects_triples(session))
 
             await asyncio.wait(
-                tasks,
+                fs=[asyncio.create_task(task) for task in tasks],
                 return_when=asyncio.ALL_COMPLETED,
             )
 

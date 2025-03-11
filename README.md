@@ -121,8 +121,8 @@ The response will be a RDF graph consisting of
 ```sh
 % git clone https://github.com/Informasjonsforvaltning/dcat-ap-no-validator-service.git
 % cd dcat-ap-no-validator-service
-% pyenv install 3.10.6
-% pyenv local 3.10.6
+% pyenv install 3.12
+% pyenv local 3.12
 % python get-poetry.py
 % pipx install nox
 % pipx inject nox nox-poetry

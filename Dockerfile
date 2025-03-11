@@ -1,10 +1,10 @@
-FROM python:3.10
+FROM python:3.13
 
 RUN mkdir -p /app
 WORKDIR /app
 
 RUN pip install --upgrade pip
-RUN pip install "poetry==1.8.3"
+RUN pip install "poetry==1.8.5"
 COPY poetry.lock pyproject.toml /app/
 
 # Project initialization:
