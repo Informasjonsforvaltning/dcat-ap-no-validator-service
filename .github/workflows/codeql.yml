@@ -15,7 +15,7 @@ jobs:
     uses: Informasjonsforvaltning/workflows/.github/workflows/codeql.yaml@main
     with:
       language: python
-      python_version: '3.13'
+      python_version: '3.12'
       python_architecture: x64
     secrets:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
